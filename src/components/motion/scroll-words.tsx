@@ -20,7 +20,7 @@ function Word({
   range: [number, number];
   active: boolean;
 }) {
-  const opacity = useTransform(progress, range, [0.2, 1]);
+  const opacity = useTransform(progress, range, [0.45, 1]);
   return (
     <motion.span data-word="" style={active ? { opacity } : undefined}>
       {word}
@@ -36,7 +36,7 @@ export function ScrollWords({ text, className, ...props }: ScrollWordsProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
   const hydrated = useHydrated();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "end 0.4"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.95", "end 0.55"] });
   const words = text.split(" ");
 
   return (

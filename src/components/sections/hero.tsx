@@ -39,7 +39,7 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, scrol
                   asChild
                   variant="outline"
                   size="lg"
-                  className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+                  className="text-primary-foreground hover:bg-primary-foreground/10"
                 >
                   <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
                 </Button>

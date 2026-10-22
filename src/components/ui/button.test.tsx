@@ -11,6 +11,7 @@ describe("Button", () => {
   it.each([
     ["secondary", "bg-secondary"],
     ["accent", "bg-accent"],
+    ["outline", "border-current"],
   ] as const)("variant %s", (variant, expected) => {
     render(<Button variant={variant}>Go</Button>);
     expect(screen.getByRole("button")).toHaveClass(expected);
