@@ -35,9 +35,8 @@
   --color-destructive: var(--color-clay-600);
 
   /* ── Typography: exactly two families (set by next/font in layout.tsx) ── */
-  --font-heading: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-heading: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --heading-variation: "SOFT" 40;
   --tracking-label: 0.14em;
 
   --text-display: clamp(2.5rem, 1rem + 8vw, 9.5rem);
@@ -113,7 +112,6 @@
   h4 {
     font-family: var(--font-heading);
     font-weight: 400;
-    font-variation-settings: var(--heading-variation);
     text-wrap: balance;
   }
 

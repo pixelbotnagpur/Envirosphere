@@ -37,13 +37,13 @@ token defined once in `src/app/globals.css`. Changing a token in ONE place resty
 
 ## Typography: exactly 2 families
 ```css
---font-heading: var(--font-fraunces), serif;   /* headings, display, pull quotes */
+--font-heading: var(--font-syne), sans-serif;   /* headings, display, pull quotes */
 --font-body: var(--font-manrope), sans-serif;  /* everything else */
 ```
-- Loaded via `next/font/google` in the root layout. **Manrope weights: 300, 400 only.**
+- Loaded via `next/font/google` in the root layout. **Manrope weights: 300, 400 only; Syne weight: 400 only.**
 - Body/UI text weight ≤ 400. `font-medium|semibold|bold` are forbidden on `font-body`.
   Emphasis = color, size, italic heading font, or underline.
-- Headings: Fraunces 300–500, tight leading, negative tracking, fluid sizes.
+- Headings: Syne, **weight 400 (Regular) only**, tight leading, negative tracking, fluid sizes.
 - Type scale tokens (fluid `clamp()`): `--text-display`, `--text-h1`…`--text-h4`,
   `--text-lead`, `--text-base`, `--text-sm`, `--text-label`. No arbitrary `text-[..px]`.
 - Labels: body font, 400, uppercase, `--tracking-label`, bracket style `[ 001 / about ]`.

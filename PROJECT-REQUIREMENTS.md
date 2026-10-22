@@ -30,7 +30,7 @@
 | Animation | **Motion** (`motion`, formerly Framer Motion) | import from `motion/react` |
 | Smooth scroll | **Lenis** (`lenis`, `lenis/react`) | one root `<ReactLenis root>` provider |
 | Icons | lucide-react | **`Sparkles` icon family banned** (§3.5) |
-| Fonts | `next/font/google`, self-hosted at build | exactly 2 families (§3.2) |
+| Fonts | `next/font/google`, self-hosted at build | exactly 2 families: Syne + Manrope (§3.2) |
 | Content | **Files in `/content`** (YAML + Markdown) + `/public/media` | §3.10. Read and validated at build time |
 | Forms | React Hook Form + Zod → **Google Apps Script → Google Sheet** | §3.8 |
 | Spam protection | Honeypot + min-fill-time + Cloudflare Turnstile (free) | Turnstile verified inside Apps Script |
@@ -71,13 +71,13 @@ text-primary-foreground`. Values are defined once in `globals.css` (rule 31).
 ### 3.2 Typography: exactly 2 font families
 | Role | Token | Family | Weights allowed |
 |---|---|---|---|
-| Headings / display | `--font-heading` → `font-heading` | **Fraunces** (variable serif, `opsz` + `SOFT` axes) | 300–500 |
+| Headings / display | `--font-heading` → `font-heading` | **Syne** | **400 (Regular) only** |
 | Body / UI / labels | `--font-body` → `font-body` | **Manrope** | **300 and 400 only, never above 400** |
 
 - No third family, including mono. Numbers and labels use Manrope 400 with tabular nums.
 - Body emphasis comes from color, size or the heading font, **never from weight > 400**.
   No `font-medium`, `font-semibold` or `font-bold` on body text. Load only 300/400 for Manrope.
-- Display headings: large and fluid (`clamp()` tokens), tight leading (≈1.0–1.1),
+- Display headings: large and fluid (`clamp()` tokens), leading ≈ 0.95–1.1,
   slight negative tracking, sentence case or lowercase editorial style.
 - Labels: Manrope 400, uppercase, wide tracking, in brackets: `[ 003 / services ]`.
 - Type scale is defined as tokens (`--text-display`, `--text-h1` … `--text-sm`).
@@ -253,3 +253,4 @@ restructured and lightly edited, never invented. Gaps are marked `TODO(content)`
 | Added Lenis + Motion, scroll-driven design (rule 34) | Premium design requirement | user | 2026-10-22 |
 | Sparkles icon family banned | User requirement | user | 2026-10-22 |
 | 2 font families, body weight ≤ 400 | User requirement | user | 2026-10-22 |
+| Heading font Syne (Regular) instead of Fraunces | User preference (Vocago needs a paid license) | user | 2026-10-22 |

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Manrope, Syne } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { LenisProvider } from "@/components/motion/lenis-provider";
 import { getImage, loadSite, socialLinks } from "@/lib/content";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const syne = Syne({
   subsets: ["latin"],
-  axes: ["opsz", "SOFT"],
-  variable: "--font-fraunces",
+  weight: ["400"],
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const logo = getImage(site.logoKey);
 
   return (
-    <html lang={site.locale} className={`${fraunces.variable} ${manrope.variable}`}>
+    <html lang={site.locale} className={`${syne.variable} ${manrope.variable}`}>
       <head>
         <noscript>
           <style>{noScriptFallback}</style>

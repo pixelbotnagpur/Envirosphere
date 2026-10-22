@@ -25,7 +25,7 @@ Google Sheet and stores CVs in Drive. No server, DB or login.
 - Static export: nothing that needs a server at request time.
 - No hardcoded content or media paths in components; everything from `content/`.
 - Tokens only. Semantic names: primary/secondary/accent/background/surface/foreground.
-- 2 fonts: Fraunces (headings), Manrope (body, ≤ 400 weight). No Sparkles icons.
+- 2 fonts: Syne (headings, Regular 400 only), Manrope (body, ≤ 400 weight). No Sparkles icons.
 - Reduced-motion disables Lenis/parallax/pinning.
 
 ## Current focus

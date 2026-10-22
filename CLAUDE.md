@@ -29,7 +29,7 @@ Next.js 16.4.x (App Router, `output: "export"`) · React 19.2 · TypeScript stri
 - **Secondary** = Sage (`bg-secondary`, text `secondary-foreground` = Bark)
 - **Accent** = Ochre (`bg-accent`, text `accent-foreground`). Use sparingly.
 - Background = Bone · Surface = Sand · Foreground = Bark · Border = Linen
-- Fonts: **Fraunces** (`font-heading`) + **Manrope** (`font-body`, weights 300/400 only)
+- Fonts: **Syne** (`font-heading`, Regular 400 only) + **Manrope** (`font-body`, weights 300/400 only)
 
 ## Hard rules
 - Follow all files in `.agent/rules/`. They are binding.

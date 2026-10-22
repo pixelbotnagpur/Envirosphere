@@ -91,10 +91,10 @@ describe("motion tokens mirror src/lib/motion.ts", () => {
 describe("fonts", () => {
   it("defines exactly the heading and body families", () => {
     const families = [...tokens.keys()].filter(
-      (k) => k.startsWith("--font-") && k !== "--font-fraunces" && k !== "--font-manrope",
+      (k) => k.startsWith("--font-") && k !== "--font-syne" && k !== "--font-manrope",
     );
     expect(families.sort()).toEqual(["--font-body", "--font-heading"]);
-    expect(tokens.get("--font-heading")).toContain("var(--font-fraunces)");
+    expect(tokens.get("--font-heading")).toContain("var(--font-syne)");
     expect(tokens.get("--font-body")).toContain("var(--font-manrope)");
   });
 });
