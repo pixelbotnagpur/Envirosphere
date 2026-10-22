@@ -40,7 +40,7 @@
   --heading-variation: "SOFT" 40;
   --tracking-label: 0.14em;
 
-  --text-display: clamp(3.5rem, 1.5rem + 8vw, 9.5rem);
+  --text-display: clamp(2.5rem, 1rem + 8vw, 9.5rem);
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.035em;
   --text-h1: clamp(2.75rem, 1.5rem + 5vw, 6rem);
@@ -84,6 +84,7 @@
 
   /* ── Layering ── */
   --z-header: 50;
+  --z-skip: 60;
 }
 
 @layer base {

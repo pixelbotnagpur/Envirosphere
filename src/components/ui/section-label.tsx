@@ -11,8 +11,10 @@ export function SectionLabel({ index, className, children, ...props }: SectionLa
       className={cn("font-body text-label uppercase tracking-label text-muted-foreground", className)}
       {...props}
     >
-      [ {index ? `${index} / ` : ""}
-      {children} ]
+      {"[ "}
+      {index ? `${index} / ` : ""}
+      {children}
+      {" ]"}
     </p>
   );
 }

@@ -14,7 +14,7 @@ export default function HomePage() {
           <SectionLabel className="text-secondary">{hero.eyebrow}</SectionLabel>
         </Reveal>
         <Reveal delay={0.1}>
-          <h1 className="mt-8 max-w-5xl text-display">{hero.title}</h1>
+          <h1 className="mt-8 max-w-5xl text-display break-words">{hero.title}</h1>
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mt-10 max-w-2xl text-lead font-light text-primary-foreground/80">{hero.subtitle}</p>

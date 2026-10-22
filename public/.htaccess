@@ -5,8 +5,9 @@ ErrorDocument 404 /404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  # Force HTTPS
+  # Force HTTPS (skip when TLS terminates at a proxy/CDN that sends X-Forwarded-Proto)
   RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   # /about → /about/ (matches trailingSlash: true)
   RewriteCond %{REQUEST_FILENAME} -d
@@ -17,7 +18,8 @@ ErrorDocument 404 /404.html
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  # Raise to 31536000 (+ includeSubDomains if all subdomains are HTTPS) once the live site is verified.
+  Header always set Strict-Transport-Security "max-age=300"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 
   # Hashed build files never change; HTML and owner-replaceable media must stay fresh.

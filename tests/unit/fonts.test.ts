@@ -14,6 +14,6 @@ describe("fonts (rule 31)", () => {
   });
 
   it("loads Manrope in weights 300 and 400 only", () => {
-    expect(layout).toMatch(/weight:\s*\["300",\s*"400"\]/);
+    expect(layout).toMatch(/Manrope\(\{[^}]*weight:\s*\["300",\s*"400"\]/);
   });
 });
