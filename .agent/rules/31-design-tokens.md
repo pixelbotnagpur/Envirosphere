@@ -42,7 +42,7 @@ token defined once in `src/app/globals.css`. Changing a token in ONE place resty
 ```
 - Loaded via `next/font/google` in the root layout. **Manrope weights: 300, 400 only; Syne weight: 400 only.**
 - Body/UI text weight ≤ 400. `font-medium|semibold|bold` are forbidden on `font-body`.
-  Emphasis = color, size, italic heading font, or underline.
+  Emphasis = color, size, or underline.
 - Headings: Syne, **weight 400 (Regular) only**, tight leading, negative tracking, fluid sizes.
 - Type scale tokens (fluid `clamp()`): `--text-display`, `--text-h1`…`--text-h4`,
   `--text-lead`, `--text-base`, `--text-sm`, `--text-label`. No arbitrary `text-[..px]`.
