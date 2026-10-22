@@ -24,6 +24,22 @@ describe("content schemas", () => {
     expect(siteSchema.safeParse(site).success).toBe(false);
   });
 
+  it("accepts normal phone numbers", () => {
+    for (const value of ["+91 9860220550", "+91 98602 20550"]) {
+      const site = parse(SITE_YAML);
+      site.contact.phones = [value];
+      expect(siteSchema.safeParse(site).success).toBe(true);
+    }
+  });
+
+  it("rejects phone numbers without enough digits", () => {
+    for (const value of ["--------", "        ", "(((())))"]) {
+      const site = parse(SITE_YAML);
+      site.contact.phones = [value];
+      expect(siteSchema.safeParse(site).success).toBe(false);
+    }
+  });
+
   it("rejects media paths outside /media/", () => {
     const media = { logo: { src: "/images/logo.svg", alt: "x" } };
     expect(mediaSchema.safeParse(media).success).toBe(false);

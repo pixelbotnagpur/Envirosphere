@@ -1,8 +1,10 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
+import { afterAll, afterEach } from "vitest";
+import { cleanupTrees } from "./unit/helpers/tree";
 
 afterEach(() => cleanup());
+afterAll(cleanupTrees);
 
 // jsdom lacks these browser APIs that Motion uses; node-environment tests skip this block.
 if (typeof window !== "undefined") {

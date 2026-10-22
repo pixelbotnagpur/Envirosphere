@@ -8,7 +8,7 @@ const href = z
   .regex(/^(\/|https?:\/\/|mailto:|tel:)/, "must start with / or https://");
 const phone = z
   .string()
-  .regex(/^\+?[0-9 ()-]{8,20}$/, "must look like +91 98602 20550");
+  .regex(/^(?=(?:\D*\d){8})\+?[0-9 ()-]{8,20}$/, "must look like +91 98602 20550");
 
 const navItemSchema = z.object({ label: z.string().min(1), href });
 
