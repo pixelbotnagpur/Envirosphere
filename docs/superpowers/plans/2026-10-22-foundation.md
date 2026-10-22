@@ -32,7 +32,7 @@ Every task's requirements include these (copied from `PROJECT-REQUIREMENTS.md` a
 - Components: build once in `src/components/ui`, extend with CVA variants, `className` merged via `cn()`, spread native props (rule 32).
 - Import alias `@/*` → `src/*`. `ui` and `motion` never import `sections`, `app` or `lib/content`.
 - No `console.log` in `src/` (scripts/ excepted). Comments explain WHY only.
-- Commit messages: Conventional Commits, subject ≤ 72 chars, and end with the trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commit messages: Conventional Commits, subject ≤ 72 chars, and end with the trailer `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
 
 ---
 
@@ -249,7 +249,7 @@ Expected: vitest reports "No test files found" and exits 0; next prints `Next.js
 
 ```bash
 git add -A
-git commit -m "chore: scaffold single Next.js app with tooling" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "chore: scaffold single Next.js app with tooling" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -389,7 +389,7 @@ Then delete `src/zz-ban-check.tsx` and re-run `pnpm lint && pnpm typecheck`. Exp
 
 ```bash
 git add -A
-git commit -m "feat: add cn utility and lint bans for sparkle icons" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add cn utility and lint bans for sparkle icons" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -682,7 +682,7 @@ Expected: PASS. If a contrast pair fails (most likely `background`/`destructive`
 
 ```bash
 git add -A
-git commit -m "feat: add nature design tokens, motion tokens and token tests" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add nature design tokens, motion tokens and token tests" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -1085,7 +1085,7 @@ Expected: PASS (8 tests).
 
 ```bash
 git add -A
-git commit -m "feat: add content schemas and validated YAML/Markdown readers" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add content schemas and validated YAML/Markdown readers" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -1531,7 +1531,7 @@ Expected: PASS.
 
 ```bash
 git add -A
-git commit -m "feat: add media resolution, content loaders and content:check" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add media resolution, content loaders and content:check" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -1696,7 +1696,7 @@ Expected: PASS (7 tests), typecheck clean.
 
 ```bash
 git add -A
-git commit -m "feat: add Button, Container and SectionLabel primitives" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add Button, Container and SectionLabel primitives" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -1814,7 +1814,7 @@ Expected: PASS (3 tests), typecheck clean. If TypeScript rejects `lenis/dist/len
 
 ```bash
 git add -A
-git commit -m "feat: add Lenis provider and Reveal motion wrapper" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add Lenis provider and Reveal motion wrapper" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -2101,7 +2101,7 @@ Expected: PASS (6 tests), typecheck clean. If `next/image` fails to load in jsdo
 
 ```bash
 git add -A
-git commit -m "feat: add header with mobile menu and footer" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: add header with mobile menu and footer" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -2466,7 +2466,7 @@ Run `pnpm dev`, open `http://localhost:3000` at 1440px and 375px wide. Confirm: 
 
 ```bash
 git add -A
-git commit -m "feat: wire layout, home placeholder and static export build" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "feat: wire layout, home placeholder and static export build" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -2528,7 +2528,7 @@ Expected: all green; `out/` contains `index.html`, `404.html`, `.htaccess`, `med
 
 ```bash
 git add -A
-git commit -m "docs: add content editing guide and sync architecture brief" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "docs: add content editing guide and sync architecture brief" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
 
 ---
