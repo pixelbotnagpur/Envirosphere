@@ -26,6 +26,7 @@ export interface RevealProps extends Omit<HTMLMotionProps<"div">, Controlled> {
 }
 
 /**
+ * Reveals as soon as any part scrolls into view, so even very tall wrappers can never stay hidden.
  * Below-the-fold entrance. Above-the-fold content uses the CSS `rise` utility instead, so it is
  * never served hidden. Reduced motion is handled globally by <MotionConfig reducedMotion="user">.
  */
@@ -35,7 +36,7 @@ export function Reveal({ delay = 0, y = 24, children, ...props }: RevealProps) {
       data-reveal=""
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: "some" }}
       transition={{ duration: duration.slow, delay, ease: ease.outExpo }}
       {...props}
     >

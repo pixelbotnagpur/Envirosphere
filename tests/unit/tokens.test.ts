@@ -114,6 +114,8 @@ describe("motion utilities and layout tokens", () => {
     expect(css).toMatch(/@keyframes rise\s*\{/);
     expect(css).toMatch(/@utility rise\s*\{/);
     expect(tokens.get("--stagger")).toBe("120ms");
+    expect(css).toMatch(/@utility rise\s*\{\s*@media \(prefers-reduced-motion: no-preference\)/);
+    expect(css).toMatch(/animation:\s*rise[^;]*\bbackwards\b/);
   });
   it("defines the header height and marquee tokens", () => {
     expect(tokens.get("--spacing-header")).toBe("5rem");

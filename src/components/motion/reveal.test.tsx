@@ -23,7 +23,7 @@ describe("Reveal", () => {
     expect(screen.getByText("Hello")).toHaveAttribute("id", "intro");
   });
 
-  it("starts hidden and offset so the entrance can play", () => {
+  it("starts hidden so the entrance can play", () => {
     render(<Reveal>Hello</Reveal>);
     expect(screen.getByText("Hello")).toHaveStyle({ opacity: "0" });
   });

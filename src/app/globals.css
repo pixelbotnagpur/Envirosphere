@@ -112,7 +112,7 @@
 
 @utility rise {
   @media (prefers-reduced-motion: no-preference) {
-    animation: rise var(--duration-slow) var(--ease-out-expo) both;
+    animation: rise var(--duration-slow) var(--ease-out-expo) backwards;
     animation-delay: var(--rise-delay, 0ms);
   }
 }
