@@ -1,0 +1,9 @@
+{
+  "$comment": "Project MCP config. Keep minimal: every server costs context. Pin versions (rule 65).",
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@0.0.83"]
+    }
+  }
+}

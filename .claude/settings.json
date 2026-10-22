@@ -1,0 +1,30 @@
+{
+  "model": "sonnet",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  },
+  "permissions": {
+    "deny": [
+      "Read(./node_modules/**)",
+      "Read(./.next/**)",
+      "Read(./dist/**)",
+      "Read(./build/**)",
+      "Read(./coverage/**)",
+      "Read(./pnpm-lock.yaml)",
+      "Read(./package-lock.json)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)"
+    ],
+    "allow": [
+      "Bash(pnpm test*)",
+      "Bash(pnpm lint*)",
+      "Bash(pnpm typecheck*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ]
+  }
+}
