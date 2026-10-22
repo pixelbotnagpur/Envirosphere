@@ -4,3 +4,163 @@
 logo:
   src: /media/brand/logo.svg
   alt: Envirosphere logo
+
+client-perkins:
+  src: /media/clients/perkins.webp
+  alt: Perkins logo
+
+client-philips:
+  src: /media/clients/philips.webp
+  alt: Philips logo
+
+client-si-group:
+  src: /media/clients/si-group.webp
+  alt: SI Group logo
+
+client-sunshield-chemicals:
+  src: /media/clients/sunshield-chemicals.webp
+  alt: Sunshield Chemicals logo
+
+client-xsio-logistics-parks:
+  src: /media/clients/xsio-logistics-parks.webp
+  alt: XSIO Logistics Parks logo
+
+client-fine-orgokem:
+  src: /media/clients/fine-orgokem.webp
+  alt: Fine Orgokem logo
+
+client-itc-limited:
+  src: /media/clients/itc-limited.webp
+  alt: ITC Limited logo
+
+client-indian-phosphate:
+  src: /media/clients/indian-phosphate.webp
+  alt: Indian Phosphate logo
+
+client-magarpatta-city:
+  src: /media/clients/magarpatta-city.webp
+  alt: Magarpatta City logo
+
+client-nxtra-by-airtel:
+  src: /media/clients/nxtra-by-airtel.webp
+  alt: Nxtra by Airtel logo
+
+client-estelle:
+  src: /media/clients/estelle.webp
+  alt: Estelle logo
+
+client-emerson:
+  src: /media/clients/emerson.webp
+  alt: Emerson logo
+
+client-shapoorji-pallonji:
+  src: /media/clients/shapoorji-pallonji.webp
+  alt: Shapoorji Pallonji logo
+
+client-jsw:
+  src: /media/clients/jsw.webp
+  alt: JSW logo
+
+client-nanded-city:
+  src: /media/clients/nanded-city.webp
+  alt: Nanded City logo
+
+client-jll:
+  src: /media/clients/jll.webp
+  alt: JLL logo
+
+client-rama-phosphates:
+  src: /media/clients/rama-phosphates.webp
+  alt: Rama Phosphates logo
+
+client-marquardt:
+  src: /media/clients/marquardt.webp
+  alt: Marquardt logo
+
+client-haier:
+  src: /media/clients/haier.webp
+  alt: Haier logo
+
+client-anuh-pharma:
+  src: /media/clients/anuh-pharma.webp
+  alt: Anuh Pharma Ltd logo
+
+client-lg:
+  src: /media/clients/lg.webp
+  alt: LG logo
+
+client-zanvar:
+  src: /media/clients/zanvar.webp
+  alt: Zanvar logo
+
+client-aarti-drugs:
+  src: /media/clients/aarti-drugs.webp
+  alt: Aarti Drugs Ltd logo
+
+client-alchemo-industries:
+  src: /media/clients/alchemo-industries.webp
+  alt: Alchemo Industries logo
+
+client-aquapharma:
+  src: /media/clients/aquapharma.webp
+  alt: Aquapharma logo
+
+client-armacell:
+  src: /media/clients/armacell.webp
+  alt: Armacell logo
+
+client-bajaj:
+  src: /media/clients/bajaj.webp
+  alt: Bajaj logo
+
+client-bloom-engineering:
+  src: /media/clients/bloom-engineering.webp
+  alt: Bloom Engineering logo
+
+client-flint-group:
+  src: /media/clients/flint-group.webp
+  alt: Flint Group logo
+
+client-fullife:
+  src: /media/clients/fullife.webp
+  alt: Fullife logo
+
+client-hengtong:
+  src: /media/clients/hengtong.webp
+  alt: Hengtong logo
+
+client-horizon-industrial-parks:
+  src: /media/clients/horizon-industrial-parks.webp
+  alt: Horizon Industrial Parks logo
+
+client-indospace:
+  src: /media/clients/indospace.webp
+  alt: Indospace logo
+
+client-john-deere:
+  src: /media/clients/john-deere.webp
+  alt: John Deere logo
+
+client-kirloskar-oil-engines:
+  src: /media/clients/kirloskar-oil-engines.webp
+  alt: Kirloskar Oil Engines logo
+
+client-lignopura-agrotech:
+  src: /media/clients/lignopura-agrotech.webp
+  alt: Lignopura Agrotech logo
+
+client-ngl-fine-chem:
+  src: /media/clients/ngl-fine-chem.webp
+  alt: NGL Fine-Chem Ltd logo
+
+client-noble-hospitals:
+  src: /media/clients/noble-hospitals.webp
+  alt: Noble Hospitals logo
+
+client-paladin-paints:
+  src: /media/clients/paladin-paints.webp
+  alt: Paladin Paints logo
+
+about-photo:
+  src: /media/images/about.webp
+  alt: A hand holding a small green model of the Earth
