@@ -41,5 +41,22 @@ describe("Header", () => {
     const mobileNav = document.getElementById("mobile-nav") as HTMLElement;
     await userEvent.click(mobileNav.querySelector("a[href='/services/']") as HTMLElement);
     expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
+    expect(mobileNav).toHaveAttribute("hidden");
+  });
+
+  it("hides #mobile-nav until the menu is opened", async () => {
+    render(<Header {...props} />);
+    const mobileNav = document.getElementById("mobile-nav") as HTMLElement;
+    expect(mobileNav).toHaveAttribute("hidden");
+    await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(mobileNav).not.toHaveAttribute("hidden");
+  });
+
+  it("makes the mobile menu scrollable and opts it out of Lenis smooth scroll", () => {
+    render(<Header {...props} />);
+    const mobileNav = document.getElementById("mobile-nav") as HTMLElement;
+    const panel = mobileNav.firstElementChild as HTMLElement;
+    expect(panel).toHaveAttribute("data-lenis-prevent");
+    expect(panel).toHaveClass("overflow-y-auto");
   });
 });

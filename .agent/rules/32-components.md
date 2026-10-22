@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"; // clsx + tailwind-merge
 
 const buttonVariants = cva(
   // base — tokens only (RULE 31), never raw values
-  "inline-flex items-center justify-center rounded-[--radius] font-body font-normal transition-colors disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-pill font-body font-normal transition-colors disabled:opacity-50",
   {
     variants: {
       variant: {

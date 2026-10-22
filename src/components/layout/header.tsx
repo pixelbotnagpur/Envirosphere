@@ -62,7 +62,11 @@ export function Header({ name, logo, nav, cta }: HeaderProps) {
       </Container>
 
       <nav id="mobile-nav" aria-label="Mobile" hidden={!open} className="border-t border-border lg:hidden">
-        <Container className="flex flex-col gap-1 py-6">
+        {/* 5rem is the header bar's h-20; data-lenis-prevent lets the panel scroll natively under Lenis. */}
+        <Container
+          data-lenis-prevent
+          className="flex max-h-[calc(100dvh-5rem)] flex-col gap-1 overflow-y-auto py-6"
+        >
           {nav.map((item) => (
             <Link
               key={item.href}

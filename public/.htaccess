@@ -7,7 +7,7 @@ ErrorDocument 404 /404.html
   RewriteEngine On
   # Force HTTPS (skip when TLS terminates at a proxy/CDN that sends X-Forwarded-Proto)
   RewriteCond %{HTTPS} off
-  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   # /about → /about/ (matches trailingSlash: true)
   RewriteCond %{REQUEST_FILENAME} -d
@@ -26,10 +26,10 @@ ErrorDocument 404 /404.html
   <FilesMatch "\.(js|css|woff2)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
-  <FilesMatch "\.(svg|jpg|jpeg|png|webp|avif|mp4|pdf)$">
+  <FilesMatch "\.(svg|jpg|jpeg|png|gif|ico|webp|avif|mp4|pdf)$">
     Header set Cache-Control "public, max-age=86400, must-revalidate"
   </FilesMatch>
-  <FilesMatch "\.html$">
+  <FilesMatch "\.(html|txt)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
 </IfModule>

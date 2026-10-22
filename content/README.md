@@ -12,8 +12,10 @@ Everything you can change without a developer lives in two places:
 
 Save files as UTF-8 (the default in Notepad and VS Code).
 
-If something is wrong, the build stops and tells you the file and the line that needs fixing,
-for example: `content/faq.yaml → items[2]: "answer" is missing`.
+When you upload the site to Hostinger, upload everything inside the `out` folder including the hidden `.htaccess` file.
+
+If something is wrong, the build stops and tells you the file and the field that needs fixing,
+for example: `content/site.yaml → contact.email: Invalid email address`.
 
 ## Replace an image
 1. Put the new file in `public/media/` (same file name keeps everything working with no other change).

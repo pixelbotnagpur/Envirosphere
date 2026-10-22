@@ -3,7 +3,7 @@
 ## What it is
 Premium static marketing site for Envirosphere Consultant & Engineers, an environmental
 consultancy (EC, CRZ, forest clearance, PCB compliance, audits, ETP/STP). Users: industry
-EHS and project heads. Phase: 0 done, no app code yet. Hosted on Hostinger as static files.
+EHS and project heads. Phase: Plan 1 (Foundation) built; Home sections next. Hosted on Hostinger as static files.
 
 ## Data flow
 Build time: loaders in `src/lib/content` read `content/*.yaml` + `content/services/*.md`,
