@@ -1,7 +1,16 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterAll, afterEach } from "vitest";
+import { afterAll, afterEach, vi } from "vitest";
 import { cleanupTrees } from "./unit/helpers/tree";
+
+import React from "react";
+
+// next/link normalizes hrefs using the build-time trailingSlash flag, which is
+// unset under jsdom and strips the trailing slash the tests assert on.
+vi.mock("next/link", () => ({
+  default: ({ href, ...p }: { href: string } & Record<string, unknown>) =>
+    React.createElement("a", { href, ...p }),
+}));
 
 afterEach(() => cleanup());
 afterAll(cleanupTrees);
