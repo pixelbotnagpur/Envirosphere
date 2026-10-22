@@ -7,7 +7,7 @@ import { loadSite } from "@/lib/content";
 export default function NotFound() {
   const { ui } = loadSite();
   return (
-    <section className="py-section">
+    <section className="pt-[calc(var(--spacing-header)+var(--spacing-section))] pb-section">
       <Container>
         <SectionLabel index="404">{ui.notFound.label}</SectionLabel>
         <h1 className="mt-6 text-h1">{ui.notFound.heading}</h1>

@@ -122,6 +122,6 @@ describe("motion utilities and layout tokens", () => {
     expect(tokens.get("--animate-marquee")).toContain("marquee");
   });
   it("keeps h1 smaller than display at narrow widths", () => {
-    expect(tokens.get("--text-h1")).toBe("clamp(2.25rem, 1.25rem + 5vw, 6rem)");
+    expect(tokens.get("--text-h1")).toBe("clamp(1.85rem, 1.15rem + 2.5vw, 3.25rem)");
   });
 });

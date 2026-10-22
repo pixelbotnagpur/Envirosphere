@@ -3,9 +3,11 @@
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { cn } from "@/lib/utils";
 
 export interface NavItem {
   label: string;
@@ -18,11 +20,26 @@ export interface HeaderProps {
   labels: { openMenu: string; closeMenu: string; mainNav: string; mobileNav: string };
   nav: NavItem[];
   cta?: NavItem;
+  transparentAtTop?: boolean;
 }
 
-export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
+export function Header({ name, logo, labels, nav, cta, transparentAtTop }: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
+
+  const isHome = transparentAtTop ?? (pathname === "/" || pathname === "");
+  const isDarkHero = isHome && !scrolled && !open;
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -36,11 +53,34 @@ export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-(--z-header) border-b border-border bg-background/85 backdrop-blur">
+    <header className="fixed top-0 right-0 left-0 z-(--z-header) w-full transition-colors duration-base">
+      {/* Sliding background container that slides down on scroll */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "absolute inset-0 -z-10 border-b border-border bg-background/90 shadow-card backdrop-blur-md transition-all duration-base ease-out",
+          isDarkHero ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
+        )}
+      />
+
       <Container className="flex h-header items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <Image src={logo.src} alt="" width={logo.width} height={logo.height} priority />
-          <span className="font-heading text-h4">{name}</span>
+          <span
+            className={cn(
+              "inline-flex items-center justify-center rounded-full transition-all duration-base",
+              isDarkHero ? "ring-1 ring-primary-foreground/25" : "ring-0",
+            )}
+          >
+            <Image src={logo.src} alt="" width={logo.width} height={logo.height} priority />
+          </span>
+          <span
+            className={cn(
+              "font-heading text-h4 transition-colors duration-base",
+              isDarkHero ? "text-primary-foreground" : "text-foreground",
+            )}
+          >
+            {name}
+          </span>
         </Link>
 
         <nav aria-label={labels.mainNav} className="hidden items-center gap-8 lg:flex">
@@ -48,7 +88,12 @@ export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm underline-offset-8 transition-colors hover:underline"
+              className={cn(
+                "text-sm underline-offset-8 transition-colors duration-base hover:underline",
+                isDarkHero
+                  ? "text-primary-foreground/80 hover:text-primary-foreground"
+                  : "text-foreground/80 hover:text-foreground",
+              )}
             >
               {item.label}
             </Link>
@@ -64,7 +109,12 @@ export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
           <button
             ref={toggleRef}
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-pill border border-border lg:hidden"
+            className={cn(
+              "inline-flex size-11 items-center justify-center rounded-pill border transition-colors duration-base lg:hidden",
+              isDarkHero
+                ? "border-primary-foreground/30 text-primary-foreground"
+                : "border-border text-foreground",
+            )}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? labels.closeMenu : labels.openMenu}
@@ -75,7 +125,12 @@ export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
         </div>
       </Container>
 
-      <nav id="mobile-nav" aria-label={labels.mobileNav} hidden={!open} className="border-t border-border lg:hidden">
+      <nav
+        id="mobile-nav"
+        aria-label={labels.mobileNav}
+        hidden={!open}
+        className="border-t border-border bg-background text-foreground lg:hidden"
+      >
         {/* data-lenis-prevent lets the panel scroll natively under Lenis; the cap is the viewport minus the header bar. */}
         <Container
           data-lenis-prevent
@@ -85,7 +140,7 @@ export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              className="py-3 font-heading text-h3"
+              className="py-3 font-heading text-h3 text-foreground"
               onClick={() => setOpen(false)}
             >
               {item.label}

@@ -12,6 +12,10 @@ vi.mock("next/link", () => ({
     React.createElement("a", { href, ...p }),
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+}));
+
 afterEach(() => cleanup());
 afterAll(cleanupTrees);
 
