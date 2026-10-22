@@ -73,13 +73,67 @@ export const siteSchema = z.object({
   }),
 });
 
+const sectionLabel = z.string().min(1);
+
 export const homeSchema = z.object({
   hero: z.object({
     eyebrow: z.string().min(1),
     title: z.string().min(1),
     subtitle: z.string().min(1),
     primaryCta: navItemSchema,
+    secondaryCta: navItemSchema.optional(),
+    scrollLabel: z.string().min(1),
     image: mediaKey.optional(),
+  }),
+  about: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    paragraphs: z.array(z.string().min(1)).min(1),
+    image: mediaKey,
+    cta: navItemSchema,
+  }),
+  services: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    intro: z.string().min(1),
+    cta: navItemSchema,
+  }),
+  stats: z.object({
+    label: sectionLabel,
+    items: z
+      .array(
+        z.object({
+          value: z.number().int().nonnegative(),
+          suffix: z.string().default(""),
+          label: z.string().min(1),
+        }),
+      )
+      .min(2),
+  }),
+  clients: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    logos: z.array(mediaKey).min(6),
+  }),
+  process: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    steps: z.array(z.object({ title: z.string().min(1), body: z.string().min(1) })).min(2),
+  }),
+  testimonials: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    items: z
+      .array(z.object({ quote: z.string().min(1), name: z.string().min(1), role: z.string().optional() }))
+      .min(1),
+  }),
+  contact: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    body: z.string().min(1),
+    primaryCta: navItemSchema,
+    phoneLabel: z.string().min(1),
+    emailLabel: z.string().min(1),
   }),
 });
 

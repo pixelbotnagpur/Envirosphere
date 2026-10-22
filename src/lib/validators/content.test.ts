@@ -61,4 +61,25 @@ describe("content schemas", () => {
     delete site.links;
     expect(siteSchema.safeParse(site).success).toBe(true);
   });
+
+  it("rejects home clients.logos with fewer than 6 keys", () => {
+    const home = parse(HOME_YAML);
+    home.clients.logos = ["client-a", "client-b"];
+    expect(homeSchema.safeParse(home).success).toBe(false);
+  });
+
+  it("rejects negative stats values", () => {
+    const home = parse(HOME_YAML);
+    home.stats.items[0].value = -1;
+    expect(homeSchema.safeParse(home).success).toBe(false);
+  });
+
+  it("requires every section label in home", () => {
+    const labels = ["about", "services", "stats", "clients", "process", "testimonials", "contact"] as const;
+    for (const key of labels) {
+      const home = parse(HOME_YAML);
+      delete home[key].label;
+      expect(homeSchema.safeParse(home).success).toBe(false);
+    }
+  });
 });

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { makeTree } from "@tests/unit/helpers/tree";
 import { LOGO_SVG } from "@tests/unit/helpers/fixtures";
 import { ContentError } from "./read";
-import { resolveMedia, verifyAllMedia } from "./media";
+import { resolveMedia, toImageAsset, verifyAllMedia } from "./media";
 
 const media = { logo: { src: "/media/brand/logo.svg", alt: "Logo" } };
 
@@ -110,5 +110,25 @@ describe("verifyAllMedia", () => {
   it("throws on the first missing file", () => {
     const { publicDir } = makeTree({ "public/other.txt": "x" });
     expect(() => verifyAllMedia(media, publicDir)).toThrowError(/logo: file not found/);
+  });
+});
+
+describe("toImageAsset", () => {
+  it("returns width and height when present", () => {
+    const resolved = { key: "logo", src: "/media/brand/logo.svg", alt: "Logo", width: 40, height: 40 };
+    expect(toImageAsset(resolved)).toEqual({
+      src: "/media/brand/logo.svg",
+      alt: "Logo",
+      width: 40,
+      height: 40,
+    });
+  });
+
+  it("throws ContentError naming the key when dimensions are missing", () => {
+    const resolved = { key: "brochure", src: "/media/docs/brochure.pdf", alt: "Brochure" };
+    expect(() => toImageAsset(resolved)).toThrowError(ContentError);
+    expect(() => toImageAsset(resolved)).toThrowError(
+      /content\/media\.yaml → brochure: \/media\/docs\/brochure\.pdf is not an image with a known size/,
+    );
   });
 });

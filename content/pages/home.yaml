@@ -1,10 +1,136 @@
-# TODO(content): owner to review the wording. Sections are added in the next phase.
+# The Home page. Each block is one section, top to bottom.
+# TODO(content): owner to review all wording marked "draft".
+
 hero:
   eyebrow: QCI NABET Accredited Consultant (Cat A)
   title: Environmental clearances and compliance, handled with precision.
   subtitle: >-
     We help public and private sector clients secure statutory clearances and consents from
     MoEFCC, State Pollution Control Boards, MIDC and other authorities.
-  primaryCta:
-    label: Talk to our team
-    href: /contact/
+  primaryCta: { label: Talk to our team, href: /contact/ }
+  secondaryCta: { label: Our services, href: /services/ }
+  scrollLabel: Scroll
+
+about:
+  label: About us
+  heading: Strategic planning and sustainable solutions for statutory clearances.
+  paragraphs:
+    - >-
+      Envirosphere Consultant and Engineers is QCI NABET Accredited Consultant, providing a wide
+      range of services to the public and private sector. Our firm provides strategic planning,
+      cost effective sustainable solutions to our clients for obtaining statutory clearances and
+      consents from MoEFCC, Pollution Control Boards, MIDC, and other government authorities. The
+      organisation is guided by a code of ethics, professional practices, philosophies leading it
+      towards attaining the stated vision and mission.
+    - >-
+      We have a team of specialised professionals to provide comprehensive services such as
+      Environmental Impact Assessment (EIA), Compliance of Environmental Laws & Regulations, etc.
+      We conduct studies in various sectors such as Industry building and construction,
+      Infrastructure Development, Industrial Estate, Coastal Regulatory Zone (CRZ) and Sustainable
+      Services such as Energy Modelling, Wind and Shadow analysis, Carbon Footprint, Environment
+      Due Diligence (EDD), ESG Reporting, Environmental Site Assessment Phase I and II, and Solid
+      waste Management.
+    - >-
+      We also provide comprehensive services - in Consent Management; Post EC Compliance,
+      Environmental Monitoring; Operation and Maintenance of ETP & STP, MIDC Approval, Fire NOC,
+      DISH Approval, CGWB Authorisation, PESO License and other industrial approvals.
+  image: about-photo
+  cta: { label: More about us, href: /about/ }
+
+services:
+  label: What we offer
+  heading: Thirteen services, one accountable team.
+  intro: From environmental clearances to the operation of treatment plants.
+  cta: { label: All services, href: /services/ }
+
+stats:
+  label: In numbers
+  items:
+    - { value: 250, suffix: "+", label: Clients }
+    - { value: 25, suffix: "+", label: Ongoing projects }
+    - { value: 2, suffix: "", label: Certifications }
+    - { value: 1, suffix: "", label: Certification in the pipeline }
+
+clients:
+  label: Clients
+  heading: Organisations we have worked with.
+  logos:
+    - client-itc-limited
+    - client-jsw
+    - client-philips
+    - client-bajaj
+    - client-john-deere
+    - client-lg
+    - client-haier
+    - client-emerson
+    - client-jll
+    - client-perkins
+    - client-shapoorji-pallonji
+    - client-magarpatta-city
+    - client-nanded-city
+    - client-nxtra-by-airtel
+    - client-kirloskar-oil-engines
+    - client-armacell
+    - client-marquardt
+    - client-si-group
+    - client-flint-group
+    - client-estelle
+    - client-indospace
+    - client-horizon-industrial-parks
+    - client-xsio-logistics-parks
+    - client-noble-hospitals
+    - client-paladin-paints
+    - client-sunshield-chemicals
+    - client-fine-orgokem
+    - client-indian-phosphate
+    - client-rama-phosphates
+    - client-anuh-pharma
+    - client-aarti-drugs
+    - client-alchemo-industries
+    - client-aquapharma
+    - client-bloom-engineering
+    - client-fullife
+    - client-hengtong
+    - client-lignopura-agrotech
+    - client-ngl-fine-chem
+    - client-zanvar
+
+# Draft: owner to review. Steps are inferred from the services list, not taken from the old site.
+process:
+  label: How we work
+  heading: From first study to final consent.
+  steps:
+    - title: Scoping
+      body: We study your project, its location and the rules that apply, and list the approvals you need.
+    - title: Assessment
+      body: Our specialists carry out the studies and prepare the assessment and management plans.
+    - title: Submission
+      body: We file the applications and follow them up with MoEFCC, the Pollution Control Boards, MIDC and other authorities.
+    - title: Compliance
+      body: After approval we handle post-clearance compliance, monitoring and audits.
+
+testimonials:
+  label: Client testimonials
+  heading: In our clients' words.
+  # TODO(content): confirm the clients agree to be quoted. Quotes are copied as published.
+  items:
+    - quote: Our company received successful and timely clearance of EC which wouldn't have been possible without the hard work and commitment of ENVIROSPHERE.
+      name: Shivali Phanse
+      role: BDM
+    - quote: We get all our needed things in right way and within timeline. Thanx
+      name: Anurag Gupta
+      role: Senior Manager
+    - quote: Now we are really relax to get all things to be done, its save our time and cost as well. Thanks
+      name: Deeawan Sethi
+      role: Customer
+    - quote: I found myself working in a true partnership that results in an extra incredible experience of us
+      name: Abhishek Patil
+      role: Customer
+
+contact:
+  label: Contact
+  heading: Tell us about your project.
+  body: Our team will help you work out which approvals you need and the quickest route to them.
+  primaryCta: { label: Start a conversation, href: /contact/ }
+  phoneLabel: Call us
+  emailLabel: Email us

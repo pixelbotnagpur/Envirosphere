@@ -40,10 +40,16 @@ ui:
     cta: Back to home
 `;
 
+const CLIENT_KEYS = ["a", "b", "c", "d", "e", "f"].map((n) => `client-${n}`);
+
 export const MEDIA_YAML = `
 logo:
   src: /media/brand/logo.svg
   alt: Test logo
+about-photo:
+  src: /media/images/about.svg
+  alt: About photo
+${CLIENT_KEYS.map((key) => `${key}:\n  src: /media/clients/${key}.svg\n  alt: ${key} logo`).join("\n")}
 `;
 
 export const HOME_YAML = `
@@ -52,6 +58,46 @@ hero:
   title: Test title
   subtitle: Test subtitle
   primaryCta: { label: Start, href: /contact/ }
+  secondaryCta: { label: Services, href: /services/ }
+  scrollLabel: Scroll
+about:
+  label: About us
+  heading: About heading
+  paragraphs: [First paragraph., Second paragraph.]
+  image: about-photo
+  cta: { label: More, href: /about/ }
+services:
+  label: What we offer
+  heading: Services heading
+  intro: Services intro
+  cta: { label: All services, href: /services/ }
+stats:
+  label: In numbers
+  items:
+    - { value: 250, suffix: "+", label: Clients }
+    - { value: 25, suffix: "+", label: Projects }
+clients:
+  label: Clients
+  heading: Clients heading
+  logos: [${CLIENT_KEYS.join(", ")}]
+process:
+  label: How we work
+  heading: Process heading
+  steps:
+    - { title: One, body: First step. }
+    - { title: Two, body: Second step. }
+testimonials:
+  label: Testimonials
+  heading: Testimonials heading
+  items:
+    - { quote: Great work., name: A Person, role: Manager }
+contact:
+  label: Contact
+  heading: Contact heading
+  body: Contact body
+  primaryCta: { label: Talk, href: /contact/ }
+  phoneLabel: Call us
+  emailLabel: Email us
 `;
 
 export const SERVICE_MD = `---
@@ -69,5 +115,7 @@ export function validFiles(): Record<string, string> {
     "content/pages/home.yaml": HOME_YAML,
     "content/services/environmental-audit.md": SERVICE_MD,
     "public/media/brand/logo.svg": LOGO_SVG,
+    "public/media/images/about.svg": LOGO_SVG,
+    ...Object.fromEntries(CLIENT_KEYS.map((key) => [`public/media/clients/${key}.svg`, LOGO_SVG])),
   };
 }

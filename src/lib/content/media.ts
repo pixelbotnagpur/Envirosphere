@@ -91,3 +91,19 @@ export function resolveMedia(
 export function verifyAllMedia(media: Media, publicRoot = PUBLIC_ROOT): void {
   for (const key of Object.keys(media)) resolveMedia(media, key, publicRoot);
 }
+
+export interface ImageAsset {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+/** For `next/image`: unlike ResolvedMedia, dimensions are guaranteed. Fails clearly for non-images. */
+export function toImageAsset(resolved: ResolvedMedia): ImageAsset {
+  const { key, src, alt, width, height } = resolved;
+  if (!width || !height) {
+    throw new ContentError(`content/media.yaml → ${key}: ${src} is not an image with a known size`);
+  }
+  return { src, alt, width, height };
+}

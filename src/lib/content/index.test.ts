@@ -41,6 +41,22 @@ describe("loadAll", () => {
     expect(() => loadAll(content, publicDir)).toThrowError(ContentError);
     expect(() => loadAll(content, publicDir)).toThrowError(/file not found/);
   });
+
+  it("fails when a client logo key is not in media.yaml", () => {
+    const files = validFiles();
+    files["content/pages/home.yaml"] = files["content/pages/home.yaml"].replace("client-c,", "client-missing,");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/home\.yaml → clients\.logos\[2\]: "client-missing" is not listed/,
+    );
+  });
+
+  it("fails when the about image key is unknown", () => {
+    const files = validFiles();
+    files["content/pages/home.yaml"] = files["content/pages/home.yaml"].replace("image: about-photo", "image: nope");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/home\.yaml → about\.image: "nope"/);
+  });
 });
 
 describe("loadServices", () => {

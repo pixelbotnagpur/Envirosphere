@@ -10,7 +10,7 @@ import {
   type ServiceFrontMatter,
   type Site,
 } from "../validators/content";
-import { resolveMedia, verifyAllMedia, type ResolvedMedia } from "./media";
+import { resolveMedia, toImageAsset, verifyAllMedia, type ImageAsset, type ResolvedMedia } from "./media";
 import { CONTENT_ROOT, ContentError, PUBLIC_ROOT, readMarkdownFile, readYamlFile } from "./read";
 
 export type Service = ServiceFrontMatter & { slug: string; body: string };
@@ -70,6 +70,11 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
     [site.logoKey, "content/site.yaml → logoKey"],
     [site.seo.ogImageKey, "content/site.yaml → seo.ogImageKey"],
     [home.hero.image, "content/pages/home.yaml → hero.image"],
+    [home.about.image, "content/pages/home.yaml → about.image"],
+    ...home.clients.logos.map((key, index): [string | undefined, string] => [
+      key,
+      `content/pages/home.yaml → clients.logos[${index}]`,
+    ]),
     ...services.map((s): [string | undefined, string] => [
       s.image,
       `content/services/${s.slug}.md → image`,
@@ -84,6 +89,11 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
 export function getImage(key: string): ResolvedMedia {
   return resolveMedia(loadMedia(), key);
 }
+
+export function getImageAsset(key: string): ImageAsset {
+  return toImageAsset(getImage(key));
+}
+export type { ImageAsset };
 
 const SOCIAL_LABELS = {
   linkedin: "LinkedIn",
