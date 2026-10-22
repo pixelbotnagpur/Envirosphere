@@ -3,7 +3,6 @@
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -27,10 +26,8 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
 
-  const isHome = transparentAtTop ?? (pathname === "/" || pathname === "");
-  const isDarkHero = isHome && !scrolled && !open;
+  const isDarkHero = (transparentAtTop ?? true) && !scrolled && !open;
 
   useEffect(() => {
     const onScroll = () => {

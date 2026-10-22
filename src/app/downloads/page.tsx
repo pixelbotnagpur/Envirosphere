@@ -18,16 +18,16 @@ export default function DownloadsPage() {
   const downloads = loadDownloads();
 
   return (
-    <div className="py-section">
-      {/* Header */}
-      <section className="pb-16 sm:pb-20">
+    <div>
+      {/* Page Hero */}
+      <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel index="001">Resources & Verification</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Resources & Verification</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
-            <h1 className="text-display max-w-4xl tracking-tight lg:col-span-8">
+            <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
               Official publications & accreditation certificates.
             </h1>
-            <p className="text-lead text-muted-foreground font-light lg:col-span-4">
+            <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
               Access verifiable documentation, corporate brochures, and environmental compliance policies for institutional review.
             </p>
           </div>

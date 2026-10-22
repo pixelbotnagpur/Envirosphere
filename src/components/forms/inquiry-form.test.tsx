@@ -20,7 +20,7 @@ describe("InquiryForm", () => {
     expect(screen.getByLabelText(/Company/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Official Email Address/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Contact Number/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Required Service/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Service of Interest/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Project Brief/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Submit Inquiry" })).toBeInTheDocument();
   });
@@ -48,7 +48,7 @@ describe("InquiryForm", () => {
     await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
     await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
     await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-    await user.selectOptions(screen.getByLabelText(/Required Service/), "environmental-clearance");
+    await user.selectOptions(screen.getByLabelText(/Service of Interest/), "environmental-clearance");
     await user.type(screen.getByLabelText(/Project Brief/), "We require full EIA scoping and appraisal.");
 
     await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
@@ -72,7 +72,7 @@ describe("InquiryForm", () => {
     await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
     await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
     await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-    await user.selectOptions(screen.getByLabelText(/Required Service/), "water-audit");
+    await user.selectOptions(screen.getByLabelText(/Service of Interest/), "water-audit");
     await user.type(screen.getByLabelText(/Project Brief/), "Comprehensive water balance and audit required.");
 
     await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));

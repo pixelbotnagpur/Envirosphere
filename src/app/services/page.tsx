@@ -19,16 +19,16 @@ export default function ServicesPage() {
   const services = loadServices();
 
   return (
-    <div className="py-section">
-      {/* Page Header */}
-      <section className="pb-16 sm:pb-20">
+    <div>
+      {/* Page Hero */}
+      <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel index="001">Services Directory</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Services Directory</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
-            <h1 className="text-display max-w-4xl tracking-tight lg:col-span-8">
+            <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
               Thirteen environmental services. One accountable team.
             </h1>
-            <p className="text-lead text-muted-foreground font-light lg:col-span-4">
+            <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
               From statutory impact assessments and consent management to turnkey wastewater engineering, we provide comprehensive environmental support for infrastructure and industrial leaders.
             </p>
           </div>

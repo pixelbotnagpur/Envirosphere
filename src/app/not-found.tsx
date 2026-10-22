@@ -7,11 +7,11 @@ import { loadSite } from "@/lib/content";
 export default function NotFound() {
   const { ui } = loadSite();
   return (
-    <section className="pt-[calc(var(--spacing-header)+var(--spacing-section))] pb-section">
+    <section className="hero-atmosphere relative flex min-h-[70vh] flex-col justify-center w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
       <Container>
-        <SectionLabel index="404">{ui.notFound.label}</SectionLabel>
-        <h1 className="mt-6 text-h1">{ui.notFound.heading}</h1>
-        <Button asChild className="mt-10">
+        <SectionLabel tone="inverse" index="404">{ui.notFound.label}</SectionLabel>
+        <h1 className="mt-6 text-h1 text-primary-foreground">{ui.notFound.heading}</h1>
+        <Button asChild variant="accent" size="lg" className="mt-10">
           <Link href="/">{ui.notFound.cta}</Link>
         </Button>
       </Container>

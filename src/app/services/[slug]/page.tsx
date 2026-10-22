@@ -40,28 +40,28 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const nextService = currentIndex < allServices.length - 1 ? allServices[currentIndex + 1] : allServices[0];
 
   return (
-    <div className="py-section">
-      {/* Service Header & Breadcrumbs */}
-      <section className="pb-16 sm:pb-20">
+    <div>
+      {/* Service Hero & Breadcrumbs */}
+      <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
           {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumbs" className="mb-8 flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-label">
-            <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+          <nav aria-label="Breadcrumbs" className="mb-8 flex items-center gap-2 text-xs text-primary-foreground/70 uppercase tracking-label">
+            <Link href="/" className="hover:text-primary-foreground transition-colors">Home</Link>
             <span aria-hidden="true">/</span>
-            <Link href="/services/" className="hover:text-foreground transition-colors">Services</Link>
+            <Link href="/services/" className="hover:text-primary-foreground transition-colors">Services</Link>
             <span aria-hidden="true">/</span>
-            <span className="text-foreground">{service.title}</span>
+            <span className="text-primary-foreground">{service.title}</span>
           </nav>
 
-          <SectionLabel index={String(service.order).padStart(3, "0")}>
+          <SectionLabel tone="inverse" index={String(service.order).padStart(3, "0")}>
             Service Specification
           </SectionLabel>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
-            <h1 className="text-display max-w-4xl tracking-tight lg:col-span-8">
+            <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
               {service.title}
             </h1>
-            <p className="text-lead text-muted-foreground font-light lg:col-span-4">
+            <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
               {service.summary}
             </p>
           </div>
