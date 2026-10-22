@@ -29,4 +29,4 @@ Google Sheet and stores CVs in Drive. No server, DB or login.
 - Reduced-motion disables Lenis/parallax/pinning.
 
 ## Current focus
-Plan 2 (Motion kit + Home) done. Next: Plan 3 (inner pages + brand assets). See docs/superpowers/plans/.
+Plan 3 (inner pages + content expansion) done. Next: Plan 4 (interactive forms, Google Apps Script integration, Turnstile). See docs/superpowers/plans/.
