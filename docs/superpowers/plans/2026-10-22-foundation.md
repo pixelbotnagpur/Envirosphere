@@ -2175,6 +2175,10 @@ describe("project rules are enforced in src/", () => {
     expect(offenders(/\[\d+(\.\d+)?px\]/, /\.tsx?$/)).toEqual([]);
   });
 
+  it("no component-level focus styles (the base two-tone ring must not be overridden)", () => {
+    expect(offenders(/focus(-visible)?:(ring|shadow|outline)/, /\.tsx?$/)).toEqual([]);
+  });
+
   it("no framer-motion imports", () => {
     expect(offenders(/from\s+"framer-motion"/)).toEqual([]);
   });
