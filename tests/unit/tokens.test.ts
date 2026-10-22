@@ -9,7 +9,8 @@ const css = readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8"
 
 const tokens = new Map<string, string>();
 for (const match of css.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-  tokens.set(match[1], match[2].trim());
+  // First definition wins so the @theme values are the ones tested (later overrides, e.g. `.bg-primary`, are ignored here).
+  if (!tokens.has(match[1])) tokens.set(match[1], match[2].trim());
 }
 
 function resolve(name: string): string {
@@ -31,10 +32,26 @@ describe("semantic color pairs meet WCAG AA (4.5:1)", () => {
     ["background", "muted-foreground"],
     ["surface", "muted-foreground"],
     ["background", "destructive"],
+    ["surface", "destructive"],
     ["primary", "secondary"],
   ];
   it.each(pairs)("%s vs %s", (a, b) => {
     expect(contrast(color(a), color(b))).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("focus ring meets WCAG 1.4.11 (3:1)", () => {
+  it("ring vs background", () => {
+    expect(contrast(color("ring"), color("background"))).toBeGreaterThanOrEqual(3);
+  });
+  it("ring vs surface", () => {
+    expect(contrast(color("ring"), color("surface"))).toBeGreaterThanOrEqual(3);
+  });
+  it("accent vs primary (the ring inside dark sections)", () => {
+    expect(contrast(color("accent"), color("primary"))).toBeGreaterThanOrEqual(3);
+  });
+  it("globals.css switches the ring to accent inside .bg-primary sections", () => {
+    expect(css).toMatch(/\.bg-primary\s*\{[^}]*--color-ring:\s*var\(--color-accent\)/);
   });
 });
 
@@ -62,7 +79,9 @@ describe("motion tokens mirror src/lib/motion.ts", () => {
 
 describe("fonts", () => {
   it("defines exactly the heading and body families", () => {
-    const families = [...tokens.keys()].filter((k) => /^--font-(heading|body)$/.test(k));
+    const families = [...tokens.keys()].filter(
+      (k) => k.startsWith("--font-") && k !== "--font-fraunces" && k !== "--font-manrope",
+    );
     expect(families.sort()).toEqual(["--font-body", "--font-heading"]);
     expect(tokens.get("--font-heading")).toContain("var(--font-fraunces)");
     expect(tokens.get("--font-body")).toContain("var(--font-manrope)");

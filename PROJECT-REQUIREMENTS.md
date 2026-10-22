@@ -61,10 +61,11 @@ text-primary-foreground`. Values are defined once in `globals.css` (rule 31).
 | Surface | `surface` | Sand | `oklch(0.92 0.02 88)` | `#E9E3D5` | cards and panels on background |
 | Muted foreground | `muted-foreground` | Lichen grey | `oklch(0.50 0.02 150)` | `#5F6B61` | captions, meta, labels |
 | Border | `border` | Linen | `oklch(0.86 0.02 95)` | `#D6D0C2` | hairlines (1px) |
-| Destructive | `destructive` | Clay red | `oklch(0.55 0.16 30)` | `#B4513A` | form errors only |
+| Destructive | `destructive` | Clay red | `oklch(0.53 0.16 30)` | `#B63C2E` | form errors only |
 
 - The hex column is for humans only. Code uses tokens, never hex.
 - Every `x` / `x-foreground` pair must pass WCAG AA (4.5:1).
+- Focus ring (`ring`): Forest on light sections, Ochre on primary (dark) sections; both ≥ 3:1.
 - Dark mode is optional. A "dark section" means `bg-primary text-primary-foreground`.
 
 ### 3.2 Typography: exactly 2 font families

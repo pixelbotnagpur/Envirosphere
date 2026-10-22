@@ -15,7 +15,7 @@
   --color-sage-300: oklch(0.78 0.045 135);
   --color-ochre-400: oklch(0.74 0.12 75);
   --color-lichen-600: oklch(0.5 0.02 150);
-  --color-clay-600: oklch(0.55 0.16 30);
+  --color-clay-600: oklch(0.53 0.16 30);
   --color-bark-900: oklch(0.22 0.02 155);
 
   /* ── 2. SEMANTIC: the ONLY tier components use ── */
@@ -30,7 +30,7 @@
   --color-surface: var(--color-sand-200);
   --color-muted-foreground: var(--color-lichen-600);
   --color-border: var(--color-linen-300);
-  --color-ring: var(--color-accent);
+  --color-ring: var(--color-primary);
   --color-destructive: var(--color-clay-600);
 
   /* ── Typography: exactly two families (set by next/font in layout.tsx) ── */
@@ -118,6 +118,11 @@
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 3px;
+  }
+
+  /* Focus rings must reach 3:1 against what they sit on: Forest on light, Ochre on Forest. */
+  .bg-primary {
+    --color-ring: var(--color-accent);
   }
 
   ::selection {
