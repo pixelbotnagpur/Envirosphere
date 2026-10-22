@@ -7,4 +7,4 @@ export const ease: Record<"outExpo" | "inOutQuart", Bezier> = {
   inOutQuart: [0.76, 0, 0.24, 1],
 };
 
-export const lenisOptions = { lerp: 0.1, smoothWheel: true } as const;
+export const lenisOptions = { lerp: 0.08, smoothWheel: true } as const;

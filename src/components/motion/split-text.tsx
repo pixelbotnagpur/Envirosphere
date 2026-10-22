@@ -27,7 +27,7 @@ export function SplitText({ text, delay = 0, stagger = 0.06, className, ...props
                 className="inline-block"
                 initial={{ y: "110%" }}
                 whileInView={{ y: 0 }}
-                viewport={{ once: true, amount: 0.6 }}
+                viewport={{ once: true, amount: "some" }}
                 transition={{ duration: duration.slow, delay: delay + index * stagger, ease: ease.outExpo }}
               >
                 {word}

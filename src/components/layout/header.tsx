@@ -58,7 +58,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
       <div
         aria-hidden="true"
         className={cn(
-          "absolute inset-0 -z-10 border-b border-border bg-background/90 shadow-card backdrop-blur-md transition-all duration-base ease-out",
+          "absolute inset-0 -z-10 border-b border-border bg-background/90 shadow-card backdrop-blur-md transition-all duration-(--duration-base) ease-out-expo",
           isDarkHero ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         )}
       />

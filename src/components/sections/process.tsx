@@ -34,7 +34,7 @@ function PinnedStep({
   return (
     <motion.li
       style={{ opacity }}
-      className="grid grid-cols-[4rem_1fr] gap-4 border-t border-primary-foreground/20 py-6"
+      className="grid grid-cols-[4rem_1fr] gap-4 border-t border-primary-foreground/35 py-6"
     >
       <span className="text-label uppercase tracking-label tabular-nums text-secondary">{pad(position + 1, 3)}</span>
       <div>
@@ -70,7 +70,7 @@ export function Process({ index, label, heading, steps }: ProcessProps) {
               {steps.map((step, position) => (
                 <li
                   key={step.title}
-                  className="grid grid-cols-[4rem_1fr] gap-4 border-t border-primary-foreground/20 py-6"
+                  className="grid grid-cols-[4rem_1fr] gap-4 border-t border-primary-foreground/35 py-6"
                 >
                   <span className="text-label uppercase tracking-label tabular-nums text-secondary">
                     {pad(position + 1, 3)}

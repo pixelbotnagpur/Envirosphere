@@ -48,9 +48,9 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, scrol
           </div>
         </div>
 
-        <div className="rise rise-3 mt-12 flex items-center justify-between border-t border-primary-foreground/15 pt-6 text-label uppercase tracking-label text-primary-foreground/70">
+        <div className="rise rise-3 mt-12 flex items-center justify-between border-t border-primary-foreground/30 pt-6 text-label uppercase tracking-label text-primary-foreground/80">
           <div className="flex items-center gap-3">
-            <span className="flex size-7 items-center justify-center rounded-full border border-primary-foreground/25">
+            <span className="flex size-7 items-center justify-center rounded-full border border-primary-foreground/40">
               <ArrowDown aria-hidden="true" className="size-3.5 animate-bounce" />
             </span>
             <span>{scrollLabel}</span>

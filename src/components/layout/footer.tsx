@@ -64,7 +64,7 @@ export function Footer({ name, tagline, contact, offices, nav, social, labels }:
         </nav>
       </Container>
 
-      <Container className="mt-16 border-t border-primary-foreground/20 pt-6 text-sm text-primary-foreground/70">
+      <Container className="mt-16 border-t border-primary-foreground/35 pt-6 text-sm text-primary-foreground/70">
         <p>
           © {new Date().getFullYear()} {name}
         </p>

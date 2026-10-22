@@ -19,7 +19,7 @@ export function Stats({ index, label, items, locale }: StatsProps) {
         </SectionLabel>
         <ul className="mt-16 grid grid-cols-2 gap-x-6 gap-y-16 lg:grid-cols-4">
           {items.map((item) => (
-            <li key={item.label} className="border-t border-secondary-foreground/30 pt-6">
+            <li key={item.label} className="border-t border-secondary-foreground/45 pt-6">
               <Reveal>
                 <p className="font-heading text-h1">
                   <Counter value={item.value} locale={locale} />
