@@ -1,12 +1,13 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
-import { loadService, loadServices, loadSite } from "@/lib/content";
+import { getImageAsset, loadService, loadServices, loadSite } from "@/lib/content";
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -38,6 +39,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const currentIndex = allServices.findIndex((s) => s.slug === slug);
   const prevService = currentIndex > 0 ? allServices[currentIndex - 1] : allServices[allServices.length - 1];
   const nextService = currentIndex < allServices.length - 1 ? allServices[currentIndex + 1] : allServices[0];
+  const serviceImage = service.image ? getImageAsset(service.image) : null;
 
   return (
     <div>
@@ -73,6 +75,27 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
         <Container className="grid gap-16 lg:grid-cols-12">
           {/* Main Scope Column */}
           <div className="lg:col-span-8">
+            {serviceImage ? (
+              <Reveal className="mb-10">
+                <div className="overflow-hidden rounded-card border border-border bg-background shadow-card">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface">
+                    <Image
+                      src={serviceImage.src}
+                      alt={serviceImage.alt}
+                      width={serviceImage.width ?? 1200}
+                      height={serviceImage.height ?? 675}
+                      className="h-full w-full object-cover"
+                      priority
+                    />
+                  </div>
+                  <div className="border-t border-border px-6 py-3.5 text-xs text-muted-foreground flex items-center justify-between">
+                    <span>Field Documentation &bull; {service.title}</span>
+                    <span className="uppercase tracking-label text-primary font-normal">Authentic Field Record</span>
+                  </div>
+                </div>
+              </Reveal>
+            ) : null}
+
             <Reveal>
               <h2 className="text-h2 tracking-tight">Scope & Engineering Methodology</h2>
               <p className="mt-6 text-lead text-muted-foreground font-light leading-relaxed">

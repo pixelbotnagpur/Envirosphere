@@ -1,11 +1,12 @@
 import { CheckCircle2, Factory, FileCheck2, FlaskConical, Milestone, ShieldCheck, Users } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
-import { loadHome, loadSite } from "@/lib/content";
+import { getImageAsset, loadHome, loadSite } from "@/lib/content";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
@@ -17,6 +18,7 @@ export function generateMetadata(): Metadata {
 
 export default function WhyUsPage() {
   const home = loadHome();
+  const treatmentImage = getImageAsset("photo-treatment-plant");
 
   const pillars = [
     {
@@ -97,6 +99,34 @@ export default function WhyUsPage() {
               </li>
             ))}
           </div>
+
+          {/* Practical Engineering Visual Feature */}
+          <Reveal className="mt-14">
+            <div className="overflow-hidden rounded-card border border-border bg-background shadow-card">
+              <div className="grid lg:grid-cols-12 items-center">
+                <div className="lg:col-span-7 relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-surface">
+                  <Image
+                    src={treatmentImage.src}
+                    alt={treatmentImage.alt}
+                    width={treatmentImage.width ?? 1200}
+                    height={treatmentImage.height ?? 800}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="lg:col-span-5 p-8 sm:p-10 space-y-4">
+                  <span className="text-label text-primary uppercase tracking-label font-normal">
+                    Turnkey Engineering Depth
+                  </span>
+                  <h3 className="text-h3 tracking-tight">
+                    Beyond Advisory: Practical On-Ground Engineering
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed">
+                    Unlike pure paperwork liaisons, our in-house engineering team designs, commissions, and operates biological effluent treatment (ETP) and sewage treatment (STP) plants with zero liquid discharge (ZLD) systems across Maharashtra.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </Container>
       </section>
 

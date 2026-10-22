@@ -21,6 +21,7 @@ export default function AboutPage() {
   const site = loadSite();
   const home = loadHome();
   const aboutImage = getImageAsset(home.about.image);
+  const acoMeetImage = getImageAsset("photo-aco-meet");
 
   return (
     <div>
@@ -115,6 +116,34 @@ export default function AboutPage() {
               </Reveal>
             ))}
           </div>
+
+          {/* Institutional Engagement Showcase */}
+          <Reveal className="mt-12">
+            <div className="overflow-hidden rounded-card border border-border bg-background shadow-card">
+              <div className="grid lg:grid-cols-12 items-center">
+                <div className="lg:col-span-7 relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-surface">
+                  <Image
+                    src={acoMeetImage.src}
+                    alt={acoMeetImage.alt}
+                    width={acoMeetImage.width ?? 1200}
+                    height={acoMeetImage.height ?? 800}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="lg:col-span-5 p-8 sm:p-10 space-y-4">
+                  <span className="text-label text-primary uppercase tracking-label font-normal">
+                    National Institutional Engagement
+                  </span>
+                  <h3 className="text-h3 tracking-tight">
+                    Active Participation in Central Environmental Policy
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed">
+                    Our leadership represents Envirosphere at national forums, including the National Meet of NABET Accredited Consultant Organisations (ACO) in Delhi, actively contributing to statutory appraisal standards and compliance guidelines.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </Container>
       </section>
 

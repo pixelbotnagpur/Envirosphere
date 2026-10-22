@@ -1,18 +1,138 @@
-# Project, field, and team gallery items.
-- id: field-monitoring-1
-  title: Ambient Air Quality Monitoring Field Deployment
-  category: Field Monitoring
-  image: about-photo
-  caption: Environmental monitoring team conducting continuous ambient air and noise sampling at an industrial site.
+﻿# Project, field, and team gallery items from authentic company documentation.
+- id: field-vegetation-survey
+  title: Deciduous Forest Vegetation Survey
+  category: Field Work
+  image: photo-g01
+  caption: Field team surveying dry deciduous forest vegetation for statutory ecological clearance.
 
-- id: wastewater-plant-2
-  title: Zero Liquid Discharge ETP Facility Commissioning
-  category: Engineering
-  image: about-photo
-  caption: Modern industrial effluent treatment facility designed and operated under our environmental engineering team.
+- id: plantation-drive-team
+  title: Corporate Environmental Plantation Drive
+  category: Plantation Drives
+  image: photo-g02
+  caption: Envirosphere technical team gathered at a community tree plantation initiative.
 
-- id: stakeholder-consultation-3
-  title: Public Consultation & Environmental Appraisal
-  category: Clearances
-  image: about-photo
-  caption: Technical presentation and stakeholder documentation support for statutory environmental clearance.
+- id: marine-water-nicobar
+  title: Marine Water Sampling at Sea
+  category: Field Work
+  image: photo-g03
+  caption: Marine water sampling conducted from an offshore survey vessel near the Nicobar Islands.
+
+- id: office-lounge-corner
+  title: Corporate Headquarters Lounge
+  category: Office
+  image: photo-g04
+  caption: Lounge corner at the Envirosphere corporate headquarters in Rahatani, Pune.
+
+- id: plantation-sapling-tagged
+  title: Tagged Sapling Plantation
+  category: Plantation Drives
+  image: photo-g05
+  caption: Monitored sapling with identity tagging beside compound perimeter.
+
+- id: offshore-sampling-crew
+  title: Offshore Marine Sampling Gear
+  category: Field Work
+  image: photo-g06
+  caption: Technical crew in protective coveralls deploying oceanographic sampling gear.
+
+- id: office-conference-room
+  title: Executive Conference Facility
+  category: Office
+  image: photo-g07
+  caption: State-of-the-art conference room for technical client presentations and regulatory reviews.
+
+- id: village-due-diligence
+  title: Rural Site Due Diligence
+  category: Field Work
+  image: photo-g08
+  caption: Environmental engineers conducting community liaison and rural baseline survey.
+
+- id: plantation-drive-completed
+  title: Green Belt Plantation Initiative
+  category: Plantation Drives
+  image: photo-g09
+  caption: Technical team celebrating completion of an industrial green belt plantation drive.
+
+- id: offshore-briefing
+  title: Marine Survey Briefing
+  category: Field Work
+  image: photo-g10
+  caption: Senior environmental scientist briefing the marine monitoring crew off Nicobar.
+
+- id: office-meeting-room
+  title: Client Consultation Meeting Room
+  category: Office
+  image: photo-g11
+  caption: Meeting room behind acoustic glass partition at the Pune headquarters.
+
+- id: roadside-plantation
+  title: Roadside Buffer Corridor Planting
+  category: Plantation Drives
+  image: photo-g12
+  caption: Planting native tree saplings along industrial road corridors for particulate buffering.
+
+- id: marine-survey-deck
+  title: Marine Monitoring Vessel Deck
+  category: Field Work
+  image: photo-g13
+  caption: Survey crew on deck during coastal and offshore water quality testing.
+
+- id: office-reception
+  title: Headquarters Reception Lounge
+  category: Office
+  image: photo-g14
+  caption: Warm, welcoming reception lounge at the Envirosphere Pune head office.
+
+- id: young-sapling-growth
+  title: Native Species Afforestation
+  category: Plantation Drives
+  image: photo-g15
+  caption: Native sapling nurtured as part of industrial compensatory afforestation planning.
+
+- id: lab-soil-sample
+  title: Certified Soil Sample Collection
+  category: Field Work
+  image: photo-g16
+  caption: Core soil sample bagged and sealed under chain-of-custody for NABL laboratory testing.
+
+- id: office-director-cabin
+  title: Principal Consultant Suite
+  category: Office
+  image: photo-g17
+  caption: Director suite at Envirosphere headquarters.
+
+- id: sea-water-sampling
+  title: Open Sea Water Quality Sampling
+  category: Field Work
+  image: photo-g18
+  caption: Offshore surface and depth water sampling for coastal regulatory compliance.
+
+- id: office-workstations
+  title: Environmental Engineering Studio
+  category: Office
+  image: photo-g19
+  caption: Engineering workstation area overlooking the Pune skyline.
+
+- id: marine-sampler-deployment
+  title: Van Veen Sampler Deployment
+  category: Field Work
+  image: photo-g20
+  caption: Crew lowering benthic grab sampler into coastal waters for sediment baseline analysis.
+
+- id: office-executive-cabin
+  title: Senior Technical Consultant Cabin
+  category: Office
+  image: photo-g21
+  caption: Senior technical advisor cabin at the Pune corporate office.
+
+- id: ecologist-quadrat-survey
+  title: Forest Quadrat Biodiversity Survey
+  category: Field Work
+  image: photo-g22
+  caption: Senior ecologist recording canopy and ground vegetation data in a forest quadrat.
+
+- id: aco-meet-2026-delhi
+  title: QCI NABET ACO Meet 2026
+  category: Events
+  image: photo-g23
+  caption: Envirosphere leadership at the National Accredited Consultant Organisations (ACO) Meet in Delhi.

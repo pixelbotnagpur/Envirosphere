@@ -1,11 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
-import { loadServices, loadSite } from "@/lib/content";
+import { getImageAsset, loadServices, loadSite } from "@/lib/content";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
@@ -39,28 +40,43 @@ export default function ServicesPage() {
       <section aria-label="Services List" className="border-t border-border bg-surface py-section">
         <Container>
           <ol className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, idx) => (
-              <li key={service.slug} className="flex">
-                <Reveal delay={idx * 0.04} className="flex w-full">
-                  <Link
-                    href={`/services/${service.slug}/`}
-                    className="group relative flex w-full flex-col justify-between rounded-card border border-border bg-background p-8 transition-colors duration-(--duration-base) ease-out-expo hover:border-primary/40 hover:shadow-card"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-label text-muted-foreground uppercase tracking-label tabular-nums">
-                          {String(service.order).padStart(3, "0")}
-                        </span>
-                        <div className="flex size-9 items-center justify-center rounded-pill border border-border text-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:bg-primary group-hover:text-primary-foreground">
-                          <ArrowUpRight
-                            aria-hidden="true"
-                            className="size-4 transition-transform duration-(--duration-base) ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                          />
+            {services.map((service, idx) => {
+              const imageAsset = service.image ? getImageAsset(service.image) : null;
+              return (
+                <li key={service.slug} className="flex">
+                  <Reveal delay={idx * 0.04} className="flex w-full">
+                    <Link
+                      href={`/services/${service.slug}/`}
+                      className="group relative flex w-full flex-col justify-between rounded-card border border-border bg-background p-8 transition-colors duration-(--duration-base) ease-out-expo hover:border-primary/40 hover:shadow-card"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-label text-muted-foreground uppercase tracking-label tabular-nums">
+                            {String(service.order).padStart(3, "0")}
+                          </span>
+                          <div className="flex size-9 items-center justify-center rounded-pill border border-border text-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:bg-primary group-hover:text-primary-foreground">
+                            <ArrowUpRight
+                              aria-hidden="true"
+                              className="size-4 transition-transform duration-(--duration-base) ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <h2 className="mt-6 text-h3 tracking-tight">
-                        {service.title}
-                      </h2>
+
+                        {imageAsset ? (
+                          <div className="mt-5 aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface">
+                            <Image
+                              src={imageAsset.src}
+                              alt={imageAsset.alt}
+                              width={imageAsset.width ?? 600}
+                              height={imageAsset.height ?? 375}
+                              className="h-full w-full object-cover transition-transform duration-(--duration-base) ease-out-expo group-hover:scale-105"
+                            />
+                          </div>
+                        ) : null}
+
+                        <h2 className="mt-5 text-h3 tracking-tight">
+                          {service.title}
+                        </h2>
                       <p className="mt-4 text-sm text-muted-foreground font-light leading-relaxed">
                         {service.summary}
                       </p>
@@ -73,8 +89,9 @@ export default function ServicesPage() {
                   </Link>
                 </Reveal>
               </li>
-            ))}
-          </ol>
+            );
+          })}
+        </ol>
         </Container>
       </section>
 
