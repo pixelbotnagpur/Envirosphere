@@ -25,19 +25,37 @@ export const loadHome = (root = CONTENT_ROOT): Home =>
 export function loadServices(root = CONTENT_ROOT): Service[] {
   const dir = path.join(root, "services");
   if (!existsSync(dir)) return [];
-  return readdirSync(dir)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const slug = file.replace(/\.md$/, "");
-      if (!SLUG.test(slug)) {
-        throw new ContentError(
-          `content/services/${file}: file names must be lowercase letters, numbers and dashes, e.g. crz-clearance.md`,
-        );
-      }
-      const { data, body } = readMarkdownFile(`services/${file}`, serviceFrontMatterSchema, root);
-      return { ...data, slug, body };
-    })
-    .sort((a, b) => a.order - b.order);
+  const names = readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => !entry.name.startsWith(".") && !entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  const services: Service[] = [];
+  for (const file of names) {
+    if (!file.endsWith(".md")) {
+      throw new ContentError(
+        `content/services/${file}: only .md files are allowed here (rename to lowercase .md or remove it)`,
+      );
+    }
+    const slug = file.replace(/\.md$/, "");
+    if (!SLUG.test(slug)) {
+      throw new ContentError(
+        `content/services/${file}: file names must be lowercase letters, numbers and dashes, e.g. crz-clearance.md`,
+      );
+    }
+    const { data, body } = readMarkdownFile(`services/${file}`, serviceFrontMatterSchema, root);
+    services.push({ ...data, slug, body });
+  }
+  const seen = new Map<number, string>();
+  for (const service of services) {
+    const first = seen.get(service.order);
+    if (first) {
+      throw new ContentError(
+        `content/services: "${first}" and "${service.slug}.md" both use order ${service.order}; give each service a different number`,
+      );
+    }
+    seen.set(service.order, `${service.slug}.md`);
+  }
+  return services.sort((a, b) => a.order - b.order);
 }
 
 /** Loads everything and checks every media reference. Used by `pnpm content:check` and the build. */

@@ -39,6 +39,7 @@ describe("loadAll", () => {
     files["public/other.txt"] = "x";
     const { content, publicDir } = makeTree(files);
     expect(() => loadAll(content, publicDir)).toThrowError(ContentError);
+    expect(() => loadAll(content, publicDir)).toThrowError(/file not found/);
   });
 });
 
@@ -56,6 +57,36 @@ describe("loadServices", () => {
     files["content/services/Bad Name.md"] = "---\ntitle: A\norder: 5\nsummary: S\n---\nB";
     const { content } = makeTree(files);
     expect(() => loadServices(content)).toThrowError(/content\/services\/Bad Name\.md: .*lowercase/);
+  });
+
+  it("rejects two services that share the same order number", () => {
+    const files = validFiles();
+    files["content/services/water-audit.md"] = "---\ntitle: Water\norder: 1\nsummary: S\n---\nB";
+    const { content } = makeTree(files);
+    expect(() => loadServices(content)).toThrowError(ContentError);
+    expect(() => loadServices(content)).toThrowError(
+      'content/services: "environmental-audit.md" and "water-audit.md" both use order 1; give each service a different number',
+    );
+  });
+
+  it("rejects files in services/ that are not lowercase .md", () => {
+    for (const name of ["Foo.MD", "x.markdown", "notes.txt"]) {
+      const files = validFiles();
+      files[`content/services/${name}`] = "x";
+      const { content } = makeTree(files);
+      expect(() => loadServices(content)).toThrowError(ContentError);
+      expect(() => loadServices(content)).toThrowError(
+        `content/services/${name}: only .md files are allowed here (rename to lowercase .md or remove it)`,
+      );
+    }
+  });
+
+  it("silently ignores hidden files and sub-folders in services/", () => {
+    const files = validFiles();
+    files["content/services/.DS_Store"] = "x";
+    files["content/services/drafts/old.md"] = "x";
+    const { content } = makeTree(files);
+    expect(loadServices(content).map((s) => s.slug)).toEqual(["environmental-audit"]);
   });
 
   it("returns an empty list when there is no services folder", () => {

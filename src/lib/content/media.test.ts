@@ -45,6 +45,64 @@ describe("resolveMedia", () => {
     const docs = { brochure: { src: "/media/docs/brochure.pdf", alt: "Brochure" } };
     const resolved = resolveMedia(docs, "brochure", publicDir);
     expect(resolved.width).toBeUndefined();
+    expect(resolved.height).toBeUndefined();
+  });
+
+  it("explains a zero-byte image in plain words", () => {
+    const { publicDir } = makeTree({ "public/media/brand/logo.png": "" });
+    const png = { logo: { src: "/media/brand/logo.png", alt: "Logo" } };
+    expect(() => resolveMedia(png, "logo", publicDir)).toThrowError(ContentError);
+    expect(() => resolveMedia(png, "logo", publicDir)).toThrowError(
+      /^content\/media\.yaml → logo: \/media\/brand\/logo\.png is not a readable image \(/,
+    );
+  });
+
+  it("explains an svg without any size information", () => {
+    const { publicDir } = makeTree({
+      "public/media/brand/logo.svg": '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+    });
+    expect(() => resolveMedia(media, "logo", publicDir)).toThrowError(ContentError);
+    expect(() => resolveMedia(media, "logo", publicDir)).toThrowError(
+      /^content\/media\.yaml → logo: \/media\/brand\/logo\.svg is not a readable image \(/,
+    );
+  });
+
+  it("does not probe images whose size is written in media.yaml", () => {
+    const { publicDir } = makeTree({ "public/media/brand/logo.png": "" });
+    const sized = { logo: { src: "/media/brand/logo.png", alt: "Logo", width: 10, height: 10 } };
+    expect(resolveMedia(sized, "logo", publicDir)).toMatchObject({ width: 10, height: 10 });
+  });
+
+  it("catches a folder-name letter-case mismatch that would break on the live server", () => {
+    const { publicDir } = makeTree({ "public/media/brand/logo.svg": LOGO_SVG });
+    const wrongCase = { logo: { src: "/media/Brand/logo.svg", alt: "Logo" } };
+    expect(() => resolveMedia(wrongCase, "logo", publicDir)).toThrowError(ContentError);
+    // Case-insensitive disks (Windows/macOS) report a case mismatch; case-sensitive ones report not found.
+    expect(() => resolveMedia(wrongCase, "logo", publicDir)).toThrowError(
+      /logo.*(case does not match: write "\/media\/brand\/logo\.svg"|file not found)/,
+    );
+  });
+
+  it("catches a file-name letter-case mismatch", () => {
+    const { publicDir } = makeTree({ "public/media/brand/logo.svg": LOGO_SVG });
+    const wrongCase = { logo: { src: "/media/brand/Logo.SVG", alt: "Logo" } };
+    expect(() => resolveMedia(wrongCase, "logo", publicDir)).toThrowError(
+      /case does not match: write "\/media\/brand\/logo\.svg"|file not found/,
+    );
+  });
+
+  it("rejects a src that points at a folder", () => {
+    const { publicDir } = makeTree({ "public/media/brand.png/inner.txt": "x" });
+    const dir = { logo: { src: "/media/brand.png", alt: "Logo" } };
+    expect(() => resolveMedia(dir, "logo", publicDir)).toThrowError(ContentError);
+    expect(() => resolveMedia(dir, "logo", publicDir)).toThrowError(/logo.*folder/);
+  });
+
+  it("rejects a src that escapes public/", () => {
+    const { publicDir } = makeTree({ "secret.txt": "x", "public/a.txt": "x" });
+    const escape = { logo: { src: "/../secret.txt", alt: "Logo" } };
+    expect(() => resolveMedia(escape, "logo", publicDir)).toThrowError(ContentError);
+    expect(() => resolveMedia(escape, "logo", publicDir)).toThrowError(/logo.*outside/);
   });
 });
 
