@@ -9,7 +9,7 @@ const css = readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8"
 
 const tokens = new Map<string, string>();
 for (const match of css.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-  // First definition wins so the @theme values are the ones tested (later overrides, e.g. the `.bg-primary *` ring rule, are ignored here).
+  // First definition wins so the @theme values are the ones tested (any later redefinition is ignored here; a separate test asserts --color-ring is defined only once).
   if (!tokens.has(match[1])) tokens.set(match[1], match[2].trim());
 }
 
@@ -47,25 +47,19 @@ describe("focus ring meets WCAG 1.4.11 (3:1)", () => {
   it("ring vs surface", () => {
     expect(contrast(color("ring"), color("surface"))).toBeGreaterThanOrEqual(3);
   });
-  it("accent vs primary (the ring inside dark sections)", () => {
-    expect(contrast(color("accent"), color("primary"))).toBeGreaterThanOrEqual(3);
+  it("ring vs secondary (the Forest outline on Sage)", () => {
+    expect(contrast(color("ring"), color("secondary"))).toBeGreaterThanOrEqual(3);
   });
-  it("primary vs secondary (the Forest ring on Sage)", () => {
-    expect(contrast(color("primary"), color("secondary"))).toBeGreaterThanOrEqual(3);
+  it("ring-offset vs primary (the Bone band on Forest sections)", () => {
+    expect(contrast(color("ring-offset"), color("primary"))).toBeGreaterThanOrEqual(3);
   });
-  it("globals.css gives descendants of .bg-primary the accent ring, not the element itself", () => {
-    expect(css).toMatch(/\.bg-primary \*\s*\{[^}]*--color-ring:\s*var\(--color-accent\)/);
-    expect(css).not.toMatch(/\.bg-primary\s*\{[^}]*--color-ring/);
-  });
-  it("globals.css gives light-surface descendants the primary ring, after the dark rule", () => {
-    const dark = css.indexOf(".bg-primary *");
-    const light = css.indexOf(".bg-surface *");
-    expect(dark).toBeGreaterThan(-1);
-    expect(light).toBeGreaterThan(-1);
-    expect(light).toBeGreaterThan(dark);
+  it("the :focus-visible block uses both tokens (two-tone, WCAG C40)", () => {
     expect(css).toMatch(
-      /\.bg-background \*,\s*\.bg-surface \*,\s*\.bg-secondary \*\s*\{[^}]*--color-ring:\s*var\(--color-primary\)/,
+      /:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--color-ring\)[^}]*box-shadow:\s*0 0 0 2px var\(--color-ring-offset\)/,
     );
+  });
+  it("--color-ring is defined exactly once (no per-section overrides)", () => {
+    expect(css.match(/--color-ring\s*:/g)).toHaveLength(1);
   });
 });
 
@@ -73,7 +67,7 @@ describe("palette roles exist", () => {
   it.each([
     "primary", "primary-foreground", "secondary", "secondary-foreground", "accent",
     "accent-foreground", "background", "foreground", "surface", "muted-foreground",
-    "border", "ring", "destructive",
+    "border", "ring", "ring-offset", "destructive",
   ])("--color-%s", (name) => {
     expect(() => color(name)).not.toThrow();
   });

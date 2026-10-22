@@ -31,6 +31,7 @@
   --color-muted-foreground: var(--color-lichen-600);
   --color-border: var(--color-linen-300);
   --color-ring: var(--color-primary);
+  --color-ring-offset: var(--color-background);
   --color-destructive: var(--color-clay-600);
 
   /* ── Typography: exactly two families (set by next/font in layout.tsx) ── */
@@ -115,21 +116,11 @@
     text-wrap: balance;
   }
 
+  /* Two-tone indicator (WCAG C40): the Bone band shows on dark sections, the Forest outline on light ones. */
   :focus-visible {
     outline: 2px solid var(--color-ring);
-    outline-offset: 3px;
-  }
-
-  /* Focus rings must reach 3:1 against the surface they sit on.
-     Descendants of dark sections get Ochre; descendants of light surfaces get Forest.
-     The section element itself keeps the default (Forest), since its outline sits outside it. */
-  .bg-primary * {
-    --color-ring: var(--color-accent);
-  }
-  .bg-background *,
-  .bg-surface *,
-  .bg-secondary * {
-    --color-ring: var(--color-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-ring-offset);
   }
 
   ::selection {

@@ -24,7 +24,8 @@ token defined once in `src/app/globals.css`. Changing a token in ONE place resty
 | surface / card | `--color-surface` | Sand `oklch(0.92 0.02 88)` |
 | muted text | `--color-muted-foreground` | `oklch(0.50 0.02 150)` |
 | border | `--color-border` | Linen `oklch(0.86 0.02 95)` |
-| ring | `--color-ring` | `var(--color-primary)`; descendants of `.bg-primary` get Ochre |
+| ring | `--color-ring` | `var(--color-primary)` (Forest outline) |
+| ring offset | `--color-ring-offset` | `var(--color-background)` (Bone band; two-tone focus, WCAG C40) |
 | destructive | `--color-destructive` | Clay `oklch(0.53 0.16 30)` (form errors only) |
 
 - "Change card background to primary" means set the card to `bg-primary text-primary-foreground`,
