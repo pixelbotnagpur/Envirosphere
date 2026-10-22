@@ -78,7 +78,7 @@ export default function HomePage() {
         primaryCta={home.hero.primaryCta}
         secondaryCta={home.hero.secondaryCta}
         scrollLabel={home.hero.scrollLabel}
-        featuredImage={getImageAsset("hero-eco-architecture")}
+        backgroundImage={getImageAsset("hero-eco-architecture")}
       />
       <About
         index="001"
