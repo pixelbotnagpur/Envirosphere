@@ -115,14 +115,6 @@
     text-wrap: balance;
   }
 
-  /* Two-tone focus (WCAG C40): Forest outline shows on light surfaces, the Bone band on dark ones.
-     The band is a box-shadow, so components must not add ring/shadow utilities on focus. */
-  :focus-visible {
-    outline: 2px solid var(--color-ring);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--color-ring-offset);
-  }
-
   ::selection {
     background: var(--color-accent);
     color: var(--color-accent-foreground);
@@ -133,4 +125,13 @@
       scroll-behavior: auto;
     }
   }
+}
+
+/* Two-tone focus (WCAG C40): Forest outline shows on light surfaces, the Bone band on dark ones.
+   Unlayered on purpose: unlayered CSS beats every Tailwind layer, so no utility (ring, shadow,
+   outline-*) can silently defeat the focus indicator. The band is a box-shadow. */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-ring-offset);
 }

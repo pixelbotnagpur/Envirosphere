@@ -13,6 +13,10 @@ describe("fonts (rule 31)", () => {
     expect(names).toEqual(["Manrope", "Syne"]);
   });
 
+  it("loads Syne in weight 400 only", () => {
+    expect(layout).toMatch(/Syne\(\{[^}]*weight:\s*\["400"\]\s*[,}]/);
+  });
+
   it("loads Manrope in weights 300 and 400 only", () => {
     expect(layout).toMatch(/Manrope\(\{[^}]*weight:\s*\["300",\s*"400"\]/);
   });

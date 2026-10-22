@@ -61,6 +61,16 @@ describe("focus ring meets WCAG 1.4.11 (3:1)", () => {
       /:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--color-ring\)[^}]*box-shadow:\s*0 0 0 2px var\(--color-ring-offset\)/,
     );
   });
+  it("the :focus-visible block is unlayered so no utility can defeat it", () => {
+    const at = css.search(/:focus-visible\s*\{/);
+    expect(at).toBeGreaterThan(-1);
+    let depth = 0;
+    for (const ch of css.slice(0, at)) {
+      if (ch === "{") depth++;
+      else if (ch === "}") depth--;
+    }
+    expect(depth).toBe(0);
+  });
   it("--color-ring is defined exactly once (no per-section overrides)", () => {
     expect(css.match(/--color-ring\s*:/g)).toHaveLength(1);
   });
