@@ -43,12 +43,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const site = loadSite();
   const logo = getImage(site.logoKey);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+        "@id": `${site.url}/#organization`,
+        name: site.name,
+        alternateName: site.shortName,
+        url: site.url,
+        logo: `${site.url}${logo.src}`,
+        description: site.seo.description,
+        telephone: site.contact.phones[0],
+        email: site.contact.email,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: site.contact.address,
+          addressLocality: "Pune",
+          addressRegion: "Maharashtra",
+          postalCode: "411017",
+          addressCountry: "IN",
+        },
+        department: site.offices.map((office) => ({
+          "@type": "LocalBusiness",
+          name: `${site.shortName} - ${office.city} ${office.name}`,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: office.city,
+            addressRegion: "Maharashtra",
+            addressCountry: "IN",
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <html lang={site.locale} className={`${syne.variable} ${manrope.variable}`}>
       <head>
         <noscript>
           <style>{noScriptFallback}</style>
         </noscript>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body>
         <LenisProvider>
