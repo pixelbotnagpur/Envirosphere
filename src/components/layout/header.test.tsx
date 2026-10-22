@@ -11,7 +11,8 @@ vi.mock("next/link", () => ({
 
 const props = {
   name: "Envirosphere",
-  logo: { src: "/media/brand/logo.svg", alt: "Envirosphere logo", width: 40, height: 40 },
+  logo: { src: "/media/brand/logo.svg", width: 40, height: 40 },
+  labels: { openMenu: "Open menu", closeMenu: "Close menu", mainNav: "Main", mobileNav: "Mobile" },
   nav: [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services/" },
@@ -58,5 +59,19 @@ describe("Header", () => {
     const panel = mobileNav.firstElementChild as HTMLElement;
     expect(panel).toHaveAttribute("data-lenis-prevent");
     expect(panel).toHaveClass("overflow-y-auto");
+  });
+
+  it("closes the mobile menu with Escape and returns focus to the toggle", async () => {
+    render(<Header {...props} />);
+    const toggle = screen.getByRole("button", { name: "Open menu" });
+    await userEvent.click(toggle);
+    await userEvent.keyboard("{Escape}");
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveFocus();
+    expect(document.getElementById("mobile-nav")).toHaveAttribute("hidden");
+  });
+
+  it("marks the logo image decorative because the brand name is visible text", () => {
+    const { container } = render(<Header {...props} />);
+    expect(container.querySelector("img")).toHaveAttribute("alt", "");
   });
 });

@@ -19,6 +19,7 @@ const props = {
   offices: [{ name: "Head Office", city: "Pune" }],
   nav: [{ label: "About", href: "/about/" }],
   social: [{ label: "LinkedIn", href: "https://www.linkedin.com/company/test" }],
+  labels: { contact: "Contact", explore: "Explore" },
 };
 
 describe("Footer", () => {
@@ -41,5 +42,10 @@ describe("Footer", () => {
   it("shows the current year in the copyright line", () => {
     render(<Footer {...props} />);
     expect(screen.getByText(new RegExp(String(new Date().getFullYear())))).toBeInTheDocument();
+  });
+
+  it("exposes the explore links as a labelled navigation landmark", () => {
+    render(<Footer {...props} />);
+    expect(screen.getByRole("navigation", { name: "Explore" })).toBeInTheDocument();
   });
 });

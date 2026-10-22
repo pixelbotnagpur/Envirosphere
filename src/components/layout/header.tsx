@@ -3,7 +3,7 @@
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
@@ -14,23 +14,36 @@ export interface NavItem {
 
 export interface HeaderProps {
   name: string;
-  logo: { src: string; alt: string; width: number; height: number };
+  logo: { src: string; width: number; height: number };
+  labels: { openMenu: string; closeMenu: string; mainNav: string; mobileNav: string };
   nav: NavItem[];
   cta?: NavItem;
 }
 
-export function Header({ name, logo, nav, cta }: HeaderProps) {
+export function Header({ name, logo, labels, nav, cta }: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-(--z-header) border-b border-border bg-background/85 backdrop-blur">
       <Container className="flex h-header items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <Image src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} priority />
+          <Image src={logo.src} alt="" width={logo.width} height={logo.height} priority />
           <span className="font-heading text-h4">{name}</span>
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-8 lg:flex">
+        <nav aria-label={labels.mainNav} className="hidden items-center gap-8 lg:flex">
           {nav.map((item) => (
             <Link
               key={item.href}
@@ -49,11 +62,12 @@ export function Header({ name, logo, nav, cta }: HeaderProps) {
             </Button>
           ) : null}
           <button
+            ref={toggleRef}
             type="button"
             className="inline-flex size-11 items-center justify-center rounded-pill border border-border lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? labels.closeMenu : labels.openMenu}
             onClick={() => setOpen((value) => !value)}
           >
             {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
@@ -61,7 +75,7 @@ export function Header({ name, logo, nav, cta }: HeaderProps) {
         </div>
       </Container>
 
-      <nav id="mobile-nav" aria-label="Mobile" hidden={!open} className="border-t border-border lg:hidden">
+      <nav id="mobile-nav" aria-label={labels.mobileNav} hidden={!open} className="border-t border-border lg:hidden">
         {/* data-lenis-prevent lets the panel scroll natively under Lenis; the cap is the viewport minus the header bar. */}
         <Container
           data-lenis-prevent

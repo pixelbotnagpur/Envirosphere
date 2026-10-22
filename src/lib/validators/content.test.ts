@@ -11,6 +11,12 @@ describe("content schemas", () => {
     expect(homeSchema.safeParse(parse(HOME_YAML)).success).toBe(true);
   });
 
+  it("requires every interface label in site.ui", () => {
+    const site = parse(SITE_YAML);
+    delete site.ui.skipToContent;
+    expect(siteSchema.safeParse(site).success).toBe(false);
+  });
+
   it("rejects a title template without %s", () => {
     const site = parse(SITE_YAML);
     site.seo.titleTemplate = "Test";

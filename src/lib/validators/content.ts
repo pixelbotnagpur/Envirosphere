@@ -57,6 +57,20 @@ export const siteSchema = z.object({
     description: z.string().min(1),
     ogImageKey: mediaKey,
   }),
+  ui: z.object({
+    skipToContent: z.string().min(1),
+    openMenu: z.string().min(1),
+    closeMenu: z.string().min(1),
+    mainNav: z.string().min(1),
+    mobileNav: z.string().min(1),
+    footerContact: z.string().min(1),
+    footerExplore: z.string().min(1),
+    notFound: z.object({
+      label: z.string().min(1),
+      heading: z.string().min(1),
+      cta: z.string().min(1),
+    }),
+  }),
 });
 
 export const homeSchema = z.object({

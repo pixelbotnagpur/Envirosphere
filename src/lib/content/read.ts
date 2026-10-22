@@ -45,7 +45,7 @@ function readText(root: string, relPath: string, label: string): string {
     throw new ContentError(`${label}: could not open the file (${reason})`);
   }
   // Editors on Windows often save a leading byte-order mark; it is not part of the content.
-  return text.replace(/^﻿/, "");
+  return text.replace(/^\uFEFF/, "");
 }
 
 /** `emptyAs` is returned for an empty document; without it an empty document is an error. */

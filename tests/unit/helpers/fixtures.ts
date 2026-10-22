@@ -26,6 +26,18 @@ seo:
   titleTemplate: "%s | Test"
   description: A test site.
   ogImageKey: logo
+ui:
+  skipToContent: Skip to content
+  openMenu: Open menu
+  closeMenu: Close menu
+  mainNav: Main
+  mobileNav: Mobile
+  footerContact: Contact
+  footerExplore: Explore
+  notFound:
+    label: page not found
+    heading: This page has moved or does not exist.
+    cta: Back to home
 `;
 
 export const MEDIA_YAML = `

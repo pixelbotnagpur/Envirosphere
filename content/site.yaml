@@ -50,3 +50,17 @@ seo:
     NABET accredited environmental consultants in Pune: environmental clearances, statutory
     compliance, audits, monitoring and water and wastewater treatment engineering.
   ogImageKey: logo
+
+# Short interface texts used by the header, footer and 404 page (screen readers use them too).
+ui:
+  skipToContent: Skip to content
+  openMenu: Open menu
+  closeMenu: Close menu
+  mainNav: Main
+  mobileNav: Mobile
+  footerContact: Contact
+  footerExplore: Explore
+  notFound:
+    label: page not found
+    heading: This page has moved or does not exist.
+    cta: Back to home

@@ -56,11 +56,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-(--z-skip) focus:rounded-pill focus:bg-accent focus:px-6 focus:py-3 focus:text-accent-foreground"
           >
-            Skip to content
+            {site.ui.skipToContent}
           </a>
           <Header
             name={site.shortName}
-            logo={{ src: logo.src, alt: logo.alt, width: logo.width ?? 40, height: logo.height ?? 40 }}
+            logo={{ src: logo.src, width: logo.width ?? 40, height: logo.height ?? 40 }}
+            labels={{
+              openMenu: site.ui.openMenu,
+              closeMenu: site.ui.closeMenu,
+              mainNav: site.ui.mainNav,
+              mobileNav: site.ui.mobileNav,
+            }}
             nav={site.nav}
             cta={site.cta}
           />
@@ -72,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             offices={site.offices}
             nav={site.nav}
             social={socialLinks(site)}
+            labels={{ contact: site.ui.footerContact, explore: site.ui.footerExplore }}
           />
         </LenisProvider>
       </body>

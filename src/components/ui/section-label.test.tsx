@@ -24,4 +24,12 @@ describe("SectionLabel", () => {
     const { container } = render(<SectionLabel>services</SectionLabel>);
     expect(container.querySelector("p")?.textContent).toBe(`[${NBSP}services${NBSP}]`);
   });
+
+  it("uses the muted tone by default and the inverse tone on dark sections", () => {
+    const { rerender } = render(<SectionLabel>one</SectionLabel>);
+    expect(screen.getByText(/one/)).toHaveClass("text-muted-foreground", "tabular-nums");
+    rerender(<SectionLabel tone="inverse">one</SectionLabel>);
+    expect(screen.getByText(/one/)).toHaveClass("text-secondary");
+    expect(screen.getByText(/one/)).not.toHaveClass("text-muted-foreground");
+  });
 });

@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { site } from "./helpers/site";
 
 test("home renders the hero and the main menu", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-  const menuButton = page.getByRole("button", { name: "Open menu" });
+  const menuButton = page.getByRole("button", { name: site.ui.openMenu });
   if (await menuButton.isVisible()) await menuButton.click();
   await expect(page.getByRole("link", { name: "Services" }).first()).toBeVisible();
 });
@@ -24,7 +25,7 @@ test("content stays visible without JavaScript", async ({ browser }) => {
 test("skip link is the first tab stop and is not covered by the header", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
-  const skip = page.getByRole("link", { name: "Skip to content" });
+  const skip = page.getByRole("link", { name: site.ui.skipToContent });
   await expect(skip).toBeFocused();
 
   const box = await skip.boundingBox();
@@ -52,5 +53,5 @@ test("home has no horizontal scroll", async ({ page }) => {
 test("unknown pages show the 404 page", async ({ page }) => {
   const response = await page.goto("/does-not-exist/");
   expect(response?.status()).toBe(404);
-  await expect(page.getByText("This page has moved or does not exist.")).toBeVisible();
+  await expect(page.getByText(site.ui.notFound.heading)).toBeVisible();
 });
