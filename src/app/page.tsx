@@ -1,30 +1,74 @@
-import Link from "next/link";
-import { Reveal } from "@/components/motion/reveal";
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
-import { SectionLabel } from "@/components/ui/section-label";
-import { loadHome } from "@/lib/content";
+import { About } from "@/components/sections/about";
+import { Clients } from "@/components/sections/clients";
+import { ContactCta } from "@/components/sections/contact-cta";
+import { Hero } from "@/components/sections/hero";
+import { Process } from "@/components/sections/process";
+import { ServicesIndex } from "@/components/sections/services-index";
+import { Stats } from "@/components/sections/stats";
+import { Testimonials } from "@/components/sections/testimonials";
+import { getImageAsset, loadHome, loadServices, loadSite } from "@/lib/content";
 
 export default function HomePage() {
-  const { hero } = loadHome();
+  const site = loadSite();
+  const home = loadHome();
+  const services = loadServices();
+
   return (
-    <section className="bg-primary py-section text-primary-foreground">
-      <Container>
-        <Reveal>
-          <SectionLabel className="text-secondary">{hero.eyebrow}</SectionLabel>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h1 className="mt-8 max-w-5xl text-display break-words">{hero.title}</h1>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mt-10 max-w-2xl text-lead font-light text-primary-foreground/80">{hero.subtitle}</p>
-        </Reveal>
-        <Reveal delay={0.3}>
-          <Button asChild variant="accent" size="lg" className="mt-12">
-            <Link href={hero.primaryCta.href}>{hero.primaryCta.label}</Link>
-          </Button>
-        </Reveal>
-      </Container>
-    </section>
+    <>
+      <Hero
+        eyebrow={home.hero.eyebrow}
+        title={home.hero.title}
+        subtitle={home.hero.subtitle}
+        primaryCta={home.hero.primaryCta}
+        secondaryCta={home.hero.secondaryCta}
+        scrollLabel={home.hero.scrollLabel}
+      />
+      <About
+        index="001"
+        label={home.about.label}
+        heading={home.about.heading}
+        paragraphs={home.about.paragraphs}
+        image={getImageAsset(home.about.image)}
+        cta={home.about.cta}
+      />
+      <ServicesIndex
+        index="002"
+        label={home.services.label}
+        heading={home.services.heading}
+        intro={home.services.intro}
+        cta={home.services.cta}
+        services={services.map(({ slug, title, summary }) => ({ slug, title, summary }))}
+      />
+      <Stats index="003" label={home.stats.label} items={home.stats.items} locale={site.locale} />
+      <Clients
+        index="004"
+        label={home.clients.label}
+        heading={home.clients.heading}
+        logos={home.clients.logos.map(getImageAsset)}
+      />
+      <Process
+        index="005"
+        label={home.process.label}
+        heading={home.process.heading}
+        steps={home.process.steps}
+      />
+      <Testimonials
+        index="006"
+        label={home.testimonials.label}
+        heading={home.testimonials.heading}
+        items={home.testimonials.items}
+      />
+      <ContactCta
+        index="007"
+        label={home.contact.label}
+        heading={home.contact.heading}
+        body={home.contact.body}
+        primaryCta={home.contact.primaryCta}
+        phone={site.contact.phones[0]}
+        email={site.contact.email}
+        phoneLabel={home.contact.phoneLabel}
+        emailLabel={home.contact.emailLabel}
+      />
+    </>
   );
 }
