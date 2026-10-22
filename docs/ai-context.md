@@ -29,4 +29,5 @@ Google Sheet and stores CVs in Drive. No server, DB or login.
 - Reduced-motion disables Lenis/parallax/pinning.
 
 ## Current focus
-Plan 4 (interactive forms, Google Apps Script integration, CV uploads) done. Next: Plan 5 (SEO metadata, XML sitemap, robots, security headers, and production deployment). See docs/superpowers/plans/.
+Plan 4 (forms & Google Apps Script integration) and Plan 5 (SEO metadata, XML sitemap, robots, Schema.org JSON-LD, security headers, and production export) complete. All 23 static routes, 229 unit tests, and 42 E2E tests passing green.
+
