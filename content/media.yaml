@@ -1,0 +1,6 @@
+# Every image, logo, video and document used on the site.
+# To replace a file: put the new file in public/media/ and change `src` (or keep the same file name).
+# `alt` is the text for screen readers and search engines. Describe what the picture shows.
+logo:
+  src: /media/brand/logo.svg
+  alt: Envirosphere logo

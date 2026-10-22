@@ -1,0 +1,52 @@
+# Company-wide details. Used in the header, footer, contact page and search results.
+name: Envirosphere Consultant & Engineers
+shortName: Envirosphere
+tagline: Empowering Excellence
+url: https://envirosphere.co.in
+locale: en-IN
+logoKey: logo            # a name from media.yaml
+
+# Button shown at the right of the header.
+cta:
+  label: Get in touch
+  href: /contact/
+
+contact:
+  email: info@envirosphere.co.in
+  phones:
+    - "+91 9860220550"
+    - "+91 9225176005"
+  address: Shree Ganesh Ace Arcade, Kokane Chowk, Rahatani, Pune - 411017
+
+offices:
+  - name: Head Office
+    city: Pune
+    address: Shree Ganesh Ace Arcade, Kokane Chowk, Rahatani, Pune - 411017
+  - { name: Branch Office, city: Mumbai }
+  - { name: Branch Office, city: Tarapur }
+  - { name: Branch Office, city: Nashik }
+  - { name: Branch Office, city: Nagpur }
+
+accreditations:
+  - label: QCI NABET Accredited Consultant (Cat A)
+
+# Main menu, in display order. Links to pages that do not exist yet go live in a later phase.
+nav:
+  - { label: Home, href: / }
+  - { label: About, href: /about/ }
+  - { label: Services, href: /services/ }
+  - { label: Why Us, href: /why-us/ }
+  - { label: Careers, href: /careers/ }
+  - { label: Gallery, href: /gallery/ }
+  - { label: Downloads, href: /downloads/ }
+  - { label: Contact, href: /contact/ }
+
+# TODO(content): add the real social profile URLs. Remove a line to hide that icon.
+links: {}
+
+seo:
+  titleTemplate: "%s | Envirosphere"
+  description: >-
+    NABET accredited environmental consultants in Pune: environmental clearances, statutory
+    compliance, audits, monitoring and water and wastewater treatment engineering.
+  ogImageKey: logo
