@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"; // clsx + tailwind-merge
 
 const buttonVariants = cva(
   // base — tokens only (RULE 31), never raw values
-  "inline-flex items-center justify-center rounded-[--radius] font-body font-normal transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-[--radius] font-body font-normal transition-colors disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -59,6 +59,7 @@ export function Button({ className, variant, size, asChild, ...props }: ButtonPr
    imports. Pure presentation + interaction; data arrives via props.
 8. **Icons:** lucide-react, sized via tokens. `Sparkles`/`Sparkle`/`WandSparkles` are banned (rule 34).
 9. **Body-font weight ≤ 400** in every variant (rule 31). Weight contrast comes from `font-heading`.
+10. **No component focus styles.** Never add `focus:`/`focus-visible:` ring, shadow or outline utilities; the global two-tone ring in `globals.css` handles focus (rule 31).
 
 ## Decision gate before writing any component
 1. Exists in `src/components/ui` (or `src/components/motion`)? → use it.

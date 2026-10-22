@@ -50,6 +50,9 @@ describe("focus ring meets WCAG 1.4.11 (3:1)", () => {
   it("ring vs secondary (the Forest outline on Sage)", () => {
     expect(contrast(color("ring"), color("secondary"))).toBeGreaterThanOrEqual(3);
   });
+  it("ring vs accent (the Forest outline on Ochre)", () => {
+    expect(contrast(color("ring"), color("accent"))).toBeGreaterThanOrEqual(3);
+  });
   it("ring-offset vs primary (the Bone band on Forest sections)", () => {
     expect(contrast(color("ring-offset"), color("primary"))).toBeGreaterThanOrEqual(3);
   });

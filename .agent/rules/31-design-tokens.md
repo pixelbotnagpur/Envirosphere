@@ -33,6 +33,7 @@ token defined once in `src/app/globals.css`. Changing a token in ONE place resty
   Change the **token** only when the user asks to change the color itself ("make primary darker").
 - Accent ≤ 5% of any viewport. Primary carries the dark, immersive sections.
 - Every `x` / `x-foreground` pair passes WCAG AA 4.5:1. Check when tokens change.
+- Focus: one global two-tone indicator (Forest outline + Bone band via box-shadow). Components must not set focus ring/shadow/outline utilities; Tailwind utilities would override the band.
 
 ## Typography: exactly 2 families
 ```css

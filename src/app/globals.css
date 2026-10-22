@@ -116,7 +116,8 @@
     text-wrap: balance;
   }
 
-  /* Two-tone indicator (WCAG C40): the Bone band shows on dark sections, the Forest outline on light ones. */
+  /* Two-tone focus (WCAG C40): Forest outline shows on light surfaces, the Bone band on dark ones.
+     The band is a box-shadow, so components must not add ring/shadow utilities on focus. */
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
