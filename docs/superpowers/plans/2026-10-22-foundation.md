@@ -1624,7 +1624,7 @@ import { cn } from "@/lib/utils";
 
 export const buttonVariants = cva(
   // base: tokens only (rule 31); body font weight stays at normal (rule 31)
-  "inline-flex items-center justify-center gap-2 rounded-pill font-body font-normal text-base whitespace-nowrap transition-colors duration-(--duration-base) ease-out-expo focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 rounded-pill font-body font-normal text-base whitespace-nowrap transition-colors duration-(--duration-base) ease-out-expo disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
