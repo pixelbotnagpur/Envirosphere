@@ -33,6 +33,20 @@ The `order:` number controls the position in lists.
 - Each service needs its own `order:` number; two services cannot share one.
 - Only `.md` files belong in `content/services/`.
 
+## Home page
+Controls the layout and copy of the home page (`content/pages/home.yaml`):
+
+- `hero`: Top banner with accreditation eyebrow, main title, subtitle, CTA links, and scroll indicator.
+- `about`: Firm overview text, paragraphs, and CTA button. Its image comes from the `about-photo` key in `content/media.yaml` (`public/media/images/about.webp`).
+- `services`: Section heading, intro, and CTA button. The 13 services displayed in the list are automatically loaded from `content/services/*.md` ordered by their `order:` field.
+- `stats`: Key metrics and animated counter items (clients, ongoing projects, certifications).
+- `clients`: Logo marquee rows. Each logo comes from a `client-*` key in `content/media.yaml` (`public/media/clients/*.webp`).
+- `process`: Four-step scroll-pinned workflow narrative. *Note: this block is a draft to be reviewed by the owner.*
+- `testimonials`: Client quotes, names, and roles.
+- `contact`: Closing call-to-action banner with phone and email contact options (values sourced from `content/site.yaml`).
+
+To add client logos: add the file to `public/media/clients/`, add an entry to `media.yaml`, then add its key to `clients.logos`.
+
 ## What you cannot change here
 Colors and fonts are part of the design. Ask the developer, for example "make the accent color a deeper ochre".
 
