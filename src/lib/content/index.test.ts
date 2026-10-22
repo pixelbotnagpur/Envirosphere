@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { makeTree } from "@tests/unit/helpers/tree";
 import { validFiles } from "@tests/unit/helpers/fixtures";
-import { loadAll, loadServices, socialLinks } from "./index";
+import { loadAll, loadService, loadServices, socialLinks } from "./index";
 import { ContentError } from "./read";
 
 describe("loadAll", () => {
@@ -108,6 +108,13 @@ describe("loadServices", () => {
   it("returns an empty list when there is no services folder", () => {
     const { content } = makeTree({ "content/site.yaml": "a: 1" });
     expect(loadServices(content)).toEqual([]);
+  });
+
+  it("finds a single service by slug or returns undefined", () => {
+    const files = validFiles();
+    const { content } = makeTree(files);
+    expect(loadService("environmental-audit", content)?.title).toBe("Environmental audit");
+    expect(loadService("non-existent", content)).toBeUndefined();
   });
 });
 

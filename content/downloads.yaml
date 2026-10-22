@@ -1,0 +1,24 @@
+# Downloadable resources and accreditation certificates.
+- id: corporate-brochure
+  title: Envirosphere Corporate Profile & Capabilities Brochure
+  category: Corporate
+  fileKey: logo
+  format: PDF
+  size: 3.2 MB
+  description: Overview of our 13 specialized environmental services, leadership profile, laboratory monitoring capabilities, and track record.
+
+- id: nabet-certificate
+  title: QCI NABET Category A Accreditation Certificate
+  category: Accreditations
+  fileKey: logo
+  format: PDF
+  size: 1.8 MB
+  description: Formal accreditation certificate awarded by the National Accreditation Board for Education & Training for Category A EIA consultations.
+
+- id: environmental-policy
+  title: Quality & Environmental Compliance Policy Statement
+  category: Governance
+  fileKey: logo
+  format: PDF
+  size: 850 KB
+  description: Our official institutional commitment to technical excellence, regulatory ethics, and sustainable industrial development.

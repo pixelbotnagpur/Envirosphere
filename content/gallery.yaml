@@ -1,0 +1,18 @@
+# Project, field, and team gallery items.
+- id: field-monitoring-1
+  title: Ambient Air Quality Monitoring Field Deployment
+  category: Field Monitoring
+  image: about-photo
+  caption: Environmental monitoring team conducting continuous ambient air and noise sampling at an industrial site.
+
+- id: wastewater-plant-2
+  title: Zero Liquid Discharge ETP Facility Commissioning
+  category: Engineering
+  image: about-photo
+  caption: Modern industrial effluent treatment facility designed and operated under our environmental engineering team.
+
+- id: stakeholder-consultation-3
+  title: Public Consultation & Environmental Appraisal
+  category: Clearances
+  image: about-photo
+  caption: Technical presentation and stakeholder documentation support for statutory environmental clearance.

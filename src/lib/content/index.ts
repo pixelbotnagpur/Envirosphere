@@ -1,11 +1,17 @@
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import {
+  downloadsSchema,
+  gallerySchema,
   homeSchema,
+  jobsSchema,
   mediaSchema,
   serviceFrontMatterSchema,
   siteSchema,
+  type DownloadItem,
+  type GalleryItem,
   type Home,
+  type Job,
   type Media,
   type ServiceFrontMatter,
   type Site,
@@ -21,6 +27,21 @@ export const loadSite = (root = CONTENT_ROOT): Site => readYamlFile("site.yaml",
 export const loadMedia = (root = CONTENT_ROOT): Media => readYamlFile("media.yaml", mediaSchema, root);
 export const loadHome = (root = CONTENT_ROOT): Home =>
   readYamlFile("pages/home.yaml", homeSchema, root);
+
+export const loadJobs = (root = CONTENT_ROOT): Job[] => {
+  const file = path.join(root, "jobs.yaml");
+  return existsSync(file) ? readYamlFile("jobs.yaml", jobsSchema, root) : [];
+};
+
+export const loadDownloads = (root = CONTENT_ROOT): DownloadItem[] => {
+  const file = path.join(root, "downloads.yaml");
+  return existsSync(file) ? readYamlFile("downloads.yaml", downloadsSchema, root) : [];
+};
+
+export const loadGallery = (root = CONTENT_ROOT): GalleryItem[] => {
+  const file = path.join(root, "gallery.yaml");
+  return existsSync(file) ? readYamlFile("gallery.yaml", gallerySchema, root) : [];
+};
 
 export function loadServices(root = CONTENT_ROOT): Service[] {
   const dir = path.join(root, "services");
@@ -56,6 +77,10 @@ export function loadServices(root = CONTENT_ROOT): Service[] {
     seen.set(service.order, `${service.slug}.md`);
   }
   return services.sort((a, b) => a.order - b.order);
+}
+
+export function loadService(slug: string, root = CONTENT_ROOT): Service | undefined {
+  return loadServices(root).find((s) => s.slug === slug);
 }
 
 /** Loads everything and checks every media reference. Used by `pnpm content:check` and the build. */

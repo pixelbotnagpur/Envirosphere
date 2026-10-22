@@ -1,0 +1,25 @@
+# Current openings at Envirosphere Consultant & Engineers.
+# If there are no current openings, leave an empty list: []
+- id: eia-coordinator
+  title: Senior EIA Coordinator
+  department: Environmental Impact Assessment
+  location: Pune (Head Office)
+  type: Full-time
+  experience: 5+ years
+  description: Lead Category A & Category B EIA studies, stakeholder consultations, and technical presentations before SEAC/SEIAA.
+  requirements:
+    - Master's degree in Environmental Science / Engineering
+    - Accreditation as EIA Coordinator with QCI NABET in relevant sectors
+    - Strong knowledge of MoEFCC EIA Notification 2006 and amendments
+
+- id: environmental-engineer
+  title: Environmental Engineer (ETP / STP)
+  department: Water & Wastewater Engineering
+  location: Pune / Site Locations
+  type: Full-time
+  experience: 3-5 years
+  description: Design, commissioning, and optimization of industrial effluent treatment plants and sewage treatment facilities achieving zero liquid discharge.
+  requirements:
+    - B.E. / B.Tech in Chemical or Environmental Engineering
+    - Hands-on experience with biological and chemical wastewater processes
+    - Familiarity with MPCB discharge norms and online CEMS monitoring

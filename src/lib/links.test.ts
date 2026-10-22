@@ -7,5 +7,8 @@ describe("links", () => {
   });
   it("builds mailto links", () => {
     expect(mailtoHref("info@example.com")).toBe("mailto:info@example.com");
+    expect(mailtoHref("info@example.com", "Project Inquiry")).toBe(
+      "mailto:info@example.com?subject=Project%20Inquiry",
+    );
   });
 });

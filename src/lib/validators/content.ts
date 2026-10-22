@@ -144,8 +144,43 @@ export const serviceFrontMatterSchema = z.object({
   image: mediaKey.optional(),
 });
 
+export const jobSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  department: z.string().min(1),
+  location: z.string().min(1),
+  type: z.string().default("Full-time"),
+  experience: z.string().min(1),
+  description: z.string().min(1),
+  requirements: z.array(z.string().min(1)),
+});
+export const jobsSchema = z.array(jobSchema);
+
+export const downloadItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  category: z.string().min(1),
+  fileKey: z.string().min(1),
+  format: z.string().default("PDF"),
+  size: z.string().optional(),
+  description: z.string().min(1),
+});
+export const downloadsSchema = z.array(downloadItemSchema);
+
+export const galleryItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  category: z.string().min(1),
+  image: mediaKey,
+  caption: z.string().optional(),
+});
+export const gallerySchema = z.array(galleryItemSchema);
+
 export type Site = z.infer<typeof siteSchema>;
 export type Media = z.infer<typeof mediaSchema>;
 export type MediaItem = z.infer<typeof mediaItemSchema>;
 export type Home = z.infer<typeof homeSchema>;
 export type ServiceFrontMatter = z.infer<typeof serviceFrontMatterSchema>;
+export type Job = z.infer<typeof jobSchema>;
+export type DownloadItem = z.infer<typeof downloadItemSchema>;
+export type GalleryItem = z.infer<typeof galleryItemSchema>;
