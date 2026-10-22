@@ -42,7 +42,7 @@
   --text-display: clamp(2.5rem, 1rem + 8vw, 9.5rem);
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.035em;
-  --text-h1: clamp(2.75rem, 1.5rem + 5vw, 6rem);
+  --text-h1: clamp(2.25rem, 1.25rem + 5vw, 6rem);
   --text-h1--line-height: 1;
   --text-h1--letter-spacing: -0.03em;
   --text-h2: clamp(2.25rem, 1.25rem + 3.5vw, 4.25rem);
@@ -67,6 +67,7 @@
   --radius-control: 0.75rem;
   --radius-card: 1.25rem;
   --radius-pill: 999px;
+  --spacing-header: 5rem;
   --spacing-gutter: clamp(1.25rem, 4vw, 3rem);
   --spacing-section: clamp(5rem, 3rem + 8vw, 11rem);
   --container-content: 80rem;
@@ -80,10 +81,52 @@
   --duration-slow: 900ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --stagger: 120ms;
 
   /* ── Layering ── */
   --z-header: 50;
   --z-skip: 60;
+}
+
+@theme {
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+}
+
+/* Above-the-fold entrance: pure CSS so the hero is never hidden before hydration or without JS. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: rise var(--duration-slow) var(--ease-out-expo) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+}
+
+@utility rise-1 {
+  --rise-delay: var(--stagger);
+}
+
+@utility rise-2 {
+  --rise-delay: calc(var(--stagger) * 2);
+}
+
+@utility rise-3 {
+  --rise-delay: calc(var(--stagger) * 3);
 }
 
 @layer base {
@@ -94,6 +137,7 @@
   }
 
   html {
+    scroll-padding-top: var(--spacing-header);
     background: var(--color-background);
     color: var(--color-foreground);
   }

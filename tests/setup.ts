@@ -35,4 +35,14 @@ if (typeof window !== "undefined") {
       dispatchEvent: () => false,
     }),
   });
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  Object.defineProperty(window, "ResizeObserver", {
+    writable: true,
+    configurable: true,
+    value: ResizeObserverStub,
+  });
 }

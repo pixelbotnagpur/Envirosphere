@@ -22,4 +22,16 @@ describe("Reveal", () => {
     expect(screen.getByText("Hello")).toHaveClass("mt-4");
     expect(screen.getByText("Hello")).toHaveAttribute("id", "intro");
   });
+
+  it("starts hidden and offset so the entrance can play", () => {
+    render(<Reveal>Hello</Reveal>);
+    expect(screen.getByText("Hello")).toHaveStyle({ opacity: "0" });
+  });
+
+  it("does not let callers override the animation contract", () => {
+    // @ts-expect-error style is omitted from RevealProps
+    render(<Reveal style={{ opacity: 1 }}>x</Reveal>);
+    // @ts-expect-error whileHover is omitted from RevealProps
+    render(<Reveal whileHover={{ scale: 2 }}>y</Reveal>);
+  });
 });

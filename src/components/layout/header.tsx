@@ -24,7 +24,7 @@ export function Header({ name, logo, nav, cta }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-(--z-header) border-b border-border bg-background/85 backdrop-blur">
-      <Container className="flex h-20 items-center justify-between gap-6">
+      <Container className="flex h-header items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           <Image src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} priority />
           <span className="font-heading text-h4">{name}</span>
@@ -62,10 +62,10 @@ export function Header({ name, logo, nav, cta }: HeaderProps) {
       </Container>
 
       <nav id="mobile-nav" aria-label="Mobile" hidden={!open} className="border-t border-border lg:hidden">
-        {/* 5rem is the header bar's h-20; data-lenis-prevent lets the panel scroll natively under Lenis. */}
+        {/* data-lenis-prevent lets the panel scroll natively under Lenis; the cap is the viewport minus the header bar. */}
         <Container
           data-lenis-prevent
-          className="flex max-h-[calc(100dvh-5rem)] flex-col gap-1 overflow-y-auto py-6"
+          className="flex max-h-[calc(100dvh-var(--spacing-header))] flex-col gap-1 overflow-y-auto py-6"
         >
           {nav.map((item) => (
             <Link

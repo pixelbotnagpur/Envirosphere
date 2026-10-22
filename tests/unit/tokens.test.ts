@@ -108,3 +108,18 @@ describe("fonts", () => {
     expect(tokens.get("--font-body")).toContain("var(--font-manrope)");
   });
 });
+
+describe("motion utilities and layout tokens", () => {
+  it("defines the hero entrance keyframes and stagger", () => {
+    expect(css).toMatch(/@keyframes rise\s*\{/);
+    expect(css).toMatch(/@utility rise\s*\{/);
+    expect(tokens.get("--stagger")).toBe("120ms");
+  });
+  it("defines the header height and marquee tokens", () => {
+    expect(tokens.get("--spacing-header")).toBe("5rem");
+    expect(tokens.get("--animate-marquee")).toContain("marquee");
+  });
+  it("keeps h1 smaller than display at narrow widths", () => {
+    expect(tokens.get("--text-h1")).toBe("clamp(2.25rem, 1.25rem + 5vw, 6rem)");
+  });
+});
