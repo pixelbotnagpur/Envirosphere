@@ -120,9 +120,16 @@
     outline-offset: 3px;
   }
 
-  /* Focus rings must reach 3:1 against what they sit on: Forest on light, Ochre on Forest. */
-  .bg-primary {
+  /* Focus rings must reach 3:1 against the surface they sit on.
+     Descendants of dark sections get Ochre; descendants of light surfaces get Forest.
+     The section element itself keeps the default (Forest), since its outline sits outside it. */
+  .bg-primary * {
     --color-ring: var(--color-accent);
+  }
+  .bg-background *,
+  .bg-surface *,
+  .bg-secondary * {
+    --color-ring: var(--color-primary);
   }
 
   ::selection {

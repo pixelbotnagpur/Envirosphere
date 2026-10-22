@@ -65,7 +65,7 @@ text-primary-foreground`. Values are defined once in `globals.css` (rule 31).
 
 - The hex column is for humans only. Code uses tokens, never hex.
 - Every `x` / `x-foreground` pair must pass WCAG AA (4.5:1).
-- Focus ring (`ring`): Forest on light sections, Ochre on primary (dark) sections; both ≥ 3:1.
+- Focus ring (`ring`): Forest by default and on light surfaces; Ochre for elements inside primary (dark) sections; both ≥ 3:1.
 - Dark mode is optional. A "dark section" means `bg-primary text-primary-foreground`.
 
 ### 3.2 Typography: exactly 2 font families

@@ -9,7 +9,7 @@ const css = readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8"
 
 const tokens = new Map<string, string>();
 for (const match of css.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-  // First definition wins so the @theme values are the ones tested (later overrides, e.g. `.bg-primary`, are ignored here).
+  // First definition wins so the @theme values are the ones tested (later overrides, e.g. the `.bg-primary *` ring rule, are ignored here).
   if (!tokens.has(match[1])) tokens.set(match[1], match[2].trim());
 }
 
@@ -50,8 +50,22 @@ describe("focus ring meets WCAG 1.4.11 (3:1)", () => {
   it("accent vs primary (the ring inside dark sections)", () => {
     expect(contrast(color("accent"), color("primary"))).toBeGreaterThanOrEqual(3);
   });
-  it("globals.css switches the ring to accent inside .bg-primary sections", () => {
-    expect(css).toMatch(/\.bg-primary\s*\{[^}]*--color-ring:\s*var\(--color-accent\)/);
+  it("primary vs secondary (the Forest ring on Sage)", () => {
+    expect(contrast(color("primary"), color("secondary"))).toBeGreaterThanOrEqual(3);
+  });
+  it("globals.css gives descendants of .bg-primary the accent ring, not the element itself", () => {
+    expect(css).toMatch(/\.bg-primary \*\s*\{[^}]*--color-ring:\s*var\(--color-accent\)/);
+    expect(css).not.toMatch(/\.bg-primary\s*\{[^}]*--color-ring/);
+  });
+  it("globals.css gives light-surface descendants the primary ring, after the dark rule", () => {
+    const dark = css.indexOf(".bg-primary *");
+    const light = css.indexOf(".bg-surface *");
+    expect(dark).toBeGreaterThan(-1);
+    expect(light).toBeGreaterThan(-1);
+    expect(light).toBeGreaterThan(dark);
+    expect(css).toMatch(
+      /\.bg-background \*,\s*\.bg-surface \*,\s*\.bg-secondary \*\s*\{[^}]*--color-ring:\s*var\(--color-primary\)/,
+    );
   });
 });
 
