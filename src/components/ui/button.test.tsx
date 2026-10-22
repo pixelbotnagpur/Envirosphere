@@ -34,8 +34,14 @@ describe("Button", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
+  it("defaults to type='button' to prevent accidental form submissions", () => {
+    render(<Button>Click</Button>);
+    expect(screen.getByRole("button")).toHaveAttribute("type", "button");
+  });
+
   it("forwards native props", () => {
     render(<Button disabled type="submit">Send</Button>);
     expect(screen.getByRole("button")).toBeDisabled();
+    expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
   });
 });

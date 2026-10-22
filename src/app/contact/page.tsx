@@ -1,6 +1,6 @@
-import { Building2, Clock, Mail, MapPin, MessageSquare, Phone, Send, ShieldCheck } from "lucide-react";
+import { Building2, Clock, Mail, MapPin, MessageSquare, Phone, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
-import { Button } from "@/components/ui/button";
+import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { loadServices, loadSite } from "@/lib/content";
@@ -49,107 +49,14 @@ export default function ContactPage() {
                 Fill in your project parameters below. Our accredited technical team will review your requirements and respond within one business day.
               </p>
 
-              <form className="mt-8 space-y-6">
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="name" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                      Full Name *
-                    </label>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      placeholder="e.g. Rahul Sharma"
-                      className="mt-2 w-full rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="company" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                      Organization / Company *
-                    </label>
-                    <input
-                      id="company"
-                      name="company"
-                      type="text"
-                      required
-                      placeholder="e.g. Tata Projects Ltd."
-                      className="mt-2 w-full rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="email" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                      Work Email *
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      placeholder="rahul@company.com"
-                      className="mt-2 w-full rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                      Phone Number *
-                    </label>
-                    <input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      required
-                      placeholder="+91 98000 00000"
-                      className="mt-2 w-full rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="service" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                    Service of Interest *
-                  </label>
-                  <select
-                    id="service"
-                    name="service"
-                    required
-                    defaultValue=""
-                    className="mt-2 w-full rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground"
-                  >
-                    <option value="" disabled>Select an environmental service...</option>
-                    {services.map((s) => (
-                      <option key={s.slug} value={s.title}>
-                        {String(s.order).padStart(3, "0")} - {s.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-xs uppercase tracking-label font-normal text-foreground">
-                    Project Details & Location
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    placeholder="Briefly describe your project sector, plot area, MIDC location, or statutory deadline..."
-                    className="mt-2 w-full rounded-control border border-border bg-surface p-4 text-sm text-foreground resize-none"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <Button type="submit" size="lg" className="w-full sm:w-auto">
-                    <Send aria-hidden="true" className="size-4 mr-2" />
-                    Submit Consultation Request
-                  </Button>
-                </div>
-              </form>
+              <div className="mt-8">
+                <InquiryForm
+                  services={services}
+                  phoneFallback={site.contact.phones[0]}
+                  emailFallback={site.contact.email}
+                  className="space-y-6"
+                />
+              </div>
 
               <div className="mt-8 pt-6 border-t border-border flex items-center gap-2 text-xs text-muted-foreground font-light">
                 <ShieldCheck aria-hidden="true" className="size-4 text-primary shrink-0" />
