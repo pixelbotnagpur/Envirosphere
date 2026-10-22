@@ -36,11 +36,11 @@ export function ContactCta({
         <SectionLabel index={index} className="text-secondary-foreground">
           {label}
         </SectionLabel>
-        <h2 className="mt-8 max-w-5xl text-h1">
+        <h2 className="mt-8 max-w-6xl text-h1">
           <SplitText text={heading} />
         </h2>
         <Reveal className="mt-12 flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <p className="max-w-xl text-lead font-light">{body}</p>
+          <p className="max-w-2xl text-lead font-light">{body}</p>
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <Button asChild size="lg">
               <Link href={primaryCta.href}>{primaryCta.label}</Link>

@@ -26,7 +26,7 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
           <h2 className="mt-8 text-h2">
             <ScrollWords text={heading} />
           </h2>
-          <div className="mt-12 flex max-w-2xl flex-col gap-6 text-lead font-light">
+          <div className="mt-12 flex max-w-3xl flex-col gap-6 text-lead font-light">
             {paragraphs.map((paragraph) => (
               <Reveal key={paragraph}>
                 <p>{paragraph}</p>

@@ -68,9 +68,9 @@
   --radius-card: 1.25rem;
   --radius-pill: 999px;
   --spacing-header: 5rem;
-  --spacing-gutter: clamp(1.25rem, 4vw, 3rem);
+  --spacing-gutter: clamp(1.25rem, 3vw, 2.5rem);
   --spacing-section: clamp(3rem, 2rem + 3vw, 5rem);
-  --container-content: 80rem;
+  --container-content: 96rem;
   --shadow-card:
     0 1px 2px color-mix(in oklch, var(--color-bark-900) 6%, transparent),
     0 12px 32px color-mix(in oklch, var(--color-bark-900) 8%, transparent);

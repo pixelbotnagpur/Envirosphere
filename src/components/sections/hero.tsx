@@ -23,11 +23,11 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, scrol
           <SectionLabel tone="inverse" className="rise">
             {eyebrow}
           </SectionLabel>
-          <h1 className="rise rise-1 mt-6 max-w-5xl break-words text-display font-normal tracking-tight">
+          <h1 className="rise rise-1 mt-6 max-w-6xl break-words text-display font-normal tracking-tight">
             {title}
           </h1>
           <div className="mt-8 flex flex-col gap-8 lg:mt-12 lg:flex-row lg:items-end lg:justify-between">
-            <p className="rise rise-2 max-w-xl text-lead font-light text-primary-foreground/85 leading-relaxed">
+            <p className="rise rise-2 max-w-2xl text-lead font-light text-primary-foreground/85 leading-relaxed">
               {subtitle}
             </p>
             <div className="rise rise-3 flex flex-wrap gap-4">

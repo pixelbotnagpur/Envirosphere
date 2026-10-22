@@ -19,18 +19,18 @@ export interface ServicesIndexProps {
 export function ServicesIndex({ index, label, heading, intro, cta, services }: ServicesIndexProps) {
   return (
     <section className="bg-surface py-section">
-      <Container className="grid gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-4">
-          <div className="lg:sticky lg:top-32">
-            <SectionLabel index={index}>{label}</SectionLabel>
-            <h2 className="mt-8 text-h2">
-              <SplitText text={heading} />
-            </h2>
-            <p className="mt-6 max-w-sm text-lead font-light text-muted-foreground">{intro}</p>
-            <Button asChild variant="outline" className="mt-10">
-              <Link href={cta.href}>{cta.label}</Link>
-            </Button>
-          </div>
+      <Container className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="max-w-2xl">
+          <SectionLabel index={index}>{label}</SectionLabel>
+          <h2 className="mt-6 text-h2">
+            <SplitText text={heading} />
+          </h2>
+        </div>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <p className="max-w-md text-lead font-light text-muted-foreground">{intro}</p>
+          <Button asChild variant="outline" className="self-start sm:self-auto">
+            <Link href={cta.href}>{cta.label}</Link>
+          </Button>
         </div>
       </Container>
       <ol className="mt-16 border-b border-border">

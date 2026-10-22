@@ -29,7 +29,7 @@ export function Testimonials({ index, label, heading, items }: TestimonialsProps
           <SplitText text={heading} />
         </h2>
         {featured ? (
-          <Reveal className="mt-16 max-w-5xl">
+          <Reveal className="mt-16 max-w-6xl">
             <figure>
               <blockquote className="font-heading text-h2">{featured.quote}</blockquote>
               <Author name={featured.name} role={featured.role} />
