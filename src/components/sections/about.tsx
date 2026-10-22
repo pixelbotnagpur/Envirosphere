@@ -20,7 +20,7 @@ export interface AboutProps {
 export function About({ index, label, heading, paragraphs, image, cta }: AboutProps) {
   return (
     <section className="py-section">
-      <Container className="grid gap-16 lg:grid-cols-12">
+      <Container className="grid items-center gap-16 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <SectionLabel index={index}>{label}</SectionLabel>
           <h2 className="mt-8 text-h2">
@@ -33,22 +33,52 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
               </Reveal>
             ))}
           </div>
+
           <Reveal>
-            <Button asChild variant="outline" className="mt-12">
+            <div className="mt-10 flex flex-wrap gap-3">
+              {[
+                "QCI NABET Accredited (Cat A)",
+                "MoEFCC Empanelled",
+                "ISO 9001:2015 Certified",
+                "Certified Testing Labs",
+              ].map((pill) => (
+                <span
+                  key={pill}
+                  className="rounded-full border border-border bg-surface px-4 py-1.5 text-label uppercase tracking-label text-muted-foreground"
+                >
+                  {pill}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal>
+            <Button asChild variant="outline" className="mt-10">
               <Link href={cta.href}>{cta.label}</Link>
             </Button>
           </Reveal>
         </div>
         <div className="lg:col-span-5">
-          <Parallax className="aspect-[4/5] rounded-card">
-            <Image
-              src={image.src}
-              alt={image.alt}
-              width={image.width}
-              height={image.height}
-              className="h-full w-full object-cover"
-            />
-          </Parallax>
+          <div className="relative">
+            <Parallax className="aspect-[4/5] overflow-hidden rounded-card border border-border bg-muted shadow-2xl">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo hover:scale-105"
+              />
+            </Parallax>
+            <div className="absolute -bottom-6 -left-6 hidden max-w-xs rounded-card border border-border/80 bg-background/95 p-6 shadow-xl backdrop-blur-md sm:block">
+              <span className="text-label uppercase tracking-label text-secondary">
+                [ 25+ YEARS PRACTICE ]
+              </span>
+              <p className="mt-2 font-heading text-h3">250+ Projects</p>
+              <p className="mt-1 text-sm font-light text-muted-foreground">
+                Approved across government ministries and state pollution boards.
+              </p>
+            </div>
+          </div>
         </div>
       </Container>
     </section>

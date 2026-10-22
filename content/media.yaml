@@ -277,3 +277,20 @@ photo-g23:
   src: /media/gallery/g23.png
   alt: Envirosphere team at the ACO Meet 2026 in Delhi
 
+hero-eco-architecture:
+  src: /media/images/hero-eco-architecture.jpg
+  alt: Modern sustainable environmental engineering pavilion nestled in a lush green valley with morning mist
+
+clean-water-facility:
+  src: /media/images/clean-water-facility.jpg
+  alt: Modern sustainable high-tech water treatment and conservation facility with crystal clear aeration basins
+
+ecological-survey:
+  src: /media/images/ecological-survey.jpg
+  alt: Environmental research team observing a pristine mountain landscape and river valley from a modern eco-deck
+
+sustainable-industrial-park:
+  src: /media/images/sustainable-industrial-park.jpg
+  alt: Next-generation green industrial estate with solar canopy roofs, integrated bio-swale gardens, and living vertical green walls
+
+
