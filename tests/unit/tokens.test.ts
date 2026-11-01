@@ -118,7 +118,7 @@ describe("motion utilities and layout tokens", () => {
     expect(css).toMatch(/animation:\s*rise[^;]*\bbackwards\b/);
   });
   it("defines the header height and marquee tokens", () => {
-    expect(tokens.get("--spacing-header")).toBe("5rem");
+    expect(tokens.get("--spacing-header")).toBe("4rem");
     expect(tokens.get("--animate-marquee")).toContain("marquee");
   });
   it("defines the micro text token for badges over images", () => {

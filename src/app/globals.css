@@ -69,7 +69,7 @@
   --radius-control: 0.75rem;
   --radius-card: 1.25rem;
   --radius-pill: 999px;
-  --spacing-header: 5rem;
+  --spacing-header: 4rem;
   --spacing-gutter: clamp(1.75rem, 4vw, 3.5rem);
   --spacing-section: clamp(3rem, 2rem + 3vw, 5rem);
   --container-content: 88rem;
