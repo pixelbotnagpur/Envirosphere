@@ -61,6 +61,12 @@ describe("shouldIntercept", () => {
     expect(shouldIntercept(click(), link({ href: "/contact/#form" }), here)).toBe(false);
   });
 
+  it("treats a slashless link to the current page as the same page", () => {
+    expect(shouldIntercept(click(), link({ href: "/about" }), "https://example.test/about/")).toBe(false);
+    expect(shouldIntercept(click(), link({ href: "/about/" }), "https://example.test/about")).toBe(false);
+    expect(shouldIntercept(click(), link({ href: "/about/team" }), "https://example.test/about/")).toBe(true);
+  });
+
   it("skips anchors without an href", () => {
     expect(shouldIntercept(click(), link({}), here)).toBe(false);
   });

@@ -111,6 +111,21 @@ describe("PageTransition", () => {
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
   });
 
+  it("cancels the pending push when Back is pressed during the cover phase", async () => {
+    setup();
+    fireEvent.click(screen.getByText("Services"));
+    expect(panel()).toHaveAttribute("data-page-transition", "cover");
+    act(() => {
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(push).not.toHaveBeenCalled();
+    expect(panel()).toBeNull();
+  });
+
   it("ignores a second click while a transition is running", async () => {
     setup();
     fireEvent.click(screen.getByText("Services"));

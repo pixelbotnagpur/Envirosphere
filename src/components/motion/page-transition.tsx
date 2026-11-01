@@ -83,6 +83,16 @@ export function PageTransition({ label }: { label: string }) {
     return () => document.removeEventListener("click", onClick, true);
   }, [setPhase]);
 
+  // Back/forward while the curtain is still closing: drop the pending navigation (the browser is
+  // already moving) instead of pushing the old target after it.
+  useEffect(() => {
+    const onPopState = () => {
+      if (phaseRef.current === "cover") finish();
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [finish]);
+
   // COVER: wipe the panel up over the page, then navigate.
   useEffect(() => {
     if (phase !== "cover" || !panelRef.current) return;
@@ -93,7 +103,7 @@ export function PageTransition({ label }: { label: string }) {
       { duration: duration.transition.cover, ease: ease.inOutQuart },
     );
     controls.then(() => {
-      if (cancelled) return;
+      if (cancelled || phaseRef.current !== "cover") return;
       setPhase("wait");
       clearSafety();
       safetyRef.current = setTimeout(finish, TRANSITION_SAFETY_MS);

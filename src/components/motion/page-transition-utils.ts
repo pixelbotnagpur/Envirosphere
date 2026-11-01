@@ -8,6 +8,8 @@ export interface ClickLike {
   defaultPrevented: boolean;
 }
 
+const stripTrailingSlash = (pathname: string) => (pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname);
+
 /**
  * True when a click on `anchor` is an internal page navigation that the curtain transition should take over.
  * Everything else (new tab, modifier or middle click, external, download, hash-only, same page, opted out,
@@ -40,8 +42,9 @@ export function shouldIntercept(
     return false;
   }
   if (next.origin !== current.origin) return false;
-  // Same page (including query or hash changes) and cross-page hash links navigate normally.
-  if (next.pathname === current.pathname) return false;
+  // Same page (including query or hash changes, and "/about" vs "/about/") and cross-page hash links
+  // navigate normally.
+  if (stripTrailingSlash(next.pathname) === stripTrailingSlash(current.pathname)) return false;
   if (next.hash) return false;
   return true;
 }
