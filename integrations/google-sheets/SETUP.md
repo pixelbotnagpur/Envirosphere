@@ -13,7 +13,7 @@ Cloudflare Turnstile is **not optional for launch**. Without it the only protect
 - [ ] `NEXT_PUBLIC_FORMS_ENDPOINT` set to the real Web App URL ending in `/exec` in `.env.local` (Step 6).
 - [ ] New script **version deployed** after the last code or property change (Step 5).
 - [ ] Run `pnpm check:launch`. It must print "check:launch OK". It stops you if the endpoint or the site key is missing, or the endpoint is the test one. (It cannot see Apps Script properties, so tick the `TURNSTILE_SECRET` box yourself.)
-- [ ] Run `pnpm build`. It ends with "check:out OK", which proves the `out/` folder has no test values. Upload only that `out/` folder.
+- [ ] Run `pnpm build`, then `pnpm package:hostinger`. The build ends with "check:out OK" (no test values), and the packager re-checks that the built site really contains your forms endpoint and Turnstile key (it stops with a plain message if not). Upload the whole `hostinger-dist/` folder (not `out/` on its own). `.htaccess` is not used on the Node.js plan.
 - [ ] Send one test inquiry and one test application from the live site and check the Sheet, the Drive folder and the email alert.
 
 ---

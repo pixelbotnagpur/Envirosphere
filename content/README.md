@@ -8,11 +8,11 @@ Everything you can change without a developer lives in two places:
 ## Change text
 1. Open the file for that page (for example `content/pages/home.yaml`).
 2. Edit the words after the colon. Keep the spaces and the dashes `-` at the start of list items.
-3. Save, then ask for a rebuild (or run `pnpm build`) and upload the `out` folder to Hostinger.
+3. Save, then ask for a rebuild. To publish it yourself, follow `docs/DEPLOY-HOSTINGER.md`: `pnpm check:launch`, `pnpm build`, `pnpm package:hostinger`, then upload the whole `hostinger-dist` folder (not the `out` folder on its own).
 
 Save files as UTF-8 (the default in Notepad and VS Code).
 
-When you upload the site to Hostinger, upload everything inside the `out` folder including the hidden `.htaccess` file.
+Upload everything inside the `hostinger-dist` folder (it holds `out`, `server.mjs` and `package.json`). The `.htaccess` file is not used on the Node.js plan, so you do not need to upload or edit it.
 
 If something is wrong, the build stops and tells you the file and the field that needs fixing,
 for example: `content/site.yaml → contact.email: Invalid email address`.
