@@ -21,7 +21,6 @@ export type InquiryData = z.infer<typeof inquirySchema>;
 
 export const allowedCvMimeTypes = [
   "application/pdf",
-  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ] as const;
 
@@ -30,9 +29,9 @@ export const cvFileSchema = z.object({
     .string()
     .trim()
     .max(255)
-    .regex(/\.(pdf|doc|docx)$/i, "CV file must be a PDF, DOC, or DOCX document"),
+    .regex(/\.(pdf|docx)$/i, "CV file must be a PDF or DOCX document"),
   type: z.enum(allowedCvMimeTypes, {
-    error: "File must be a PDF or Word document (.pdf, .doc, .docx)",
+    error: "File must be a PDF or Word document (.pdf, .docx)",
   }),
   size: z.number().int().positive().max(5 * 1024 * 1024, "CV file size must not exceed 5 MB"),
   data: z.string().min(1, "CV file data cannot be empty"),

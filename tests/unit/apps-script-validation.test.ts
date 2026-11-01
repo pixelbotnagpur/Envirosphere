@@ -144,10 +144,15 @@ describe("validateApplication", () => {
 describe("CV checks", () => {
   const meta = (over: Record<string, unknown> = {}) => ({ name: "cv.pdf", type: PDF, data: "JVBERi0=", ...over });
 
-  it("accepts pdf, doc and docx metadata with matching MIME", () => {
+  it("accepts pdf and docx metadata with matching MIME", () => {
     expect(v.checkCvMetadata(meta()).ext).toBe("pdf");
     expect(v.checkCvMetadata(meta({ name: "a.DOCX", type: DOCX })).ext).toBe("docx");
-    expect(v.checkCvMetadata(meta({ name: "a.doc", type: "application/msword" })).ok).toBe(true);
+  });
+  it("no longer accepts legacy .doc (any OLE file, including macro-enabled ones)", () => {
+    expect(v.checkCvMetadata(meta({ name: "a.doc", type: "application/msword" })).ok).toBe(false);
+    const ole = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
+    expect(v.checkCvBytes(ole, "doc").ok).toBe(false);
+    expect(validationSource).not.toContain("msword");
   });
   it("rejects wrong extension, mismatching MIME, oversize and non-base64 data", () => {
     expect(v.checkCvMetadata(meta({ name: "cv.exe" })).ok).toBe(false);
@@ -169,8 +174,10 @@ describe("CV checks", () => {
   it("checks magic bytes (including Apps Script signed bytes) and size", () => {
     expect(v.checkCvBytes([0x25, 0x50, 0x44, 0x46, 0x2d], "pdf").ok).toBe(true);
     expect(v.checkCvBytes([0x4d, 0x5a, 0x90, 0x00], "pdf").ok).toBe(false);
-    const signedDoc = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1].map((b) => (b > 127 ? b - 256 : b));
-    expect(v.checkCvBytes(signedDoc, "doc").ok).toBe(true);
+    const signedPdf = [0x25, 0x50, 0x44, 0x46].map((b) => (b > 127 ? b - 256 : b));
+    expect(v.checkCvBytes(signedPdf, "pdf").ok).toBe(true);
+    const signedZip = [0x50, 0x4b, 0x03, 0x04, 0xff].map((b) => (b > 127 ? b - 256 : b));
+    expect(v.checkCvBytes(signedZip, "docx").ok).toBe(true);
     expect(v.checkCvBytes([0x50, 0x4b, 0x03, 0x04, 1], "docx").ok).toBe(true);
     expect(v.checkCvBytes([0x50, 0x4b, 0x03, 0x04], "pdf").ok).toBe(false);
     expect(v.checkCvBytes([], "pdf").ok).toBe(false);

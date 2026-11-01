@@ -107,7 +107,7 @@ Turn both on together. If the secret is set in Apps Script but the site was buil
 ## Built-in abuse protection (what the script enforces)
 - Honeypot field and a **required** minimum fill time of 3 seconds (the form sends `fillMs`, the milliseconds it measured itself between opening the form and submitting; the server never compares clocks).
 - Maximum lengths on every field, email and phone format checks, and a fixed list of allowed services (and optionally roles).
-- CVs: only `.pdf`, `.doc`, `.docx`; the declared type must match the extension; the file content must start with the right signature (`%PDF`, the Word 97 header, or the zip header for `.docx`); at most 5 MB; stored under a generated name (timestamp plus a cleaned-up version of the file name).
+- CVs: only `.pdf` and `.docx` (legacy `.doc` is refused because any OLE file, including macro-enabled ones, shares its signature); the declared type must match the extension; the file content must start with the right signature (`%PDF`, or the zip header for `.docx`); at most 5 MB; stored under a generated name (timestamp plus a cleaned-up version of the file name).
 - Turnstile verification whenever `TURNSTILE_SECRET` is set (fails closed).
 - Throttling: at most 20 submissions per minute across the whole site (Apps Script cannot see visitor IP addresses, so this is a global limit) and at most 5 per email address per 10 minutes. If a real burst hits the global limit, visitors see a "try again in a minute" message.
 - The Sheet is locked only for the moment a row is written; Drive uploads and emails do not block other visitors.

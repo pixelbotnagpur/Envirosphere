@@ -51,7 +51,6 @@ var EMAIL_LIMIT_PER_WINDOW = 5;
 
 var CV_TYPES = {
   pdf: { mime: "application/pdf", magic: [0x25, 0x50, 0x44, 0x46] },
-  doc: { mime: "application/msword", magic: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1] },
   docx: {
     mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     magic: [0x50, 0x4b, 0x03, 0x04],
@@ -207,7 +206,7 @@ function checkCvMetadata(cv) {
   if (!cv || typeof cv !== "object") return { ok: false, message: "CV document missing" };
   var ext = extensionOf(cv.name);
   var type = cvTypeFor(ext);
-  if (!type) return { ok: false, message: "CV must be a PDF, DOC or DOCX file" };
+  if (!type) return { ok: false, message: "CV must be a PDF or DOCX file" };
   if (typeof cv.name !== "string" || cv.name.length > LIMITS.cvName) {
     return { ok: false, message: "CV file name is too long" };
   }

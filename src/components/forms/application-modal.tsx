@@ -87,7 +87,7 @@ export function ApplicationModal({
     }
 
     // Validate type
-    const validExtensions = /\.(pdf|doc|docx)$/i;
+    const validExtensions = /\.(pdf|docx)$/i;
     if (!validExtensions.test(file.name)) {
       setFileError("Only PDF, DOC, or DOCX files are accepted.");
       return;
@@ -357,7 +357,7 @@ export function ApplicationModal({
                     <span className="mt-1 text-sm text-muted-foreground">PDF, DOC, or DOCX (up to 5 MB)</span>
                     <input
                       type="file"
-                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={handleFileChange}
                       className="sr-only"
                     />

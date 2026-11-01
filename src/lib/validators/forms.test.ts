@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applicationSchema,
+  cvFileSchema,
   inquirySchema,
   isBotSubmission,
 } from "./forms";
@@ -113,5 +114,23 @@ describe("isBotSubmission", () => {
 
   it("passes legitimate submissions", () => {
     expect(isBotSubmission({ website: "", fillMs: 5000 }, 3000)).toBe(false);
+  });
+});
+
+describe("cvFileSchema (legacy .doc is not accepted)", () => {
+  const base = { size: 1000, data: "JVBERi0=" };
+  it("accepts pdf and docx", () => {
+    expect(cvFileSchema.safeParse({ ...base, name: "cv.pdf", type: "application/pdf" }).success).toBe(true);
+    expect(
+      cvFileSchema.safeParse({
+        ...base,
+        name: "cv.docx",
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      }).success,
+    ).toBe(true);
+  });
+  it("rejects .doc and application/msword", () => {
+    expect(cvFileSchema.safeParse({ ...base, name: "cv.doc", type: "application/msword" }).success).toBe(false);
+    expect(cvFileSchema.safeParse({ ...base, name: "cv.pdf", type: "application/msword" }).success).toBe(false);
   });
 });
