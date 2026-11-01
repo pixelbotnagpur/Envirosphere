@@ -25,13 +25,35 @@ for example: `content/site.yaml → contact.email: Invalid email address`.
 Image file names are case-sensitive on the live server: `Logo.svg` and `logo.svg` are different files.
 Always use the exact same capitals in `media.yaml`.
 
-## Add or remove a service
-Each service is one file in `content/services/`. Copy an existing file, rename it
-(lowercase, dashes, for example `crz-clearance.md`), and edit the text. Delete the file to remove it.
-The `order:` number controls the position in lists.
+## Edit, add or remove a service
+Each service is one file in `content/services/` (for example `crz-clearance.md`). The file has two parts:
 
-- Each service needs its own `order:` number; two services cannot share one.
-- Only `.md` files belong in `content/services/`.
+```
+---
+title: CRZ Clearance
+order: 7
+image: photo-g18
+summary: One or two sentences, shown on the service cards and under the page title.
+---
+The text of the service page goes here, below the second --- line.
+```
+
+- `title`: the page heading and the name in menus and cards.
+- `order`: position in lists and the previous/next links. Each service needs its own number.
+- `summary`: short description (also used by Google).
+- `image`: a key from `content/media.yaml` (see "Replace an image" above). The picture is shown at the top of the page. Optional.
+- The text below the second `---` line must not be empty; `pnpm content:check` stops with a message if it is.
+- To add a service, copy a file, rename it (lowercase, dashes, `.md`) and edit it. Delete the file to remove it. Only `.md` files belong in this folder.
+
+Writing the text (Markdown):
+- Leave a blank line between paragraphs.
+- Start a line with `## ` for a sub-heading (the service title is already the main heading; do not repeat it).
+- Start lines with `- ` for a bulleted list, or `1. ` for a numbered list.
+- Links: `[text](https://example.com)`. Links to other pages of this site start with `/`, for example `[Contact](/contact/)`.
+- There is no bold. `**word**` is shown underlined and `*word*` in the green colour, never heavy type; use them sparingly.
+- Raw HTML and images inside the text are ignored. Pictures come only from `media.yaml`.
+
+Labels on every service page (breadcrumb, "Previous service", "Next service") and the closing contact box are in `content/pages/services.yaml` under `serviceDetail`.
 
 ## Home page
 Controls the layout and copy of the home page (`content/pages/home.yaml`):

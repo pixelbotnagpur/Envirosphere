@@ -8,11 +8,11 @@ test.describe("inner pages", () => {
     await expect(serviceCards).toHaveCount(13);
   });
 
-  test("service detail page renders metadata, scope, and navigation", async ({ page }) => {
+  test("service detail page renders the title, text and next-service link", async ({ page }) => {
     await page.goto("/services/environmental-clearance/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Environmental Clearance (EIA)");
-    await expect(page.getByRole("link", { name: "Contact us" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /Next Service/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Start a conversation" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Next service/i })).toBeVisible();
   });
 
   test("about page lists the five offices from content", async ({ page }) => {
