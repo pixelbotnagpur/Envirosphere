@@ -32,6 +32,10 @@ test.describe("route curtain", () => {
     await link.click();
 
     await expect(panel(page)).toHaveCount(1);
+    // Decorative leaf only: visible while the curtain covers, and no text of any kind.
+    await expect(page.locator("[data-page-transition] [data-transition-leaf]")).toBeVisible();
+    expect(((await panel(page).textContent()) ?? "").trim()).toBe("");
+    await expect(page.locator("[data-page-transition] [data-transition-art]")).toHaveAttribute("aria-hidden", "true");
     await expect(page).toHaveURL(/\/services\/$/);
     await expect(panel(page)).toHaveCount(0, { timeout: 5000 });
 
