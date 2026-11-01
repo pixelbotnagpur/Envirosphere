@@ -4,14 +4,14 @@ import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { loadServices, loadSite } from "@/lib/content";
-import { canonicalAlternates } from "@/lib/seo";
+import { pageSeo } from "@/lib/page-seo";
 import { mailtoHref, telHref } from "@/lib/links";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Contact Us | Head Office Pune & Regional Branches",
-    alternates: canonicalAlternates(site.url, "/contact/"),
+    ...pageSeo("/contact/"),
     description: `Connect with ${site.name} for environmental clearance inquiries, compliance audits, and engineering consultations.`,
   };
 }

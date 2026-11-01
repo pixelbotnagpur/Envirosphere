@@ -4,13 +4,13 @@ import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadGallery, loadSite } from "@/lib/content";
-import { canonicalAlternates } from "@/lib/seo";
+import { pageSeo } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Project & Field Gallery | Environmental Operations in Action",
-    alternates: canonicalAlternates(site.url, "/gallery/"),
+    ...pageSeo("/gallery/"),
     description: `View field monitoring, wastewater treatment plant engineering, and site due diligence projects by ${site.name}.`,
   };
 }

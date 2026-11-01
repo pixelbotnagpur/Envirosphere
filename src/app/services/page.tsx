@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadServices, loadSite } from "@/lib/content";
-import { canonicalAlternates } from "@/lib/seo";
+import { pageSeo } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Environmental Consultancy & Engineering Services",
-    alternates: canonicalAlternates(site.url, "/services/"),
+    ...pageSeo("/services/"),
     description: `Explore all 13 specialized statutory clearance, monitoring, audit, and engineering services offered by ${site.name}.`,
   };
 }

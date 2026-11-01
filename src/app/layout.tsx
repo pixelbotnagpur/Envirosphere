@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { LenisProvider } from "@/components/motion/lenis-provider";
 import { getImage, loadSite, socialLinks } from "@/lib/content";
+import { baseOpenGraph } from "@/lib/page-seo";
 import "./globals.css";
 
 const syne = Syne({
@@ -22,17 +23,11 @@ const manrope = Manrope({
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
-  const og = getImage(site.seo.ogImageKey);
   return {
     metadataBase: new URL(site.url),
     title: { default: site.name, template: site.seo.titleTemplate },
     description: site.seo.description,
-    openGraph: {
-      siteName: site.name,
-      locale: site.locale.replace("-", "_"),
-      type: "website",
-      images: [{ url: og.src, alt: og.alt }],
-    },
+    openGraph: baseOpenGraph(),
   };
 }
 

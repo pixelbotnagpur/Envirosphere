@@ -7,8 +7,8 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
-import { getImageAsset, loadService, loadServices, loadSite } from "@/lib/content";
-import { canonicalAlternates } from "@/lib/seo";
+import { getImageAsset, loadService, loadServices } from "@/lib/content";
+import { pageSeo } from "@/lib/page-seo";
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -24,10 +24,9 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
   const service = loadService(slug);
   if (!service) return { title: "Service Not Found" };
 
-  const site = loadSite();
   return {
     title: service.title,
-    alternates: canonicalAlternates(site.url, `/services/${slug}/`),
+    ...pageSeo(`/services/${slug}/`),
     description: service.summary,
   };
 }

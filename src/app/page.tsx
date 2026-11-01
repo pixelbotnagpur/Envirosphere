@@ -10,10 +10,10 @@ import { Stats } from "@/components/sections/stats";
 import { Testimonials } from "@/components/sections/testimonials";
 import { VisualBreak } from "@/components/sections/visual-break";
 import { getImageAsset, loadHome, loadServices, loadSite } from "@/lib/content";
-import { canonicalAlternates } from "@/lib/seo";
+import { pageSeo } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
-  return { alternates: canonicalAlternates(loadSite().url, "/") };
+  return pageSeo("/");
 }
 
 export default function HomePage() {
