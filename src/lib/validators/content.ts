@@ -160,7 +160,7 @@ export const downloadItemSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   category: z.string().min(1),
-  fileKey: z.string().min(1),
+  fileKey: mediaKey,
   format: z.string().default("PDF"),
   size: z.string().optional(),
   description: z.string().min(1),

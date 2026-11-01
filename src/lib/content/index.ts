@@ -89,6 +89,9 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const media = loadMedia(root);
   const home = loadHome(root);
   const services = loadServices(root);
+  const jobs = loadJobs(root);
+  const gallery = loadGallery(root);
+  const downloads = loadDownloads(root);
 
   verifyAllMedia(media, publicRoot);
   const references: [string | undefined, string][] = [
@@ -104,11 +107,16 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
       s.image,
       `content/services/${s.slug}.md → image`,
     ]),
+    ...gallery.map((g): [string | undefined, string] => [g.image, `content/gallery.yaml → "${g.id}" image`]),
+    ...downloads.map((d): [string | undefined, string] => [
+      d.fileKey,
+      `content/downloads.yaml → "${d.id}" fileKey`,
+    ]),
   ];
   for (const [key, where] of references) {
     if (key) resolveMedia(media, key, publicRoot, where);
   }
-  return { site, media, home, services };
+  return { site, media, home, services, jobs, gallery, downloads };
 }
 
 export function getImage(key: string): ResolvedMedia {

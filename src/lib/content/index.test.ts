@@ -51,6 +51,40 @@ describe("loadAll", () => {
     );
   });
 
+  it("loads jobs, gallery and downloads", () => {
+    const { content, publicDir } = makeTree(validFiles());
+    const all = loadAll(content, publicDir);
+    expect(all.jobs.map((j) => j.id)).toEqual(["engineer"]);
+    expect(all.gallery.map((g) => g.id)).toEqual(["field-day"]);
+    expect(all.downloads.map((d) => d.id)).toEqual(["brochure"]);
+  });
+
+  it("fails when a gallery item references an unknown image key", () => {
+    const files = validFiles();
+    files["content/gallery.yaml"] = files["content/gallery.yaml"].replace("image: about-photo", "image: nope");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/gallery\.yaml → "field-day" image: "nope" is not listed/,
+    );
+  });
+
+  it("fails when a download fileKey is unknown", () => {
+    const files = validFiles();
+    files["content/downloads.yaml"] = files["content/downloads.yaml"].replace("fileKey: logo", "fileKey: nope");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/downloads\.yaml → "brochure" fileKey: "nope" is not listed/,
+    );
+  });
+
+  it("fails with a plain message when jobs.yaml is malformed", () => {
+    const files = validFiles();
+    files["content/jobs.yaml"] = "- id: broken\n  title: Missing the rest\n";
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(ContentError);
+    expect(() => loadAll(content, publicDir)).toThrowError(/jobs\.yaml/);
+  });
+
   it("fails when the about image key is unknown", () => {
     const files = validFiles();
     files["content/pages/home.yaml"] = files["content/pages/home.yaml"].replace("image: about-photo", "image: nope");

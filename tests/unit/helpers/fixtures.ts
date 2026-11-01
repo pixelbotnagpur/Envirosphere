@@ -108,12 +108,41 @@ summary: Independent audit of compliance.
 Body text of the service.
 `;
 
+export const JOBS_YAML = `
+- id: engineer
+  title: Environmental Engineer
+  department: Engineering
+  location: Pune
+  type: Full-time
+  experience: 2+ years
+  description: Test job description.
+  requirements: [Degree in engineering]
+`;
+
+export const GALLERY_YAML = `
+- id: field-day
+  title: Field day
+  category: Field Work
+  image: about-photo
+`;
+
+export const DOWNLOADS_YAML = `
+- id: brochure
+  title: Brochure
+  category: Corporate
+  fileKey: logo
+  description: Company brochure.
+`;
+
 export function validFiles(): Record<string, string> {
   return {
     "content/site.yaml": SITE_YAML,
     "content/media.yaml": MEDIA_YAML,
     "content/pages/home.yaml": HOME_YAML,
     "content/services/environmental-audit.md": SERVICE_MD,
+    "content/jobs.yaml": JOBS_YAML,
+    "content/gallery.yaml": GALLERY_YAML,
+    "content/downloads.yaml": DOWNLOADS_YAML,
     "public/media/brand/logo.svg": LOGO_SVG,
     "public/media/images/about.svg": LOGO_SVG,
     ...Object.fromEntries(CLIENT_KEYS.map((key) => [`public/media/clients/${key}.svg`, LOGO_SVG])),
