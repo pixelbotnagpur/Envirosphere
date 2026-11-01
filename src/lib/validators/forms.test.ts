@@ -15,7 +15,7 @@ describe("inquirySchema", () => {
     service: "environmental-clearance",
     message: "We need an EIA scoping study for our upcoming facility in MIDC Tarapur.",
     website: "",
-    formLoadedAt: Date.now() - 5000,
+    fillMs: 5000,
   };
 
   it("accepts a well-formed consultation inquiry", () => {
@@ -66,7 +66,7 @@ describe("applicationSchema", () => {
       data: "JVBERi0xLjQKJ...",
     },
     website: "",
-    formLoadedAt: Date.now() - 5000,
+    fillMs: 5000,
   };
 
   it("accepts a well-formed job application with CV", () => {
@@ -108,12 +108,10 @@ describe("isBotSubmission", () => {
   });
 
   it("detects rapid submissions (< 3000ms) as bot", () => {
-    const now = 10000;
-    expect(isBotSubmission({ website: "", formLoadedAt: 8000 }, 3000, now)).toBe(true);
+    expect(isBotSubmission({ website: "", fillMs: 2000 }, 3000)).toBe(true);
   });
 
   it("passes legitimate submissions", () => {
-    const now = 10000;
-    expect(isBotSubmission({ website: "", formLoadedAt: 5000 }, 3000, now)).toBe(false);
+    expect(isBotSubmission({ website: "", fillMs: 5000 }, 3000)).toBe(false);
   });
 });

@@ -61,8 +61,8 @@ function doPost(e) {
       return jsonResponse(true, BOT_SUCCESS);
     }
 
-    // 2. Fill time is REQUIRED and must match the 3 s the site enforces
-    if (!checkFillTime(payload.formLoadedAt, new Date().getTime())) {
+    // 2. Fill time (elapsed ms measured by the browser) is REQUIRED and must be at least 3 s
+    if (!checkFillTime(payload.fillMs)) {
       return jsonResponse(false, "Please wait a few seconds and submit the form again.");
     }
 

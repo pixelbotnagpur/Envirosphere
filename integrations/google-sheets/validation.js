@@ -40,6 +40,7 @@ var LIMITS = {
 };
 
 var MIN_FILL_MS = 3000;
+var MAX_FILL_MS = 24 * 60 * 60 * 1000;
 var CV_MAX_BYTES = 5 * 1024 * 1024;
 /** Base64 grows data by 4/3; refuse anything clearly larger before decoding it. */
 var CV_MAX_BASE64_CHARS = Math.ceil((CV_MAX_BYTES * 4) / 3) + 8;
@@ -81,11 +82,14 @@ function isValidEmail(email) {
   );
 }
 
-/** The form must have been open for at least 3 s. A missing or future timestamp fails. */
-function checkFillTime(formLoadedAt, now) {
-  var loaded = Number(formLoadedAt);
-  if (!isFinite(loaded) || loaded <= 0) return false;
-  return now - loaded >= MIN_FILL_MS;
+/**
+ * `fillMs` is the number of milliseconds the visitor had the form open, measured in the
+ * browser (performance.now), so Google's clock and the visitor's clock never get compared.
+ * Must be a finite integer between 3 s and 24 h. Missing or invalid values fail.
+ */
+function checkFillTime(fillMs) {
+  if (typeof fillMs !== "number" || !isFinite(fillMs) || Math.floor(fillMs) !== fillMs) return false;
+  return fillMs >= MIN_FILL_MS && fillMs <= MAX_FILL_MS;
 }
 
 function isHoneypotTripped(payload) {
@@ -254,6 +258,7 @@ if (typeof module !== "undefined" && module.exports) {
     GENERAL_ROLE: GENERAL_ROLE,
     LIMITS: LIMITS,
     MIN_FILL_MS: MIN_FILL_MS,
+    MAX_FILL_MS: MAX_FILL_MS,
     CV_MAX_BYTES: CV_MAX_BYTES,
     CV_MAX_BASE64_CHARS: CV_MAX_BASE64_CHARS,
     MAX_BODY_CHARS: MAX_BODY_CHARS,

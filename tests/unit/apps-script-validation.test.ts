@@ -15,7 +15,7 @@ interface Validation {
   CV_MAX_BYTES: number;
   sanitize(v: unknown): string;
   isValidEmail(v: unknown): boolean;
-  checkFillTime(loaded: unknown, now: number): boolean;
+  checkFillTime(fillMs: unknown): boolean;
   isHoneypotTripped(p: unknown): boolean;
   validateInquiry(p: Record<string, unknown>): Result;
   validateApplication(p: Record<string, unknown>, roles: string[] | null): Result;
@@ -71,13 +71,23 @@ describe("sanitize", () => {
 });
 
 describe("fill time and honeypot", () => {
-  const now = 1_000_000_000_000;
-  it("requires formLoadedAt and at least 3 seconds", () => {
-    expect(v.checkFillTime(undefined, now)).toBe(false);
-    expect(v.checkFillTime("abc", now)).toBe(false);
-    expect(v.checkFillTime(now - 2900, now)).toBe(false);
-    expect(v.checkFillTime(now + 5000, now)).toBe(false);
-    expect(v.checkFillTime(now - 3000, now)).toBe(true);
+  it("requires an integer fillMs between 3 seconds and 24 hours", () => {
+    expect(v.checkFillTime(undefined)).toBe(false);
+    expect(v.checkFillTime(null)).toBe(false);
+    expect(v.checkFillTime("abc")).toBe(false);
+    expect(v.checkFillTime("5000")).toBe(false);
+    expect(v.checkFillTime(NaN)).toBe(false);
+    expect(v.checkFillTime(Infinity)).toBe(false);
+    expect(v.checkFillTime(4000.5)).toBe(false);
+    expect(v.checkFillTime(-5000)).toBe(false);
+    expect(v.checkFillTime(2999)).toBe(false);
+    expect(v.checkFillTime(3000)).toBe(true);
+    expect(v.checkFillTime(86_400_000)).toBe(true);
+    expect(v.checkFillTime(86_400_001)).toBe(false);
+  });
+  it("does not depend on any absolute timestamp", () => {
+    expect(validationSource).not.toContain("formLoadedAt");
+    expect(codeSource).not.toContain("formLoadedAt");
   });
   it("detects the honeypot", () => {
     expect(v.isHoneypotTripped({ website: "http://spam" })).toBe(true);

@@ -39,7 +39,7 @@ export function ApplicationModal({
 
   const [cvFile, setCvFile] = React.useState<CvFileInput | null>(null);
   const [fileError, setFileError] = React.useState<string | null>(null);
-  const formLoadedAtRef = React.useRef<number | null>(null);
+  const openedAtRef = React.useRef<number>(0);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
@@ -47,8 +47,8 @@ export function ApplicationModal({
   const [turnstileReset, setTurnstileReset] = React.useState(0);
 
   React.useEffect(() => {
-    formLoadedAtRef.current = Date.now();
-  }, []);
+    if (isOpen) openedAtRef.current = performance.now();
+  }, [isOpen]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,10 +122,11 @@ export function ApplicationModal({
       return;
     }
 
+    const fillMs = Math.round(performance.now() - openedAtRef.current);
     const payload = {
       ...formData,
       cvFile,
-      formLoadedAt: formLoadedAtRef.current ?? undefined,
+      fillMs,
     };
 
     const parsed = applicationSchema.safeParse(payload);
@@ -142,7 +143,7 @@ export function ApplicationModal({
       return;
     }
 
-    if (isBotSubmission({ website: formData.website, formLoadedAt: formLoadedAtRef.current ?? undefined })) {
+    if (isBotSubmission({ website: formData.website, fillMs })) {
       setStatus("success");
       setStatusMessage("Thank you. Your application has been logged.");
       return;

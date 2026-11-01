@@ -105,7 +105,7 @@ Turn both on together. If the secret is set in Apps Script but the site was buil
 ---
 
 ## Built-in abuse protection (what the script enforces)
-- Honeypot field and a **required** minimum fill time of 3 seconds (the form sends its load time).
+- Honeypot field and a **required** minimum fill time of 3 seconds (the form sends `fillMs`, the milliseconds it measured itself between opening the form and submitting; the server never compares clocks).
 - Maximum lengths on every field, email and phone format checks, and a fixed list of allowed services (and optionally roles).
 - CVs: only `.pdf`, `.doc`, `.docx`; the declared type must match the extension; the file content must start with the right signature (`%PDF`, the Word 97 header, or the zip header for `.docx`); at most 5 MB; stored under a generated name (timestamp plus a cleaned-up version of the file name).
 - Turnstile verification whenever `TURNSTILE_SECRET` is set (fails closed).

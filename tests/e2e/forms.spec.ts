@@ -1,9 +1,19 @@
 import { expect, test } from "@playwright/test";
 
+/** The server contract: elapsed ms measured by the browser, never an absolute timestamp. */
+function expectFillMsContract(postData: string | null) {
+  const body = JSON.parse(postData ?? "{}") as Record<string, unknown>;
+  expect(Number.isInteger(body.fillMs)).toBe(true);
+  expect(body.fillMs as number).toBeGreaterThanOrEqual(3000);
+  expect(body).not.toHaveProperty("formLoadedAt");
+}
+
 test.describe("consultation inquiry form", () => {
   test("submits inquiry successfully and displays confirmation state", async ({ page }) => {
     // Intercept form submission endpoint
+    const requests: (string | null)[] = [];
     await page.route("**/macros/s/**/exec", async (route) => {
+      requests.push(route.request().postData());
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -26,12 +36,15 @@ test.describe("consultation inquiry form", () => {
       "We need an immediate water audit and wastewater ZLD feasibility study for our Nanded unit.",
     );
 
-    // Submit
+    // The form refuses submissions faster than 3 s, as a real visitor would be
+    await page.waitForTimeout(3200);
     await page.getByRole("button", { name: "Submit Inquiry" }).click();
 
     // Verify confirmation view
     await expect(page.getByRole("status")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Inquiry Received" })).toBeVisible();
+    expect(requests).toHaveLength(1);
+    expectFillMsContract(requests[0]);
   });
 
   test("shows inline error when submitted empty", async ({ page }) => {
@@ -44,7 +57,9 @@ test.describe("consultation inquiry form", () => {
 test.describe("career application modal", () => {
   test("opens application modal and accepts CV upload", async ({ page }) => {
     // Intercept form submission endpoint
+    const requests: (string | null)[] = [];
     await page.route("**/macros/s/**/exec", async (route) => {
+      requests.push(route.request().postData());
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -80,11 +95,13 @@ test.describe("career application modal", () => {
 
     await expect(dialog.getByText("Sunil_Joshi_Resume.pdf")).toBeVisible();
 
-    // Submit application
+    await page.waitForTimeout(3200);
     await dialog.getByRole("button", { name: "Submit Application" }).click();
 
     // Verify confirmation
     await expect(dialog.getByRole("status")).toBeVisible();
     await expect(dialog.getByRole("heading", { name: "Application Submitted" })).toBeVisible();
+    expect(requests).toHaveLength(1);
+    expectFillMsContract(requests[0]);
   });
 });

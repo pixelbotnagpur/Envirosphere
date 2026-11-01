@@ -11,7 +11,8 @@ export const inquirySchema = z.object({
   service: z.string().trim().min(1, "Please select a service or general inquiry"),
   message: z.string().trim().min(10, "Message must be at least 10 characters").max(2000, "Message cannot exceed 2000 characters"),
   website: z.string().max(0, "Bot detected").optional().default(""),
-  formLoadedAt: z.number().int().positive().optional(),
+  /** Milliseconds the visitor had the form open, measured in the browser with performance.now(). */
+  fillMs: z.number().int().min(0).optional(),
   turnstileToken: z.string().optional(),
 });
 
@@ -49,7 +50,8 @@ export const applicationSchema = z.object({
   coverLetter: z.string().trim().max(2000, "Cover note cannot exceed 2000 characters").optional().default(""),
   cvFile: cvFileSchema,
   website: z.string().max(0, "Bot detected").optional().default(""),
-  formLoadedAt: z.number().int().positive().optional(),
+  /** Milliseconds the visitor had the form open, measured in the browser with performance.now(). */
+  fillMs: z.number().int().min(0).optional(),
   turnstileToken: z.string().optional(),
 });
 
@@ -58,16 +60,16 @@ export type ApplicationData = z.infer<typeof applicationSchema>;
 
 /**
  * Anti-abuse gate: checks honeypot field and minimum fill time (default: 3000ms).
+ * `fillMs` is elapsed time measured on the visitor's own clock, so it is immune to clock skew.
  */
 export function isBotSubmission(
-  data: { website?: string; formLoadedAt?: number },
+  data: { website?: string; fillMs?: number },
   minFillTimeMs = process.env.NODE_ENV === "test" ? 0 : 3000,
-  now = Date.now(),
 ): boolean {
   if (data.website && data.website.trim().length > 0) {
     return true;
   }
-  if (data.formLoadedAt && now - data.formLoadedAt < minFillTimeMs) {
+  if (typeof data.fillMs === "number" && data.fillMs < minFillTimeMs) {
     return true;
   }
   return false;

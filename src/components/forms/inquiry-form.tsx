@@ -36,7 +36,7 @@ export function InquiryForm({
     website: "",
   });
 
-  const formLoadedAtRef = React.useRef<number | null>(null);
+  const openedAtRef = React.useRef<number>(0);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
@@ -44,7 +44,7 @@ export function InquiryForm({
   const [turnstileReset, setTurnstileReset] = React.useState(0);
 
   React.useEffect(() => {
-    formLoadedAtRef.current = Date.now();
+    openedAtRef.current = performance.now();
   }, []);
 
   const handleChange = (
@@ -64,10 +64,11 @@ export function InquiryForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 1. Zod Validation
+    // 1. Zod Validation (fill time is elapsed ms on the visitor's own clock)
+    const fillMs = Math.round(performance.now() - openedAtRef.current);
     const parsed = inquirySchema.safeParse({
       ...formData,
-      formLoadedAt: formLoadedAtRef.current ?? undefined,
+      fillMs,
     });
 
     if (!parsed.success) {
@@ -83,7 +84,7 @@ export function InquiryForm({
     }
 
     // 2. Anti-abuse check (honeypot or sub-3s submit)
-    if (isBotSubmission({ website: formData.website, formLoadedAt: formLoadedAtRef.current ?? undefined })) {
+    if (isBotSubmission({ website: formData.website, fillMs })) {
       // Fake success for bots to prevent adversarial learning
       setStatus("success");
       setStatusMessage("Thank you. Your consultation request has been received.");
@@ -128,7 +129,7 @@ export function InquiryForm({
       message: "",
       website: "",
     });
-    formLoadedAtRef.current = Date.now();
+    openedAtRef.current = performance.now();
     setFieldErrors({});
     setStatus("idle");
     setStatusMessage("");
