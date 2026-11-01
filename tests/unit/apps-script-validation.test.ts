@@ -158,6 +158,14 @@ describe("CV checks", () => {
     expect(v.checkCvMetadata(meta({ data: "<script>" })).ok).toBe(false);
     expect(v.checkCvMetadata(null).ok).toBe(false);
   });
+  it("rejects prototype property names used as the extension", () => {
+    for (const name of ["x.constructor", "x.__proto__", "x.toString", "x.hasOwnProperty", "x.valueOf"]) {
+      const r = v.checkCvMetadata(meta({ name, type: PDF }));
+      expect(r.ok).toBe(false);
+      expect(r.message).toMatch(/PDF/);
+    }
+    expect(v.checkCvBytes([0x25, 0x50, 0x44, 0x46], "constructor").ok).toBe(false);
+  });
   it("checks magic bytes (including Apps Script signed bytes) and size", () => {
     expect(v.checkCvBytes([0x25, 0x50, 0x44, 0x46, 0x2d], "pdf").ok).toBe(true);
     expect(v.checkCvBytes([0x4d, 0x5a, 0x90, 0x00], "pdf").ok).toBe(false);

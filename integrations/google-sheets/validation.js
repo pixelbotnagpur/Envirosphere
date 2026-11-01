@@ -181,6 +181,11 @@ function validateApplication(payload, allowedRoles) {
   };
 }
 
+/** Own-property lookup so names like "constructor" or "__proto__" never resolve to a type. */
+function cvTypeFor(ext) {
+  return Object.prototype.hasOwnProperty.call(CV_TYPES, ext) ? CV_TYPES[ext] : null;
+}
+
 function extensionOf(fileName) {
   var match = /\.([A-Za-z0-9]+)$/.exec(String(fileName || ""));
   return match ? match[1].toLowerCase() : "";
@@ -201,11 +206,12 @@ function bytesStartWith(bytes, magic) {
 function checkCvMetadata(cv) {
   if (!cv || typeof cv !== "object") return { ok: false, message: "CV document missing" };
   var ext = extensionOf(cv.name);
-  if (!CV_TYPES[ext]) return { ok: false, message: "CV must be a PDF, DOC or DOCX file" };
+  var type = cvTypeFor(ext);
+  if (!type) return { ok: false, message: "CV must be a PDF, DOC or DOCX file" };
   if (typeof cv.name !== "string" || cv.name.length > LIMITS.cvName) {
     return { ok: false, message: "CV file name is too long" };
   }
-  if (cv.type !== CV_TYPES[ext].mime) {
+  if (cv.type !== type.mime) {
     return { ok: false, message: "CV file type does not match its extension" };
   }
   if (typeof cv.data !== "string" || cv.data.length === 0 || cv.data.length > CV_MAX_BASE64_CHARS) {
@@ -214,14 +220,15 @@ function checkCvMetadata(cv) {
   if (!/^[A-Za-z0-9+\/=\s]+$/.test(cv.data)) {
     return { ok: false, message: "CV file data is not valid" };
   }
-  return { ok: true, ext: ext, mime: CV_TYPES[ext].mime };
+  return { ok: true, ext: ext, mime: type.mime };
 }
 
 /** Checks the decoded bytes: size cap and magic bytes matching the extension. */
 function checkCvBytes(bytes, ext) {
   if (!bytes || bytes.length === 0) return { ok: false, message: "CV file is empty" };
   if (bytes.length > CV_MAX_BYTES) return { ok: false, message: "CV file must be 5 MB or smaller" };
-  if (!CV_TYPES[ext] || !bytesStartWith(bytes, CV_TYPES[ext].magic)) {
+  var type = cvTypeFor(ext);
+  if (!type || !bytesStartWith(bytes, type.magic)) {
     return { ok: false, message: "CV file content does not match its type" };
   }
   return { ok: true };
