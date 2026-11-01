@@ -343,6 +343,23 @@ describe("ApplicationModal", () => {
     await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
   }
 
+  it("wires an inline error, aria-invalid and focus for the cover letter", async () => {
+    const submitSpy = vi.spyOn(submitClient, "submitForm");
+    const user = userEvent.setup();
+    render(<ApplicationModal copy={forms} role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+    await fillValid(user);
+    const cover = screen.getByLabelText(rx(forms.application.fields.coverLetter.label));
+    fireEvent.change(cover, { target: { value: "x".repeat(2001) } });
+
+    await user.click(screen.getByRole("button", { name: forms.application.submitLabel }));
+
+    const message = await screen.findByText(rx(forms.application.errors.coverLetterMax));
+    expect(cover).toHaveAttribute("aria-invalid", "true");
+    expect(cover.getAttribute("aria-describedby")).toContain(message.id);
+    await waitFor(() => expect(cover).toHaveFocus());
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
   it("does not send a too-fast submit and asks the visitor to press again", async () => {
     vi.stubEnv("NODE_ENV", "production");
     const submitSpy = vi

@@ -427,8 +427,11 @@ export function ApplicationModal({
                       placeholder={application.fields.coverLetter.placeholder}
                       value={formData.coverLetter || ""}
                       onChange={handleChange}
+                      hasError={Boolean(fieldErrors.coverLetter)}
+                      aria-describedby={describedBy(fieldErrors.coverLetter && errorId("app-cover"))}
                       className="mt-1.5"
                     />
+                    <FieldError controlId="app-cover" message={fieldErrors.coverLetter} className="mt-1" />
                   </div>
 
                   <div>
