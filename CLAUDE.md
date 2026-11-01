@@ -2,7 +2,7 @@
 
 Premium redesign of envirosphere.co.in, the site of Envirosphere Consultant & Engineers
 (Pune), a NABET-accredited environmental consultancy. Single Next.js app, not a monorepo,
-**static export** (`out/`) hosted on Hostinger. No login, no DB, no server.
+**static export** (`out/`) served by `server.mjs` on Hostinger's Node.js plan. No login, no DB, no app server logic.
 Full spec: `PROJECT-REQUIREMENTS.md`.
 
 ## Stack
@@ -12,7 +12,8 @@ Next.js 16.4.x (App Router, `output: "export"`) · React 19.2 · TypeScript stri
 (Apps Script) · Vitest + Playwright · pnpm · Node 24 LTS
 
 ## Commands
-- Dev: `pnpm dev` | Build (static → `out/`): `pnpm build` | Preview build: `pnpm preview`
+- Dev: `pnpm dev` | Build (static → `out/`): `pnpm build` | Serve `out/`: `pnpm start` (port 3000) / `pnpm preview` (4173)
+- Upload bundle: `pnpm package:hostinger` (`hostinger-dist/`, see `docs/DEPLOY-HOSTINGER.md`)
 - Content check: `pnpm content:check`
 - Test: `pnpm test` (one file: `pnpm test -- <file>`) | E2E: `pnpm test:e2e`
 - Typecheck: `pnpm typecheck` | Lint: `pnpm lint`

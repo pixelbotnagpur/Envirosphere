@@ -21,6 +21,15 @@ pnpm build          # ends with check:out, which fails if out/ contains test-onl
 `pnpm test:e2e` builds into `.next-e2e/` (never `out/`), so running tests cannot overwrite the
 site you upload.
 
+## Run and deploy
+```
+pnpm start               # serve out/ with server.mjs on PORT (default 3000); pnpm preview uses 4173
+pnpm package:hostinger   # assemble hostinger-dist/ (out/, server.mjs, minimal package.json)
+```
+The site is a static export served by the dependency-free `server.mjs` on Hostinger's Node.js
+plan (PORT is provided by Hostinger). Step-by-step owner guide: `docs/DEPLOY-HOSTINGER.md`.
+`public/.htaccess` is only an Apache/LiteSpeed fallback and is ignored on the Node plan.
+
 ## Agent tooling
 ```
 .agent/rules/        numbered rules (source of truth)

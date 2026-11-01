@@ -4,6 +4,9 @@
 - `next.config.ts`: `output: "export"`, `trailingSlash: true`, images handled at build.
   Never add server-only features (server actions, route handlers using the request,
   middleware/proxy, ISR, `cookies()`/`headers()`). They break the export.
+- Hosting is Hostinger Node.js: `server.mjs` (repo root) serves the static `out/`. `server.mjs` and
+  `scripts/` are the only allowed Node files outside `src/`. They use `node:` built-ins only (no
+  runtime dependencies), and this does not allow any Next.js server feature.
 - Layout: `content/` (owner-editable), `public/media/`, `integrations/google-sheets/`,
   `src/app`, `src/components/{ui,motion,sections,layout}`, `src/lib/{content,forms,validators}`,
   `src/hooks`, `tests/`.

@@ -3,7 +3,7 @@
 ## What it is
 Premium static marketing site for Envirosphere Consultant & Engineers, an environmental
 consultancy (EC, CRZ, forest clearance, PCB compliance, audits, ETP/STP). Users: industry
-EHS and project heads. Phase: Plan 1 (Foundation) built; Home sections next. Hosted on Hostinger as static files.
+EHS and project heads. Phase: Plan 1 (Foundation) built; Home sections next. Static export served by `server.mjs` (Node built-ins only) on Hostinger's Node.js plan.
 
 ## Data flow
 Build time: loaders in `src/lib/content` read `content/*.yaml` + `content/services/*.md`,
@@ -12,12 +12,15 @@ RSC pages render to static HTML in `out/`. Client components exist only at the l
 motion (Motion + Lenis) and forms.
 Runtime: forms POST JSON (text/plain) to a Google Apps Script Web App
 (`NEXT_PUBLIC_FORMS_ENDPOINT`), which validates, verifies Turnstile, appends a row to the
-Google Sheet and stores CVs in Drive. No server, DB or login.
+Google Sheet and stores CVs in Drive. No DB or login; no app server logic.
 
 ## Key modules
 - `content/`: owner-editable "database" · `public/media/`: assets
 - `scripts/optimize-images.ts` (`pnpm optimize:images`): resizes + WebP-converts `public/media`;
   `tests/unit/media-weight.test.ts` enforces the budget (photo ≤ 400 KB, total ≤ 6 MB).
+- `server.mjs`: serves `out/` (traversal-safe, 404 status, https redirect, gzip, cache rules, security
+  headers mirrored from `public/.htaccess`; `tests/unit/server.test.ts`). `pnpm package:hostinger`
+  builds the upload folder; owner guide: `docs/DEPLOY-HOSTINGER.md`.
 - `src/app/globals.css`: all design tokens (palette, type scale, motion durations/easings)
 - `src/components/ui`: CVA primitives · `src/components/motion`: LenisProvider, Reveal,
   Parallax, SplitText, Marquee, Counter, Pin · `src/components/sections`: page blocks

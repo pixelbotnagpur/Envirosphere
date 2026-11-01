@@ -96,7 +96,7 @@ The Web App URL stays the same.
 ---
 
 ## Step 6: Set the website environment variables (BEFORE building the site)
-The website is a static export: `NEXT_PUBLIC_*` values are written into the built files when you run `pnpm build`. Setting them afterwards, or in the Hostinger "deployment settings", has **no effect**. Set them first, then build, then upload:
+The website is a static export: `NEXT_PUBLIC_*` values are written into the built files when you run `pnpm build`. Setting them afterwards, or in the Hostinger Node.js app settings, has **no effect**. Set them first, then build, then upload:
 
 ```bash
 # .env.local (on the computer where you run the build)
@@ -104,7 +104,7 @@ NEXT_PUBLIC_FORMS_ENDPOINT=https://script.google.com/macros/s/<YOUR_DEPLOYMENT_I
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=<your Turnstile site key>   # REQUIRED for launch, see Step 7
 ```
 
-Then run `pnpm check:launch` (it fails with a plain message if either value is missing or is a test value), then `pnpm build`, and upload the new `out/` folder. `pnpm build` ends with an automatic `check:out` that fails if `out/` contains the test endpoint or Cloudflare test keys. Whenever you change either value, rebuild and re-upload.
+Then run `pnpm check:launch` (it fails with a plain message if either value is missing or is a test value), then `pnpm build`, then `pnpm package:hostinger`, and upload the new `hostinger-dist/` contents to the Hostinger Node.js app (see `docs/DEPLOY-HOSTINGER.md`). `pnpm build` ends with an automatic `check:out` that fails if `out/` contains the test endpoint or Cloudflare test keys. Whenever you change either value, rebuild and re-upload.
 
 Security headers: the site's Content-Security-Policy (in `public/.htaccess`, mirrored by the Node server) already allows `https://script.google.com`, `https://script.googleusercontent.com` (Apps Script redirects replies there) and `https://challenges.cloudflare.com` (Turnstile). If you ever replace the headers, keep those three origins or the forms will stop working.
 

@@ -9,8 +9,8 @@
   display type, numbered sections (`001`), bracketed labels (`[ services / ]`), generous
   whitespace and scroll storytelling. **Do not copy it:** no layouts, copy or assets.
 - **Type:** Static marketing site. One Next.js app, **not a monorepo**, exported to plain
-  HTML/CSS/JS (`out/`) and uploaded to Hostinger.
-- **No user login, no database, no server.** Forms post to Google Sheets (§3.8).
+  HTML/CSS/JS (`out/`) and served by a small Node server on Hostinger's Node.js plan.
+- **No user login, no database, no application server logic.** A dependency-free `server.mjs` only serves the files. Forms post to Google Sheets (§3.8).
 - **Target users:** Plant and project heads, EHS managers and developers in industry,
   infrastructure and real estate who need EC, CRZ, forest, PCB consents or audits. Also
   government bodies and job seekers.
@@ -37,7 +37,7 @@
 | Images | Build-time optimization (WebP/AVIF, responsive sizes) | static export has no image server |
 | Testing | Vitest + Testing Library + Playwright | see §6 |
 | Lint/format | ESLint (flat config) + Prettier | `next lint` is gone in v16; run `eslint` directly |
-| Hosting | **Hostinger** shared hosting (LiteSpeed/Apache) | upload `out/` to `public_html`, `.htaccess` included |
+| Hosting | **Hostinger Node.js plan** | `server.mjs` serves the static `out/` (no Next.js server features); `public/.htaccess` stays as an Apache/LiteSpeed fallback |
 
 Not used: user accounts/login, database, CMS server, API routes, server actions,
 middleware, Turborepo, tRPC, payments. Add any only after approval.
@@ -115,7 +115,7 @@ text-primary-foreground`. Values are defined once in `globals.css` (rule 31).
 - Turnstile secret and notification email live in Apps Script **Script Properties**, never in the repo.
 - The Google Sheet stays private (owner + named staff). It holds PII.
 - Security headers (CSP, HSTS, X-Content-Type-Options, Referrer-Policy) and caching
-  rules ship in `public/.htaccess`.
+  rules ship in `public/.htaccess` and are mirrored exactly by `server.mjs` (a test keeps them identical).
 
 ### 3.8 Forms → Google Sheets
 ```
@@ -136,9 +136,10 @@ Google Apps Script Web App (doPost) ──▶ validates again + verifies Turnsti
 - Every route must be pre-renderable. Dynamic routes (`/services/[slug]`) use `generateStaticParams`.
 - Not available: server actions, route handlers with request data, middleware/proxy,
   ISR, cookies/headers, Next image optimization server. Do not use them.
-- `trailingSlash: true` so `/about/` maps to `about/index.html` on Apache/LiteSpeed.
+- `trailingSlash: true` so `/about/` maps to `about/index.html` (`server.mjs` and Apache/LiteSpeed both resolve it).
 - `sitemap.xml`, `robots.txt`, OG images, 404 page are generated at build.
-- Deploy = `pnpm build`, then upload the contents of `out/` to Hostinger `public_html`.
+- Deploy = `pnpm build`, `pnpm package:hostinger`, then upload `hostinger-dist/` to the Hostinger Node.js app
+  (`docs/DEPLOY-HOSTINGER.md`). `server.mjs` (Node built-ins only) serves `out/`; `pnpm start` runs it locally.
 
 ### 3.10 Content & assets as files ("local database")
 The owner edits text and swaps images **without touching code**. All content lives in
@@ -178,7 +179,8 @@ public/media/              # the actual files: brand/, images/, clients/, galler
 ├── content/                 # §3.10, the owner-editable "database"
 ├── public/
 │   ├── media/               # images, logos, videos, PDFs
-│   └── .htaccess            # headers, caching, 404, trailing slash
+│   └── .htaccess            # Apache fallback: headers, caching, 404, trailing slash (ignored on Node plan)
+├── server.mjs               # Node server for the static export (Hostinger Node.js)
 ├── integrations/google-sheets/  # Code.gs + SETUP.md (Apps Script)
 ├── src/
 │   ├── app/                 # routes, layout, globals.css (tokens), sitemap, robots
@@ -227,8 +229,8 @@ restructured and lightly edited, never invented. Gaps are marked `TODO(content)`
 - Gates before deploy: lint, typecheck, test, `content:check`, build. Lighthouse on `/` and one service page.
 
 ## 7. Delivery & ops
-- Build: `pnpm build` → `out/`. Upload `out/*` to Hostinger `public_html` (File Manager or FTP).
-  Optional later: GitHub Action that builds and deploys over FTP on push.
+- Build: `pnpm build` → `out/`, then `pnpm package:hostinger` → `hostinger-dist/` (`out/`, `server.mjs`,
+  minimal `package.json`). Upload it to the Hostinger Node.js app (`docs/DEPLOY-HOSTINGER.md`).
 - Env: `.env.example` lists `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_FORMS_ENDPOINT`,
   `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
 - Monitoring: Hostinger uptime + Google Search Console. Form failures are visible in the
@@ -238,7 +240,7 @@ restructured and lightly edited, never invented. Gaps are marked `TODO(content)`
 1. **Login:** none. No client portal link.
 2. **Content editing:** file-based `/content` (YAML + Markdown) + `/public/media`, validated at build (§3.10).
 3. **Form delivery:** Google Sheets via Apps Script Web App, CVs to Google Drive (§3.8).
-4. **Hosting:** Hostinger, static export from `out/` (§3.9).
+4. **Hosting:** Hostinger Node.js plan serving the static export from `out/` via `server.mjs` (§3.9; user decision 2026-11-01).
 5. **Brand assets:** downloaded from envirosphere.co.in into `/public/media` as placeholders.
    The owner replaces them later via `media.yaml`.
 
@@ -248,6 +250,7 @@ restructured and lightly edited, never invented. Gaps are marked `TODO(content)`
 | Single Next.js app, no monorepo/Turborepo/`packages/*` | User requirement: no monorepo | user | 2026-10-22 |
 | No DB, auth, tRPC, BullMQ, payments or multi-tenancy | Static marketing site | user | 2026-10-22 |
 | Static export (`output: "export"`) to Hostinger | Hosting choice | user | 2026-10-22 |
+| Node server (`server.mjs`) serves the static export on Hostinger Node.js plan | User decision: "static and hosted on Hostinger Node.js"; no Next.js server features, no runtime dependencies | user | 2026-11-01 |
 | Forms to Google Sheets via Apps Script instead of server email | User requirement; no server | user | 2026-10-22 |
 | `site.config.ts` replaced by `/content/*.yaml` | Owner edits content without code | user | 2026-10-22 |
 | Added Lenis + Motion, scroll-driven design (rule 34) | Premium design requirement | user | 2026-10-22 |
