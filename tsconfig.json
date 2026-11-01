@@ -41,6 +41,7 @@
   "exclude": [
     "node_modules",
     "out",
+    "hostinger-dist",
     ".next-e2e"
   ]
 }

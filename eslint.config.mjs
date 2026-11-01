@@ -17,7 +17,7 @@ const sparkleIcons = [
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores([".next/**", ".next-e2e/**", "out/**", "node_modules/**", "next-env.d.ts", "coverage/**", ".claude/worktrees/**", ".next-shot-*/**"]),
+  globalIgnores([".next/**", ".next-e2e/**", "out/**", "hostinger-dist/**", "node_modules/**", "next-env.d.ts", "coverage/**", ".claude/worktrees/**", ".next-shot-*/**"]),
   {
     rules: {
       "no-restricted-imports": [

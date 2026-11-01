@@ -11,6 +11,7 @@
     "build": "pnpm content:check && next build",
     "postbuild": "pnpm check:out",
     "check:out": "node scripts/check-out.mjs",
+    "package:hostinger": "node scripts/package-hostinger.mjs",
     "check:launch": "node scripts/check-launch.mjs",
     "start": "node server.mjs",
     "preview": "node server.mjs --port 4173",
