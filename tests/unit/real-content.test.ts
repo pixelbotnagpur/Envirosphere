@@ -9,6 +9,13 @@ describe("real site content (what the owner edits)", () => {
     expect(services.map((s) => s.order)).toEqual(Array.from({ length: 13 }, (_, i) => i + 1));
   });
 
+  it("has real text for every service (no placeholder left)", () => {
+    for (const s of services) {
+      expect(s.body, s.slug).not.toMatch(/TODO(content)/);
+      expect(s.body.length, s.slug).toBeGreaterThan(200);
+    }
+  });
+
   it("lists every client logo in media.yaml with a readable alt", () => {
     expect(home.clients.logos.length).toBeGreaterThanOrEqual(30);
     for (const key of home.clients.logos) expect(media[key]?.alt.length).toBeGreaterThan(3);
