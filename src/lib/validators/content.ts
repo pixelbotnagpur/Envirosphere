@@ -41,6 +41,16 @@ export const siteSchema = z.object({
     /** Optional address for job applications; when absent the main email is used. */
     careersEmail: z.email().optional(),
     address: z.string().min(1),
+    /** Optional, for search engines (structured data). All five fields or none; when absent no address is published there. */
+    addressParts: z
+      .object({
+        streetAddress: z.string().min(1),
+        locality: z.string().min(1),
+        region: z.string().min(1),
+        postalCode: z.string().min(1),
+        country: z.string().min(1),
+      })
+      .optional(),
   }),
   offices: z
     .array(

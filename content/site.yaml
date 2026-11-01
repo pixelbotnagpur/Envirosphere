@@ -19,6 +19,14 @@ contact:
     - "+91 9860220550"
     - "+91 9225176005"
   address: Shree Ganesh Ace Arcade, Kokane Chowk, Rahatani, Pune - 411017
+  # Same address split into parts, only used by search engines (Google). Keep it equal to the line above.
+  # country is the two-letter code (IN for India). Delete the whole block to publish no address there.
+  addressParts:
+    streetAddress: Shree Ganesh Ace Arcade, Kokane Chowk, Rahatani
+    locality: Pune
+    region: Maharashtra
+    postalCode: "411017"
+    country: IN
 
 offices:
   - name: Head Office

@@ -96,6 +96,7 @@ Every word you see on these pages is in `content/pages/<page>.yaml`. Each file s
 
 Pictures are always a key from `content/media.yaml` (for example `photo-aco-meet`), never a file path.
 Phone numbers, email, address and the list of offices are typed once in `content/site.yaml`; the pages only show them.
+`contact.addressParts` in `content/site.yaml` repeats the address in five parts (street, locality, region, postal code, country code such as `IN`). It is used only for Google's business information, never shown on a page. Fill in all five or delete the block; without it no address is sent to Google. Keep it equal to `contact.address`.
 Where a card has an `icon:`, pick one of: `award`, `briefcase`, `building`, `factory`, `file-check`, `file-text`, `globe`, `layers`, `leaf`, `map-pin`, `shield-check`, `users`, `waves`. Any other name stops the build and lists these.
 
 ### `pages/about.yaml`

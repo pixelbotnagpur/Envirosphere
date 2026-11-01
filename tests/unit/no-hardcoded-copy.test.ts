@@ -55,7 +55,7 @@ function listFiles(): string[] {
   const components = ["sections", "forms", "layout", "ui", "motion"].flatMap((dir) =>
     walk(`src/components/${dir}`).filter((f) => f.endsWith(".tsx") && !/\.test\./.test(f)),
   );
-  return [...pages, ...components].sort();
+  return [...pages, "src/app/layout.tsx", "src/app/not-found.tsx", ...components].sort();
 }
 
 const words = (s: string) => s.split(/\s+/).filter((w) => /[A-Za-z]{2,}/.test(w));
@@ -134,6 +134,8 @@ describe("no hardcoded copy in pages and sections (rule 33)", () => {
     // Forms, layout, ui and motion are scanned too, with no exceptions.
     for (const file of [
       "src/app/page.tsx",
+      "src/app/layout.tsx",
+      "src/app/not-found.tsx",
       "src/components/sections/hero.tsx",
       "src/components/forms/inquiry-form.tsx",
       "src/components/forms/application-modal.tsx",

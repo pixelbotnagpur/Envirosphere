@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header";
 import { LenisProvider } from "@/components/motion/lenis-provider";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getImage, loadSite, socialLinks } from "@/lib/content";
+import { buildOrganizationJsonLd, serializeJsonLd } from "@/lib/json-ld";
 import { baseOpenGraph } from "@/lib/page-seo";
 import "./globals.css";
 
@@ -39,40 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const site = loadSite();
   const logo = getImage(site.logoKey);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
-        "@id": `${site.url}/#organization`,
-        name: site.name,
-        alternateName: site.shortName,
-        url: site.url,
-        logo: `${site.url}${logo.src}`,
-        description: site.seo.description,
-        telephone: site.contact.phones[0],
-        email: site.contact.email,
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: site.contact.address,
-          addressLocality: "Pune",
-          addressRegion: "Maharashtra",
-          postalCode: "411017",
-          addressCountry: "IN",
-        },
-        department: site.offices.map((office) => ({
-          "@type": "LocalBusiness",
-          name: `${site.shortName} - ${office.city} ${office.name}`,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: office.city,
-            addressRegion: "Maharashtra",
-            addressCountry: "IN",
-          },
-        })),
-      },
-    ],
-  };
+  const jsonLd = buildOrganizationJsonLd(site, logo.src);
 
   return (
     <html lang={site.locale} className={`${syne.variable} ${manrope.variable}`}>
@@ -82,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       </head>
       {/* Browser extensions (e.g. Grammarly) inject attributes into <body> before hydration. */}
