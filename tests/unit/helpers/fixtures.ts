@@ -53,6 +53,9 @@ ${CLIENT_KEYS.map((key) => `${key}:\n  src: /media/clients/${key}.svg\n  alt: ${
 `;
 
 export const HOME_YAML = `
+seo:
+  title: Test Co home
+  description: Test Co home description.
 hero:
   eyebrow: Test eyebrow
   title: Test title
@@ -60,6 +63,9 @@ hero:
   primaryCta: { label: Start, href: /contact/ }
   secondaryCta: { label: Services, href: /services/ }
   scrollLabel: Scroll
+  image: about-photo
+  highlights: [Clients]
+  keywords: [Alpha, Beta]
 about:
   label: About us
   heading: About heading
@@ -71,6 +77,9 @@ services:
   heading: Services heading
   intro: Services intro
   cta: { label: All services, href: /services/ }
+  viewLabel: View details
+  featured:
+    - { service: environmental-audit, tag: "[ AUDITS ]", image: about-photo }
 stats:
   label: In numbers
   items:
@@ -80,6 +89,17 @@ clients:
   label: Clients
   heading: Clients heading
   logos: [${CLIENT_KEYS.join(", ")}]
+visualBreak:
+  image: about-photo
+  tag: Test tag
+fieldArchive:
+  label: FIELD
+  heading: Field heading
+  body: Field body
+  topCta: { label: Archive, href: /gallery/ }
+  bottomCta: { label: Gallery, href: /gallery/ }
+  items:
+    - { image: about-photo, tag: ONE, caption: First caption. }
 process:
   label: How we work
   heading: Process heading

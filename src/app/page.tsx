@@ -9,11 +9,13 @@ import { ServicesIndex } from "@/components/sections/services-index";
 import { Stats } from "@/components/sections/stats";
 import { Testimonials } from "@/components/sections/testimonials";
 import { VisualBreak } from "@/components/sections/visual-break";
-import { getImageAsset, loadHome, loadServices, loadSite } from "@/lib/content";
+import { getImageAsset, loadHome, loadServices, loadSite, resolveFeaturedServices } from "@/lib/content";
 import { pageSeo } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
-  return pageSeo("/");
+  const { seo } = loadHome();
+  // The Home title is the whole title (no "| Envirosphere" suffix), as written in home.yaml.
+  return { title: { absolute: seo.title }, description: seo.description, ...pageSeo("/") };
 }
 
 export default function HomePage() {
@@ -21,36 +23,22 @@ export default function HomePage() {
   const home = loadHome();
   const services = loadServices();
 
-  const bySlug = (slug: string) => services.find((service) => service.slug === slug);
-  const featuredSpecs = [
-    { slug: "environmental-clearance", tag: "[ STATUTORY & CONSENTS ]", image: "hero-eco-architecture" },
-    { slug: "water-wastewater-treatment", tag: "[ WATER ]", image: "clean-water-facility" },
-    { slug: "environmental-audit", tag: "[ AUDITS ]", image: "sustainable-industrial-park" },
-  ];
-  const featuredDisciplines = featuredSpecs.flatMap(({ slug, tag, image }) => {
-    const service = bySlug(slug);
-    return service
-      ? [
-          {
-            title: service.title,
-            tag,
-            summary: service.summary,
-            href: `/services/${slug}/`,
-            image: getImageAsset(image),
-          },
-        ]
-      : [];
-  });
-
-  const fieldArchiveItems = [
-    { image: getImageAsset("photo-g18"), tag: "MARINE", caption: "Water sampling over the side of a vessel at sea." },
-    { image: getImageAsset("photo-g22"), tag: "FOREST", caption: "Recording vegetation data inside a forest quadrat." },
-    { image: getImageAsset("photo-g16"), tag: "SAMPLING", caption: "A bagged and labelled sediment sample." },
-    { image: getImageAsset("photo-g21"), tag: "PUNE OFFICE", caption: "An executive cabin at the Pune office." },
-  ];
+  const featuredDisciplines = resolveFeaturedServices(home, services).map(
+    ({ title, tag, summary, href, image }) => ({ title, tag, summary, href, image: getImageAsset(image) }),
+  );
+  const fieldArchiveItems = home.fieldArchive.items.map((item) => ({
+    image: getImageAsset(item.image),
+    tag: item.tag,
+    caption: item.caption,
+  }));
 
   const stats = home.stats.items.map((item) => ({ value: `${item.value}${item.suffix}`, label: item.label }));
+  const highlights = home.hero.highlights.flatMap((label) => {
+    const stat = stats.find((item) => item.label === label);
+    return stat ? [`${stat.value} ${stat.label}`] : [];
+  });
   const cities = site.offices.map((office) => office.city);
+  const { visualBreak } = home;
 
   return (
     <>
@@ -61,8 +49,9 @@ export default function HomePage() {
         primaryCta={home.hero.primaryCta}
         secondaryCta={home.hero.secondaryCta}
         scrollLabel={home.hero.scrollLabel}
-        backgroundImage={getImageAsset("hero-eco-architecture")}
-        highlights={stats.slice(0, 2).map((item) => `${item.value} ${item.label}`)}
+        backgroundImage={home.hero.image ? getImageAsset(home.hero.image) : undefined}
+        highlights={highlights}
+        keywords={home.hero.keywords}
         locations={cities}
       />
       <About
@@ -70,14 +59,16 @@ export default function HomePage() {
         label={home.about.label}
         heading={home.about.heading}
         paragraphs={home.about.paragraphs}
-        image={getImageAsset("ecological-survey")}
+        image={getImageAsset(home.about.image)}
         cta={home.about.cta}
         accreditations={site.accreditations.map((item) => item.label)}
         highlight={stats[0]}
       />
       <VisualBreak
-        image={getImageAsset("clean-water-facility")}
-        location={cities.join(" • ").toUpperCase()}
+        image={getImageAsset(visualBreak.image)}
+        tag={visualBreak.tag}
+        quote={visualBreak.quote}
+        location={visualBreak.showOffices ? cities.join(" • ").toUpperCase() : undefined}
       />
       <ServicesIndex
         index="002"
@@ -85,6 +76,7 @@ export default function HomePage() {
         heading={home.services.heading}
         intro={home.services.intro}
         cta={home.services.cta}
+        viewLabel={home.services.viewLabel}
         services={services.map(({ slug, title, summary }) => ({ slug, title, summary }))}
         featured={featuredDisciplines}
       />
@@ -97,6 +89,11 @@ export default function HomePage() {
       />
       <FieldArchive
         index="005"
+        label={home.fieldArchive.label}
+        heading={home.fieldArchive.heading}
+        body={home.fieldArchive.body}
+        topCta={home.fieldArchive.topCta}
+        bottomCta={home.fieldArchive.bottomCta}
         items={fieldArchiveItems}
       />
       <Process

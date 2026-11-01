@@ -5,7 +5,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
-import type { ImageAsset } from "./types";
+import type { Cta, ImageAsset } from "./types";
 
 export interface FieldItem {
   image: ImageAsset;
@@ -15,19 +15,17 @@ export interface FieldItem {
 
 export interface FieldArchiveProps {
   index?: string;
-  label?: string;
-  heading?: string;
-  body?: string;
+  label: string;
+  heading: string;
+  body: string;
+  /** Outline button at the right of the heading. */
+  topCta: Cta;
+  /** Outline button below the photographs. */
+  bottomCta: Cta;
   items: FieldItem[];
 }
 
-export function FieldArchive({
-  index = "005",
-  label = "FIELD WORK",
-  heading = "Photographs from the field.",
-  body = "A selection of photographs from our field work and office.",
-  items,
-}: FieldArchiveProps) {
+export function FieldArchive({ index, label, heading, body, topCta, bottomCta, items }: FieldArchiveProps) {
   return (
     <section className="bg-surface py-section">
       <Container>
@@ -39,7 +37,7 @@ export function FieldArchive({
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <p className="max-w-md text-lead font-light text-muted-foreground">{body}</p>
             <Button asChild variant="outline" className="self-start sm:self-auto">
-              <Link href="/gallery/">Field Archive</Link>
+              <Link href={topCta.href}>{topCta.label}</Link>
             </Button>
           </div>
         </div>
@@ -72,8 +70,8 @@ export function FieldArchive({
 
         <div className="mt-12 flex justify-center">
           <Button asChild variant="outline">
-            <Link href="/gallery/" className="flex items-center gap-2">
-              <span>View Photographic Gallery</span>
+            <Link href={bottomCta.href} className="flex items-center gap-2">
+              <span>{bottomCta.label}</span>
               <ArrowUpRight aria-hidden="true" className="size-4" />
             </Link>
           </Button>

@@ -12,6 +12,7 @@ import {
   loadServices,
   loadServicesPage,
   loadWhyUsPage,
+  resolveFeaturedServices,
   socialLinks,
 } from "./index";
 import { ContentError } from "./read";
@@ -174,9 +175,76 @@ describe("loadAll", () => {
 
   it("fails when the about image key is unknown", () => {
     const files = validFiles();
-    files["content/pages/home.yaml"] = files["content/pages/home.yaml"].replace("image: about-photo", "image: nope");
+    files["content/pages/home.yaml"] = files["content/pages/home.yaml"].replace(
+      "paragraphs: [First paragraph., Second paragraph.]\n  image: about-photo",
+      "paragraphs: [First paragraph., Second paragraph.]\n  image: nope",
+    );
     const { content, publicDir } = makeTree(files);
     expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/home\.yaml → about\.image: "nope"/);
+  });
+});
+
+describe("Home featured services, field archive and visual break", () => {
+  const edit = (from: string, to: string) => {
+    const files = validFiles();
+    const key = "content/pages/home.yaml";
+    expect(files[key]).toContain(from);
+    files[key] = files[key].replace(from, to);
+    return makeTree(files);
+  };
+
+  it("builds each card from its service file, with the link derived from the slug", () => {
+    const { content, publicDir } = makeTree(validFiles());
+    const all = loadAll(content, publicDir);
+    expect(resolveFeaturedServices(all.home, all.services)).toEqual([
+      {
+        slug: "environmental-audit",
+        title: "Environmental audit",
+        summary: "Independent audit of compliance.",
+        tag: "[ AUDITS ]",
+        image: "about-photo",
+        href: "/services/environmental-audit/",
+      },
+    ]);
+  });
+
+  it("lets a card override the title and summary", () => {
+    const { content, publicDir } = edit(
+      "tag: \"[ AUDITS ]\", image: about-photo }",
+      "tag: \"[ AUDITS ]\", image: about-photo, title: Own title, summary: Own summary }",
+    );
+    const all = loadAll(content, publicDir);
+    const [card] = resolveFeaturedServices(all.home, all.services);
+    expect([card.title, card.summary, card.href]).toEqual(["Own title", "Own summary", "/services/environmental-audit/"]);
+  });
+
+  it("fails and names the file and field when a card points at a service that does not exist", () => {
+    const { content, publicDir } = edit("service: environmental-audit", "service: no-such-service");
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/home\.yaml → services\.featured\[0\]\.service: "no-such-service" is not a service.*environmental-audit/,
+    );
+  });
+
+  it.each([
+    ["tag: \"[ AUDITS ]\", image: about-photo", "tag: \"[ AUDITS ]\", image: nope", /services\.featured\[0\]\.image: "nope" is not listed/],
+    ["{ image: about-photo, tag: ONE", "{ image: nope, tag: ONE", /fieldArchive\.items\[0\]\.image: "nope" is not listed/],
+    ["visualBreak:\n  image: about-photo", "visualBreak:\n  image: nope", /visualBreak\.image: "nope" is not listed/],
+    ["  image: about-photo\n  highlights", "  image: nope\n  highlights", /hero\.image: "nope" is not listed/],
+  ])("fails when an image key is unknown (%#)", (from, to, message) => {
+    const { content, publicDir } = edit(from, to);
+    expect(() => loadAll(content, publicDir)).toThrowError(message);
+  });
+
+  it("fails when a hero fact is not one of the stats", () => {
+    const { content } = edit("highlights: [Clients]", "highlights: [Customers]");
+    expect(() => loadAll(content)).toThrowError(
+      /content\/pages\/home\.yaml → hero\.highlights\[0\]: "Customers" is not one of the stats below \(Clients, Projects\)/,
+    );
+  });
+
+  it("fails when the page title is missing", () => {
+    const { content, publicDir } = edit("  title: Test Co home\n", "");
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/home\.yaml → seo\.title/);
   });
 });
 

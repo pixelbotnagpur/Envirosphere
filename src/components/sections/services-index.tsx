@@ -22,6 +22,8 @@ export interface ServicesIndexProps {
   heading: string;
   intro: string;
   cta: Cta;
+  /** Text at the bottom of each featured card. */
+  viewLabel?: string;
   services: { slug: string; title: string; summary: string }[];
   featured?: FeaturedService[];
 }
@@ -32,6 +34,7 @@ export function ServicesIndex({
   heading,
   intro,
   cta,
+  viewLabel,
   services,
   featured,
 }: ServicesIndexProps) {
@@ -84,7 +87,7 @@ export function ServicesIndex({
                       </p>
                     </div>
                     <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-label uppercase tracking-label text-primary">
-                      <span>View Specifications</span>
+                      <span>{viewLabel}</span>
                       <ArrowUpRight
                         aria-hidden="true"
                         className="size-4 transition-transform duration-(--duration-base) group-hover:translate-x-1 group-hover:-translate-y-1"

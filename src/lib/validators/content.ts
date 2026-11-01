@@ -37,6 +37,8 @@ export const siteSchema = z.object({
     email: z.email(),
     phones: z.array(phone).min(1),
     whatsapp: phone.optional(),
+    /** Optional address for job applications; when absent the main email is used. */
+    careersEmail: z.email().optional(),
     address: z.string().min(1),
   }),
   offices: z
@@ -77,7 +79,21 @@ export const siteSchema = z.object({
 
 const sectionLabel = z.string().min(1);
 
-export const homeSchema = z.object({
+const slug = z
+  .string()
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "use the file name of a service without .md, e.g. crz-clearance");
+
+/** One of the cards under "What we offer". Title and summary come from the service file unless set here. */
+export const featuredServiceSchema = z.object({
+  service: slug,
+  tag: z.string().min(1),
+  image: mediaKey,
+  title: z.string().min(1).optional(),
+  summary: z.string().min(1).optional(),
+});
+
+const homeBaseSchema = z.object({
+  seo: pageSeoSchema,
   hero: z.object({
     eyebrow: z.string().min(1),
     title: z.string().min(1),
@@ -85,7 +101,12 @@ export const homeSchema = z.object({
     primaryCta: navItemSchema,
     secondaryCta: navItemSchema.optional(),
     scrollLabel: z.string().min(1),
+    /** Background photo (a name from media.yaml). Without it the hero is a plain Forest band. */
     image: mediaKey.optional(),
+    /** Labels of stats (stats.items) shown as short facts under the buttons. */
+    highlights: z.array(z.string().min(1)).default([]),
+    /** Short words shown at the bottom right of the hero, separated by dots. */
+    keywords: z.array(z.string().min(1)).default([]),
   }),
   about: z.object({
     label: sectionLabel,
@@ -99,6 +120,8 @@ export const homeSchema = z.object({
     heading: z.string().min(1),
     intro: z.string().min(1),
     cta: navItemSchema,
+    viewLabel: z.string().min(1),
+    featured: z.array(featuredServiceSchema).default([]),
   }),
   stats: z.object({
     label: sectionLabel,
@@ -129,6 +152,27 @@ export const homeSchema = z.object({
       .array(z.object({ quote: z.string().min(1), name: z.string().min(1), role: z.string().optional() }))
       .min(1),
   }),
+  fieldArchive: z.object({
+    label: sectionLabel,
+    heading: z.string().min(1),
+    body: z.string().min(1),
+    /** Outline button at the right of the heading. */
+    topCta: navItemSchema,
+    /** Outline button below the photographs. */
+    bottomCta: navItemSchema,
+    items: z
+      .array(z.object({ image: mediaKey, tag: z.string().min(1), caption: z.string().min(1) }))
+      .min(1),
+  }),
+  visualBreak: z.object({
+    image: mediaKey,
+    /** Small pill at the top left of the photo. */
+    tag: z.string().min(1).optional(),
+    /** Larger line at the bottom left of the photo. */
+    quote: z.string().min(1).optional(),
+    /** Show the office cities (from site.yaml) at the bottom right of the photo. */
+    showOffices: z.boolean().default(true),
+  }),
   contact: z.object({
     label: sectionLabel,
     heading: z.string().min(1),
@@ -137,6 +181,19 @@ export const homeSchema = z.object({
     phoneLabel: z.string().min(1),
     emailLabel: z.string().min(1),
   }),
+});
+
+export const homeSchema = homeBaseSchema.superRefine((home, ctx) => {
+  const labels = home.stats.items.map((item) => item.label);
+  home.hero.highlights.forEach((label, index) => {
+    if (!labels.includes(label)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["hero", "highlights", index],
+        message: `"${label}" is not one of the stats below (${labels.join(", ")}); write a stats label exactly`,
+      });
+    }
+  });
 });
 
 /** content/pages/services.yaml: the Services page (hub) and the labels used on every service page. */

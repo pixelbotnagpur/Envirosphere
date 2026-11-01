@@ -1,6 +1,13 @@
 # The Home page. Each block is one section, top to bottom.
 # TODO(content): owner to review all wording marked "draft".
 
+# Page title and description shown in search results (the title is used exactly as written).
+seo:
+  title: Envirosphere Consultant & Engineers
+  description: >-
+    NABET accredited environmental consultants in Pune: environmental clearances, statutory
+    compliance, audits, monitoring and water and wastewater treatment engineering.
+
 hero:
   eyebrow: QCI NABET Accredited Consultant (Cat A)
   title: Environmental clearances and statutory compliance.
@@ -10,6 +17,12 @@ hero:
   primaryCta: { label: Talk to our team, href: /contact/ }
   secondaryCta: { label: Our services, href: /services/ }
   scrollLabel: Scroll
+  # Background photo: a name from media.yaml.
+  image: hero-eco-architecture
+  # Short facts under the buttons: write the label of a stat from "stats" below, exactly.
+  highlights: [Clients, Ongoing projects]
+  # Words shown at the bottom right, separated by dots.
+  keywords: [Environment, Engineering, Statutory Compliance]
 
 about:
   label: About us
@@ -34,7 +47,8 @@ about:
       We also provide comprehensive services - in Consent Management; Post EC Compliance,
       Environmental Monitoring; Operation and Maintenance of ETP & STP, MIDC Approval, Fire NOC,
       DISH Approval, CGWB Authorisation, PESO License and other industrial approvals.
-  image: about-photo
+  # Photo beside the text: a name from media.yaml.
+  image: ecological-survey
   cta: { label: More about us, href: /about/ }
 
 services:
@@ -42,6 +56,20 @@ services:
   heading: Thirteen environmental services.
   intro: From environmental clearances to the operation of treatment plants.
   cta: { label: All services, href: /services/ }
+  # Text at the bottom of each featured card.
+  viewLabel: View Specifications
+  # The three photo cards. `service` is the file name of a service in content/services (without .md);
+  # the link, title and summary come from that service. Add `title:` or `summary:` to override them.
+  featured:
+    - service: environmental-clearance
+      tag: "[ STATUTORY & CONSENTS ]"
+      image: hero-eco-architecture
+    - service: water-wastewater-treatment
+      tag: "[ WATER ]"
+      image: clean-water-facility
+    - service: environmental-audit
+      tag: "[ AUDITS ]"
+      image: sustainable-industrial-park
 
 stats:
   label: In numbers
@@ -94,6 +122,24 @@ clients:
     - client-lignopura-agrotech
     - client-ngl-fine-chem
     - client-zanvar
+
+# Wide photo between "About us" and "What we offer". The office cities from site.yaml are shown at
+# its bottom right (showOffices). Optional: `tag` (pill at the top left) and `quote` (line at the bottom left).
+visualBreak:
+  image: clean-water-facility
+  showOffices: true
+
+fieldArchive:
+  label: FIELD WORK
+  heading: Photographs from the field.
+  body: A selection of photographs from our field work and office.
+  topCta: { label: Field Archive, href: /gallery/ }
+  bottomCta: { label: View Photographic Gallery, href: /gallery/ }
+  items:
+    - { image: photo-g18, tag: MARINE, caption: Water sampling over the side of a vessel at sea. }
+    - { image: photo-g22, tag: FOREST, caption: Recording vegetation data inside a forest quadrat. }
+    - { image: photo-g16, tag: SAMPLING, caption: A bagged and labelled sediment sample. }
+    - { image: photo-g21, tag: PUNE OFFICE, caption: An executive cabin at the Pune office. }
 
 # Draft: owner to review. Steps are inferred from the services list, not taken from the old site.
 process:

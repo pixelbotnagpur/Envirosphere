@@ -8,13 +8,28 @@ const props = {
   heading: "Thirteen services",
   intro: "From clearances to plants.",
   cta: { label: "All services", href: "/services/" },
+  viewLabel: "View details",
   services: [
     { slug: "environmental-clearance", title: "Environmental Clearance (EIA)", summary: "EIA and clearance." },
     { slug: "water-audit", title: "Water Audit", summary: "Water audits." },
   ],
 };
 
+const image = { src: "/media/a.jpg", alt: "A", width: 10, height: 10 };
+
 describe("ServicesIndex", () => {
+  it("renders the featured cards with the label it is given", () => {
+    render(
+      <ServicesIndex
+        {...props}
+        featured={[{ title: "Audit", tag: "[ AUDITS ]", summary: "Audits.", href: "/services/water-audit/", image }]}
+      />,
+    );
+    const card = screen.getByRole("link", { name: /Audit.*View details/s });
+    expect(card).toHaveAttribute("href", "/services/water-audit/");
+    expect(screen.getByText("[ AUDITS ]")).toBeInTheDocument();
+  });
+
   it("renders one numbered link per service to its own page", () => {
     render(<ServicesIndex {...props} />);
     const link = screen.getByRole("link", { name: /Environmental Clearance \(EIA\)/ });

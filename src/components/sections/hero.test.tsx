@@ -42,4 +42,11 @@ describe("Hero", () => {
     expect(screen.queryByText("250+ Clients")).toBeNull();
     expect(screen.queryByText(/Pune/)).toBeNull();
   });
+
+  it("shows the keywords it is given, joined by dots, and nothing when it has none", () => {
+    const { rerender } = render(<Hero {...props} keywords={["Alpha", "Beta"]} />);
+    expect(screen.getByText(/Alpha . Beta/)).toBeInTheDocument();
+    rerender(<Hero {...props} />);
+    expect(screen.queryByText(/Alpha/)).toBeNull();
+  });
 });

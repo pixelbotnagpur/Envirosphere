@@ -19,6 +19,8 @@ export interface HeroProps {
   highlights?: string[];
   /** Office cities shown at the right of the facts bar (from site.yaml). */
   locations?: string[];
+  /** Short words at the bottom right, joined by dots (from home.yaml). */
+  keywords?: string[];
 }
 
 /** Entrance is CSS-only (`rise`) so the hero is readable immediately, without JavaScript. */
@@ -33,6 +35,7 @@ export function Hero({
   featuredImage,
   highlights = [],
   locations = [],
+  keywords = [],
 }: HeroProps) {
   const bg = backgroundImage ?? featuredImage;
 
@@ -116,9 +119,11 @@ export function Hero({
               </span>
               <span>{scrollLabel}</span>
             </div>
-            <span className="hidden text-primary-foreground/50 sm:inline">
-              Environment &bull; Engineering &bull; Statutory Compliance
-            </span>
+            {keywords.length > 0 ? (
+              <span className="hidden text-primary-foreground/50 sm:inline">
+                {keywords.join(" • ")}
+              </span>
+            ) : null}
           </div>
         </div>
       </Container>

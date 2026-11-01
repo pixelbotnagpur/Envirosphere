@@ -26,6 +26,19 @@ describe("real site content (what the owner edits)", () => {
     expect(home.testimonials.items).toHaveLength(4);
   });
 
+  it("points every featured card at an existing service, and every Home image at a media key", () => {
+    const slugs = services.map((s) => s.slug);
+    expect(home.services.featured.length).toBeGreaterThanOrEqual(1);
+    for (const card of home.services.featured) {
+      expect(slugs, card.service).toContain(card.service);
+      expect(media[card.image], card.image).toBeDefined();
+    }
+    for (const key of [home.hero.image, home.about.image, home.visualBreak.image]) {
+      expect(media[key as string], String(key)).toBeDefined();
+    }
+    for (const item of home.fieldArchive.items) expect(media[item.image], item.image).toBeDefined();
+  });
+
   it("has a drafted process with at least three steps", () => {
     expect(home.process.steps.length).toBeGreaterThanOrEqual(3);
   });
