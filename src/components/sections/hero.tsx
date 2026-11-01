@@ -31,7 +31,7 @@ export function Hero({
   const bg = backgroundImage ?? featuredImage;
 
   return (
-    <section className="relative flex min-h-screen min-h-dvh h-screen h-dvh w-full flex-col justify-between overflow-hidden bg-primary pt-28 pb-6 text-primary-foreground sm:pt-36 sm:pb-8">
+    <section className="relative flex min-h-dvh w-full flex-col justify-between bg-primary pt-28 pb-6 text-primary-foreground sm:pt-36 sm:pb-8">
       {/* 100vh Cinematic Background Image with balanced lighting */}
       {bg ? (
         <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
