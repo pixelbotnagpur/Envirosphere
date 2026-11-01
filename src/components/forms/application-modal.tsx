@@ -5,6 +5,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { submitForm } from "@/lib/forms/submit";
 import {
   applicationSchema,
@@ -42,6 +43,8 @@ export function ApplicationModal({
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = React.useState(0);
 
   React.useEffect(() => {
     formLoadedAtRef.current = Date.now();
@@ -145,10 +148,17 @@ export function ApplicationModal({
       return;
     }
 
+    if (isTurnstileEnabled() && !turnstileToken) {
+      setStatus("error");
+      setStatusMessage("Please complete the verification check, then submit again.");
+      return;
+    }
+
     setFieldErrors({});
     setStatus("submitting");
 
-    const result = await submitForm(parsed.data);
+    const result = await submitForm({ ...parsed.data, turnstileToken: turnstileToken ?? undefined });
+    setTurnstileReset((n) => n + 1);
 
     if (result.success) {
       setStatus("success");
@@ -357,6 +367,8 @@ export function ApplicationModal({
                   <p className="mt-1.5 text-sm text-destructive">{fileError}</p>
                 ) : null}
               </div>
+
+              <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
 
               {status === "error" ? (
                 <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">

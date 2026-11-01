@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApplicationModal } from "./application-modal";
@@ -70,5 +70,43 @@ describe("ApplicationModal", () => {
       expect(screen.getByRole("status")).toBeInTheDocument();
       expect(screen.getByText("Application Submitted")).toBeInTheDocument();
     });
+  });
+
+  it("sends the turnstileToken when Turnstile is configured and blocks without it", async () => {
+    vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "site-key-123");
+    let callback: ((t: string) => void) | undefined;
+    window.turnstile = {
+      render: vi.fn((_el: HTMLElement, o: { callback: (t: string) => void }) => {
+        callback = o.callback;
+        return "w1";
+      }),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+    const submitSpy = vi.spyOn(submitClient, "submitForm").mockResolvedValue({ success: true, message: "ok" });
+    const user = userEvent.setup();
+    render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+
+    await user.type(screen.getByLabelText(/Full Name/), "Pooja Deshmukh");
+    await user.type(screen.getByLabelText(/Email Address/), "pooja@gmail.com");
+    await user.type(screen.getByLabelText(/Phone Number/), "+91 98602 20550");
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(["dummy"], "resume.pdf", { type: "application/pdf" })] },
+    });
+    await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: "Submit Application" }));
+    expect(screen.getByText(/complete the verification check/)).toBeInTheDocument();
+    expect(submitSpy).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(callback).toBeDefined());
+    act(() => callback?.("tok-xyz"));
+    await user.click(screen.getByRole("button", { name: "Submit Application" }));
+    await waitFor(() => expect(submitSpy).toHaveBeenCalled());
+    expect(submitSpy.mock.calls[0]![0]).toMatchObject({ turnstileToken: "tok-xyz", type: "application" });
+
+    vi.unstubAllEnvs();
+    delete window.turnstile;
   });
 });

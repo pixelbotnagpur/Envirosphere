@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { submitForm } from "@/lib/forms/submit";
 import { inquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
 
@@ -39,6 +40,8 @@ export function InquiryForm({
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = React.useState(0);
 
   React.useEffect(() => {
     formLoadedAtRef.current = Date.now();
@@ -87,11 +90,18 @@ export function InquiryForm({
       return;
     }
 
+    if (isTurnstileEnabled() && !turnstileToken) {
+      setStatus("error");
+      setStatusMessage("Please complete the verification check, then submit again.");
+      return;
+    }
+
     setFieldErrors({});
     setStatus("submitting");
 
-    // 3. Submit
-    const result = await submitForm(parsed.data);
+    // 3. Submit (a Turnstile token is single-use, so the widget is refreshed afterwards)
+    const result = await submitForm({ ...parsed.data, turnstileToken: turnstileToken ?? undefined });
+    setTurnstileReset((n) => n + 1);
 
     if (result.success) {
       setStatus("success");
@@ -301,6 +311,8 @@ export function InquiryForm({
           <p className="mt-1.5 text-sm text-destructive">{fieldErrors.message}</p>
         ) : null}
       </div>
+
+      <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} className="mt-6" />
 
       {status === "error" ? (
         <div className="mt-6 rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
