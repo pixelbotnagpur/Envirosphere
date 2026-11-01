@@ -1,14 +1,24 @@
 // @vitest-environment node
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
-import { HOME_YAML, MEDIA_YAML, SITE_YAML } from "@tests/unit/helpers/fixtures";
-import { homeSchema, mediaSchema, siteSchema } from "./content";
+import { HOME_YAML, MEDIA_YAML, SERVICES_PAGE_YAML, SITE_YAML } from "@tests/unit/helpers/fixtures";
+import { homeSchema, mediaSchema, servicesPageSchema, siteSchema } from "./content";
 
 describe("content schemas", () => {
   it("accept the valid fixtures", () => {
     expect(siteSchema.safeParse(parse(SITE_YAML)).success).toBe(true);
     expect(mediaSchema.safeParse(parse(MEDIA_YAML)).success).toBe(true);
     expect(homeSchema.safeParse(parse(HOME_YAML)).success).toBe(true);
+  });
+
+  it("accepts the services page fixture and requires every serviceDetail label", () => {
+    const data = parse(SERVICES_PAGE_YAML);
+    expect(servicesPageSchema.safeParse(data).success).toBe(true);
+    for (const key of ["breadcrumbHome", "breadcrumbServices", "label", "previousLabel", "nextLabel", "contact"]) {
+      const broken = structuredClone(data);
+      delete broken.serviceDetail[key];
+      expect(servicesPageSchema.safeParse(broken).success, key).toBe(false);
+    }
   });
 
   it("requires every interface label in site.ui", () => {

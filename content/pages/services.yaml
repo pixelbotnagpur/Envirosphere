@@ -1,0 +1,17 @@
+# Labels and the call-to-action shown on every service page.
+# The text of each service itself is in content/services/*.md.
+# TODO(content): owner to review all wording marked "draft".
+
+serviceDetail:
+  breadcrumbHome: Home
+  breadcrumbServices: Services
+  label: Service
+  previousLabel: Previous service
+  nextLabel: Next service
+  contact:
+    label: Discuss this service
+    heading: Tell us about your project.
+    body: Our team will help you work out which approvals your project needs.
+    primaryCta: { label: Start a conversation, href: /contact/ }
+    phoneLabel: Call us
+    emailLabel: Email us

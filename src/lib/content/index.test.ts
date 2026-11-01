@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { makeTree } from "@tests/unit/helpers/tree";
 import { validFiles } from "@tests/unit/helpers/fixtures";
-import { loadAll, loadService, loadServices, socialLinks } from "./index";
+import { loadAll, loadService, loadServices, loadServicesPage, socialLinks } from "./index";
 import { ContentError } from "./read";
 
 describe("loadAll", () => {
@@ -12,6 +12,20 @@ describe("loadAll", () => {
     expect(all.site.name).toBe("Test Co");
     expect(all.home.hero.title).toBe("Test title");
     expect(all.services.map((s) => s.slug)).toEqual(["environmental-audit"]);
+  });
+
+  it("loads the services page block", () => {
+    const { content, publicDir } = makeTree(validFiles());
+    const all = loadAll(content, publicDir);
+    expect(all.servicesPage.serviceDetail.previousLabel).toBe("Previous service");
+    expect(loadServicesPage(content).serviceDetail.contact.primaryCta.href).toBe("/contact/");
+  });
+
+  it("fails with a plain message when a serviceDetail label is missing", () => {
+    const files = validFiles();
+    files["content/pages/services.yaml"] = files["content/pages/services.yaml"].replace("  nextLabel: Next service\n", "");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/services\.yaml → serviceDetail\.nextLabel/);
   });
 
   it("fails when site.yaml points at an unknown logo key", () => {
@@ -94,6 +108,18 @@ describe("loadAll", () => {
 });
 
 describe("loadServices", () => {
+  it.each([
+    ["nothing", ""],
+    ["spaces and blank lines", "   \n\n  "],
+  ])("rejects a service whose text is %s", (_label, text) => {
+    const files = validFiles();
+    files["content/services/environmental-audit.md"] = `---\ntitle: A\norder: 1\nsummary: S\n---\n${text}`;
+    const { content } = makeTree(files);
+    expect(() => loadServices(content)).toThrowError(
+      "content/services/environmental-audit.md: the service text below the --- line is empty; write the service description there",
+    );
+  });
+
   it("sorts by order and derives the slug from the file name", () => {
     const files = validFiles();
     files["content/services/water-audit.md"] = "---\ntitle: Water audit\norder: 2\nsummary: S\n---\nB";
@@ -121,7 +147,7 @@ describe("loadServices", () => {
 
   it("rejects files in services/ that are not lowercase .md", () => {
     for (const name of ["Foo.MD", "x.markdown", "notes.txt"]) {
-      const files = validFiles();
+    const files = validFiles();
       files[`content/services/${name}`] = "x";
       const { content } = makeTree(files);
       expect(() => loadServices(content)).toThrowError(ContentError);

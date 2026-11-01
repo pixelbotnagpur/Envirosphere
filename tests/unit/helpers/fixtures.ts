@@ -108,6 +108,22 @@ summary: Independent audit of compliance.
 Body text of the service.
 `;
 
+export const SERVICES_PAGE_YAML = `
+serviceDetail:
+  breadcrumbHome: Home
+  breadcrumbServices: Services
+  label: Service
+  previousLabel: Previous service
+  nextLabel: Next service
+  contact:
+    label: Discuss this service
+    heading: Tell us about your project.
+    body: Our team will help.
+    primaryCta: { label: Start a conversation, href: /contact/ }
+    phoneLabel: Call us
+    emailLabel: Email us
+`;
+
 export const CAREERS_YAML = `
 openings:
   noneHeading: No open positions
@@ -149,6 +165,7 @@ export function validFiles(): Record<string, string> {
     "content/media.yaml": MEDIA_YAML,
     "content/pages/home.yaml": HOME_YAML,
     "content/services/environmental-audit.md": SERVICE_MD,
+    "content/pages/services.yaml": SERVICES_PAGE_YAML,
     "content/pages/careers.yaml": CAREERS_YAML,
     "content/jobs.yaml": JOBS_YAML,
     "content/gallery.yaml": GALLERY_YAML,

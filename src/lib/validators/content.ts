@@ -137,6 +137,25 @@ export const homeSchema = z.object({
   }),
 });
 
+/** content/pages/services.yaml: labels and call-to-action used on every service page. */
+export const servicesPageSchema = z.object({
+  serviceDetail: z.object({
+    breadcrumbHome: z.string().min(1),
+    breadcrumbServices: z.string().min(1),
+    label: z.string().min(1),
+    previousLabel: z.string().min(1),
+    nextLabel: z.string().min(1),
+    contact: z.object({
+      label: z.string().min(1),
+      heading: z.string().min(1),
+      body: z.string().min(1),
+      primaryCta: navItemSchema,
+      phoneLabel: z.string().min(1),
+      emailLabel: z.string().min(1),
+    }),
+  }),
+});
+
 export const serviceFrontMatterSchema = z.object({
   title: z.string().min(1),
   order: z.number().int().positive(),
@@ -190,6 +209,7 @@ export type Site = z.infer<typeof siteSchema>;
 export type Media = z.infer<typeof mediaSchema>;
 export type MediaItem = z.infer<typeof mediaItemSchema>;
 export type Home = z.infer<typeof homeSchema>;
+export type ServicesPage = z.infer<typeof servicesPageSchema>;
 export type ServiceFrontMatter = z.infer<typeof serviceFrontMatterSchema>;
 export type Careers = z.infer<typeof careersSchema>;
 export type Job = z.infer<typeof jobSchema>;

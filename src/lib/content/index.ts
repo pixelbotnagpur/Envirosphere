@@ -8,6 +8,7 @@ import {
   jobsSchema,
   mediaSchema,
   serviceFrontMatterSchema,
+  servicesPageSchema,
   siteSchema,
   type Careers,
   type DownloadItem,
@@ -16,6 +17,7 @@ import {
   type Job,
   type Media,
   type ServiceFrontMatter,
+  type ServicesPage,
   type Site,
 } from "../validators/content";
 import { resolveMedia, toImageAsset, verifyAllMedia, type ImageAsset, type ResolvedMedia } from "./media";
@@ -29,6 +31,9 @@ export const loadSite = (root = CONTENT_ROOT): Site => readYamlFile("site.yaml",
 export const loadMedia = (root = CONTENT_ROOT): Media => readYamlFile("media.yaml", mediaSchema, root);
 export const loadHome = (root = CONTENT_ROOT): Home =>
   readYamlFile("pages/home.yaml", homeSchema, root);
+
+export const loadServicesPage = (root = CONTENT_ROOT): ServicesPage =>
+  readYamlFile("pages/services.yaml", servicesPageSchema, root);
 
 export const loadCareers = (root = CONTENT_ROOT): Careers =>
   readYamlFile("pages/careers.yaml", careersSchema, root);
@@ -69,6 +74,11 @@ export function loadServices(root = CONTENT_ROOT): Service[] {
       );
     }
     const { data, body } = readMarkdownFile(`services/${file}`, serviceFrontMatterSchema, root);
+    if (body.trim() === "") {
+      throw new ContentError(
+        `content/services/${file}: the service text below the --- line is empty; write the service description there`,
+      );
+    }
     services.push({ ...data, slug, body });
   }
   const seen = new Map<number, string>();
@@ -94,6 +104,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const media = loadMedia(root);
   const home = loadHome(root);
   const services = loadServices(root);
+  const servicesPage = loadServicesPage(root);
   const careers = loadCareers(root);
   const jobs = loadJobs(root);
   const gallery = loadGallery(root);
@@ -122,7 +133,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   for (const [key, where] of references) {
     if (key) resolveMedia(media, key, publicRoot, where);
   }
-  return { site, media, home, careers, services, jobs, gallery, downloads };
+  return { site, media, home, servicesPage, careers, services, jobs, gallery, downloads };
 }
 
 export function getImage(key: string): ResolvedMedia {
