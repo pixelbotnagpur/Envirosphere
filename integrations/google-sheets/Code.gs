@@ -11,7 +11,7 @@
  * Script Properties (Project Settings):
  *   NOTIFY_EMAIL      where alerts are sent (optional)
  *   DRIVE_FOLDER_ID   REQUIRED for job applications; CVs are refused when this is not set
- *   TURNSTILE_SECRET  optional; when SET, every submission needs a valid Turnstile token
+ *   TURNSTILE_SECRET  REQUIRED FOR LAUNCH; when SET, every submission needs a valid Turnstile token
  *   TURNSTILE_ALLOWED_HOSTNAMES  optional, comma-separated, e.g. envirosphere.co.in,www.envirosphere.co.in;
  *                     when set, Cloudflare must report one of these hostnames for the token
  *   ALLOWED_ROLES     optional, job titles separated by | ; when set, only these roles

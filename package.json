@@ -11,6 +11,7 @@
     "build": "pnpm content:check && next build",
     "postbuild": "pnpm check:out",
     "check:out": "node scripts/check-out.mjs",
+    "check:launch": "node scripts/check-launch.mjs",
     "preview": "serve out -l 4173",
     "content:check": "tsx scripts/content-check.ts",
     "test": "vitest run",

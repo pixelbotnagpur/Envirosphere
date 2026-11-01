@@ -2,6 +2,22 @@
 
 This guide walks you through deploying the Google Apps Script Web App that receives submissions from the Envirosphere website, logs them to Google Sheets, saves CV documents to Google Drive, and sends email alerts.
 
+## Launch checklist (do ALL of these before the site goes live)
+
+Cloudflare Turnstile is **not optional for launch**. Without it the only protection against bots flooding the forms (and uploading files to your Drive) is a global rate limit that a bot can use up to lock real visitors out. Both Turnstile values below are launch requirements:
+
+- [ ] `DRIVE_FOLDER_ID` script property set to a private Drive folder (Step 2 and Step 4).
+- [ ] **`TURNSTILE_SECRET`** script property set to the Turnstile **secret** key (Step 4 and Step 7).
+- [ ] **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** set to the Turnstile **site** key in `.env.local` before building (Step 6 and Step 7).
+- [ ] `TURNSTILE_ALLOWED_HOSTNAMES` script property set to `envirosphere.co.in,www.envirosphere.co.in` (Step 4).
+- [ ] `NEXT_PUBLIC_FORMS_ENDPOINT` set to the real Web App URL ending in `/exec` in `.env.local` (Step 6).
+- [ ] New script **version deployed** after the last code or property change (Step 5).
+- [ ] Run `pnpm check:launch`. It must print "check:launch OK". It stops you if the endpoint or the site key is missing, or the endpoint is the test one. (It cannot see Apps Script properties, so tick the `TURNSTILE_SECRET` box yourself.)
+- [ ] Run `pnpm build`. It ends with "check:out OK", which proves the `out/` folder has no test values. Upload only that `out/` folder.
+- [ ] Send one test inquiry and one test application from the live site and check the Sheet, the Drive folder and the email alert.
+
+---
+
 The script is made of **two files** that you paste into the Apps Script editor:
 
 - `Code.gs` – the web app (receives requests, writes the Sheet, uploads CVs, sends email).
@@ -51,8 +67,8 @@ The script is made of **two files** that you paste into the Apps Script editor:
 3. Add the following key-value pairs:
    - `NOTIFY_EMAIL`: Your notifications email address (e.g. `info@envirosphere.co.in` or HR email).
    - `DRIVE_FOLDER_ID`: The Folder ID copied from Step 2. **Required.**
-   - `TURNSTILE_SECRET`: (Optional, recommended) Your Cloudflare Turnstile **secret** key (see Step 7). **When this is set, every submission must carry a valid Turnstile token; a missing or invalid one is rejected.** When it is not set, the check is skipped.
-   - `TURNSTILE_ALLOWED_HOSTNAMES`: (Optional, recommended) Comma-separated site hostnames, e.g. `envirosphere.co.in,www.envirosphere.co.in`. When set, a Turnstile token is only accepted if Cloudflare reports one of these hostnames for it, so tokens minted on another site are refused.
+   - `TURNSTILE_SECRET`: **Required for launch.** Your Cloudflare Turnstile **secret** key (see Step 7). When it is set, every submission must carry a valid Turnstile token; a missing or invalid one is rejected. (If it is left out, the script skips the check, which is only acceptable while you are testing.)
+   - `TURNSTILE_ALLOWED_HOSTNAMES`: (Recommended; part of the launch checklist) Comma-separated site hostnames, e.g. `envirosphere.co.in,www.envirosphere.co.in`. When set, a Turnstile token is only accepted if Cloudflare reports one of these hostnames for it, so tokens minted on another site are refused.
    - `ALLOWED_ROLES`: (Optional) Job titles separated by `|`, for example `Senior EIA Coordinator|Environmental Engineer`. When set, only these roles are accepted. Keep it equal to the titles in `content/jobs.yaml`.
 4. Click **Save script properties**.
 
@@ -85,23 +101,25 @@ The website is a static export: `NEXT_PUBLIC_*` values are written into the buil
 ```bash
 # .env.local (on the computer where you run the build)
 NEXT_PUBLIC_FORMS_ENDPOINT=https://script.google.com/macros/s/<YOUR_DEPLOYMENT_ID>/exec
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=<your Turnstile site key>   # optional, see Step 7
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=<your Turnstile site key>   # REQUIRED for launch, see Step 7
 ```
 
-Then run `pnpm build` and upload the new `out/` folder. Whenever you change either value, rebuild and re-upload.
+Then run `pnpm check:launch` (it fails with a plain message if either value is missing or is a test value), then `pnpm build`, and upload the new `out/` folder. `pnpm build` ends with an automatic `check:out` that fails if `out/` contains the test endpoint or Cloudflare test keys. Whenever you change either value, rebuild and re-upload.
 
 Security headers: the site's Content-Security-Policy (in `public/.htaccess`, mirrored by the Node server) already allows `https://script.google.com`, `https://script.googleusercontent.com` (Apps Script redirects replies there) and `https://challenges.cloudflare.com` (Turnstile). If you ever replace the headers, keep those three origins or the forms will stop working.
 
 ---
 
-## Step 7: Turn on Cloudflare Turnstile (optional but recommended)
+## Step 7: Turn on Cloudflare Turnstile (REQUIRED for launch)
 1. In the [Cloudflare dashboard](https://dash.cloudflare.com/) open **Turnstile** and click **Add widget**.
 2. Enter the site domain (`envirosphere.co.in`) and choose the **Managed** mode.
 3. Copy the **Site key** and the **Secret key**.
 4. Put the **Site key** in `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (Step 6), rebuild and re-upload the site. The challenge then appears above the Submit button on both forms.
 5. Put the **Secret key** in the `TURNSTILE_SECRET` script property (Step 4). Then deploy a **New version** (Step 5).
 
-Turn both on together. If the secret is set in Apps Script but the site was built without the site key, every submission will be rejected as a failed bot check. If the site has the site key but the secret is not set, the token is simply ignored.
+Turn both on together. If the secret is set in Apps Script but the site was built without the site key, every submission will be rejected as a failed bot check (`pnpm check:launch` catches this). If the site has the site key but the secret is not set, the token is simply ignored and the forms are unprotected, so never launch in that state.
+
+Optional hardening: set the `TURNSTILE_ALLOWED_HOSTNAMES` script property (Step 4) so tokens created on any other website are refused.
 
 ---
 
@@ -109,7 +127,7 @@ Turn both on together. If the secret is set in Apps Script but the site was buil
 - Honeypot field and a **required** minimum fill time of 3 seconds (the form sends `fillMs`, the milliseconds it measured itself between opening the form and submitting; the server never compares clocks).
 - Maximum lengths on every field, email and phone format checks, and a fixed list of allowed services (and optionally roles).
 - CVs: only `.pdf` and `.docx` (legacy `.doc` is refused because any OLE file, including macro-enabled ones, shares its signature); the declared type must match the extension; the file content must start with the right signature (`%PDF`, or the zip header for `.docx`); at most 5 MB; stored under a generated name (timestamp plus a cleaned-up version of the file name).
-- Turnstile verification whenever `TURNSTILE_SECRET` is set (fails closed).
+- Turnstile verification whenever `TURNSTILE_SECRET` is set (fails closed), plus the optional hostname check.
 - Throttling: at most 20 submissions per minute across the whole site (Apps Script cannot see visitor IP addresses, so this is a global limit) and at most 5 per email address per 10 minutes. If a real burst hits the global limit, visitors see a "try again in a minute" message.
 - Job applications (CV uploads) have their own, tighter site-wide cap: at most 5 per hour and 15 per day, independent of the 20 per minute inquiry limit. Change `APPLICATION_LIMIT_PER_HOUR` / `APPLICATION_LIMIT_PER_DAY` at the top of `validation.js` if hiring season needs more. The daily counter is kept in the `APP_DAY_COUNTER` script property (do not edit it).
 - The Sheet is locked only for the moment a row is written; Drive uploads and emails do not block other visitors.
