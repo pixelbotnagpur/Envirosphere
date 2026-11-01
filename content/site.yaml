@@ -38,7 +38,6 @@ nav:
   - { label: Why Us, href: /why-us/ }
   - { label: Careers, href: /careers/ }
   - { label: Gallery, href: /gallery/ }
-  - { label: Downloads, href: /downloads/ }
   - { label: Contact, href: /contact/ }
 
 # TODO(content): add the real social profile URLs. Remove a line to hide that icon.

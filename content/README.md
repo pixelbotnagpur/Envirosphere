@@ -47,6 +47,10 @@ Controls the layout and copy of the home page (`content/pages/home.yaml`):
 
 To add client logos: add the file to `public/media/clients/`, add an entry to `media.yaml`, then add its key to `clients.logos`.
 
+## Careers and Downloads
+- `content/jobs.yaml`: open positions. Leave it as `[]` when there are none: the Careers page then says so and offers a general application form (texts in `content/pages/careers.yaml`).
+- `content/downloads.yaml`: files to download. Leave it as `[]` until real files exist: the Downloads page then shows a short "nothing yet" message, the menu link is removed (delete or add the `Downloads` line in `content/site.yaml` under `nav`) and the page stays out of the sitemap.
+
 ## What you cannot change here
 Colors and fonts are part of the design. Ask the developer, for example "make the accent color a deeper ochre".
 

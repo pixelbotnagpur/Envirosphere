@@ -1,4 +1,4 @@
-import { Download, FileText, ShieldCheck } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/motion/reveal";
 import { staggerDelay } from "@/lib/motion";
@@ -11,9 +11,11 @@ import { pageSeo } from "@/lib/page-seo";
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
-    title: "Downloads & Accreditations | Official Documentation",
+    title: "Downloads",
     ...pageSeo("/downloads/"),
-    description: `Download official QCI NABET accreditation certificates, corporate profile, and compliance brochures from ${site.name}.`,
+    description: `Documents to download from ${site.name}.`,
+    // An empty page should not be indexed; it also is left out of the sitemap.
+    ...(loadDownloads().length === 0 ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -25,14 +27,11 @@ export default function DownloadsPage() {
       {/* Page Hero */}
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel tone="inverse" index="001">Resources & Verification</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Downloads</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Official publications & accreditation certificates.
+              Downloads.
             </h1>
-            <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              Access verifiable documentation, corporate brochures, and environmental compliance policies for institutional review.
-            </p>
           </div>
         </Container>
       </section>
@@ -40,6 +39,11 @@ export default function DownloadsPage() {
       {/* Downloads Grid */}
       <section className="border-t border-border bg-surface py-section">
         <Container>
+          {downloads.length === 0 ? (
+            <p className="mx-auto max-w-2xl rounded-card border border-border bg-background p-12 text-center text-sm font-light text-muted-foreground">
+              There are no documents to download yet.
+            </p>
+          ) : null}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {downloads.map((item, idx) => {
               const mediaItem = getImage(item.fileKey);
@@ -80,19 +84,6 @@ export default function DownloadsPage() {
                 </Reveal>
               );
             })}
-          </div>
-
-          {/* Credential Verification Notice */}
-          <div className="mt-16 rounded-card border border-border bg-background p-8 flex flex-col sm:flex-row sm:items-center gap-6">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-pill bg-secondary text-secondary-foreground">
-              <ShieldCheck aria-hidden="true" className="size-6" />
-            </div>
-            <div>
-              <h3 className="text-h4">Accreditation Verification Assistance</h3>
-              <p className="mt-1 text-sm text-muted-foreground font-light">
-                Need official certificate verification numbers for public tenders or SEAC submission portals? Reach out directly to our compliance office.
-              </p>
-            </div>
           </div>
         </Container>
       </section>

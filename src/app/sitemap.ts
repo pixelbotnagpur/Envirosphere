@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { loadServices, loadSite } from "@/lib/content";
+import { loadDownloads, loadServices, loadSite } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -38,11 +38,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${site.url}/downloads/`,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
+    // The Downloads page only goes into the sitemap once content/downloads.yaml has entries.
+    ...(loadDownloads().length > 0
+      ? [{ url: `${site.url}/downloads/`, changeFrequency: "monthly" as const, priority: 0.7 }]
+      : []),
     {
       url: `${site.url}/contact/`,
       changeFrequency: "monthly",

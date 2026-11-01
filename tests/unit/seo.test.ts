@@ -1,7 +1,7 @@
-﻿import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import { loadServices, loadSite } from "@/lib/content";
+import { loadDownloads, loadServices, loadSite } from "@/lib/content";
 
 describe("SEO & Production Meta", () => {
   it("sitemap contains all expected pages with correct URL formatting", () => {
@@ -9,13 +9,16 @@ describe("SEO & Production Meta", () => {
     const services = loadServices();
     const entries = sitemap();
 
-    expect(entries.length).toBe(1 + 7 + services.length); // home + 7 static + 13 services = 21
+    // Downloads is listed only while content/downloads.yaml has entries.
+    const hasDownloads = loadDownloads().length > 0;
+    expect(entries.length).toBe(1 + 6 + (hasDownloads ? 1 : 0) + services.length);
+    expect(entries.some((e) => e.url === `${site.url}/downloads/`)).toBe(hasDownloads);
 
     // Home
     expect(entries.some((e) => e.url === `${site.url}/` && e.priority === 1.0)).toBe(true);
 
     // Core static routes
-    const coreRoutes = ["/about/", "/services/", "/why-us/", "/careers/", "/gallery/", "/downloads/", "/contact/"];
+    const coreRoutes = ["/about/", "/services/", "/why-us/", "/careers/", "/gallery/", "/contact/"];
     for (const route of coreRoutes) {
       expect(entries.some((e) => e.url === `${site.url}${route}`)).toBe(true);
     }
