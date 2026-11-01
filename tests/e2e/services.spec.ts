@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { readContent, type ServicesContent } from "./helpers/content";
+
+const detailCta = readContent<ServicesContent>("pages/services.yaml").serviceDetail.contact.primaryCta.label;
 
 /** Reads a service file straight from content/services so the test follows the owner's edits. */
 function readService(slug: string) {
@@ -22,7 +25,7 @@ for (const slug of [FIRST, LAST]) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
     await expect(page.getByText(firstParagraph, { exact: false }).first()).toBeVisible();
     await expect(page.getByText("TODO(content)")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Start a conversation" })).toBeVisible();
+    await expect(page.getByRole("link", { name: detailCta })).toBeVisible();
   });
 }
 

@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { readContent, type CareersContent } from "./helpers/content";
+
+const generalApply = readContent<CareersContent>("pages/careers.yaml").openings.generalApplyLabel;
 
 /** The server contract: elapsed ms measured by the browser, never an absolute timestamp. */
 function expectFillMsContract(postData: string | null) {
@@ -73,7 +76,7 @@ test.describe("career application modal", () => {
     await page.goto("/careers/");
 
     // content/jobs.yaml is empty, so the page offers a general application; with openings it is "Apply with CV".
-    const applyButton = page.getByRole("button", { name: /Send a general application|Apply with CV/i }).first();
+    const applyButton = page.getByRole("button", { name: new RegExp(`${generalApply}|Apply with CV`, "i") }).first();
     await applyButton.click();
 
     // Verify modal is open
