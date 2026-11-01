@@ -1,18 +1,28 @@
 /**
  * Envirosphere Consultant & Engineers — Google Apps Script Form Handler
  *
- * Receives form submissions from the static website, performs server-side
- * validation, guards against formula injection & spam bots, logs rows to
- * Google Sheets, stores CV attachments in Google Drive, and alerts the office inbox.
+ * Receives form submissions from the static website, validates them on the server,
+ * guards against formula injection and spam bots, logs rows to Google Sheets, stores CV
+ * attachments in Google Drive, and alerts the office inbox.
+ *
+ * This project has TWO files: Code.gs (this file) and validation.js (pure helpers).
+ * Both must be pasted into the Apps Script editor; see SETUP.md.
+ *
+ * Script Properties (Project Settings):
+ *   NOTIFY_EMAIL      where alerts are sent (optional)
+ *   DRIVE_FOLDER_ID   REQUIRED for job applications; CVs are refused when this is not set
+ *   TURNSTILE_SECRET  optional; when SET, every submission needs a valid Turnstile token
+ *   ALLOWED_ROLES     optional, job titles separated by | ; when set, only these roles
+ *                     (plus "General Application") are accepted
  */
 
-// Configuration loaded from Script Properties
-var SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
+var GENERIC_ERROR = "We could not process your submission right now. Please try again or contact us directly.";
+var BOT_SUCCESS = "Submission received successfully";
 
 /**
- * HTTP GET Health check endpoint
+ * HTTP GET health check endpoint
  */
-function doGet(e) {
+function doGet() {
   return ContentService.createTextOutput(
     JSON.stringify({
       status: "ok",
@@ -23,16 +33,17 @@ function doGet(e) {
 }
 
 /**
- * HTTP POST Form submission endpoint
+ * HTTP POST form submission endpoint.
+ * Order matters: everything cheap and lock-free runs first; the script lock is held only
+ * while appending to the Sheet (see appendRowLocked).
  */
 function doPost(e) {
-  var lock = LockService.getScriptLock();
   try {
-    // Wait up to 10 seconds for concurrent requests
-    lock.waitLock(10000);
-
     if (!e || !e.postData || !e.postData.contents) {
       return jsonResponse(false, "Invalid request payload");
+    }
+    if (e.postData.contents.length > MAX_BODY_CHARS) {
+      return jsonResponse(false, "Request is too large");
     }
 
     var payload;
@@ -41,67 +52,62 @@ function doPost(e) {
     } catch (err) {
       return jsonResponse(false, "Malformed JSON format");
     }
-
-    // 1. Anti-abuse check (Honeypot + minimum fill time)
-    if (payload.website && payload.website.toString().trim().length > 0) {
-      // Fake success for bots to prevent adversarial tuning
-      return jsonResponse(true, "Submission received successfully");
+    if (!payload || typeof payload !== "object") {
+      return jsonResponse(false, "Invalid request payload");
     }
 
-    var now = new Date().getTime();
-    if (payload.formLoadedAt && now - Number(payload.formLoadedAt) < 2500) {
-      return jsonResponse(true, "Submission received successfully");
+    // 1. Honeypot: fake success so bots cannot tune against us
+    if (isHoneypotTripped(payload)) {
+      return jsonResponse(true, BOT_SUCCESS);
     }
 
-    // 2. Cloudflare Turnstile Verification (if configured)
-    var turnstileSecret = SCRIPT_PROPERTIES.getProperty("TURNSTILE_SECRET_KEY");
-    if (turnstileSecret && payload.turnstileToken) {
-      var isHuman = verifyTurnstile(payload.turnstileToken, turnstileSecret);
-      if (!isHuman) {
-        return jsonResponse(false, "Bot verification challenge failed");
+    // 2. Fill time is REQUIRED and must match the 3 s the site enforces
+    if (!checkFillTime(payload.formLoadedAt, new Date().getTime())) {
+      return jsonResponse(false, "Please wait a few seconds and submit the form again.");
+    }
+
+    // 3. Field validation (length caps, formats, allow-lists)
+    var isApplication = payload.type === "application";
+    var checked;
+    var cvInfo = null;
+    if (isApplication) {
+      checked = validateApplication(payload, getAllowedRoles());
+      if (checked.ok) {
+        cvInfo = checkCvMetadata(payload.cvFile);
+        if (!cvInfo.ok) checked = cvInfo;
       }
-    }
-
-    // 3. Rate limiting per email (max 5 submissions per 10 minutes)
-    var userEmail = (payload.email || "").toString().toLowerCase().trim();
-    if (userEmail) {
-      var cache = CacheService.getScriptCache();
-      var rateKey = "rate_" + Utilities.base64Encode(userEmail);
-      var currentCount = Number(cache.get(rateKey) || 0);
-      if (currentCount >= 5) {
-        return jsonResponse(false, "Submission limit reached. Please wait a few minutes before trying again.");
-      }
-      cache.put(rateKey, String(currentCount + 1), 600); // 10 minutes
-    }
-
-    // 4. Route payload by type
-    if (payload.type === "application") {
-      return handleApplication(payload);
     } else {
-      return handleInquiry(payload);
+      checked = validateInquiry(payload);
     }
+    if (!checked.ok) {
+      return jsonResponse(false, checked.message);
+    }
+
+    // 4. Cloudflare Turnstile: fail CLOSED whenever the secret is configured
+    var turnstileSecret = getTurnstileSecret();
+    var action = turnstileAction(turnstileSecret, payload.turnstileToken);
+    if (action === "reject" || (action === "verify" && !verifyTurnstile(payload.turnstileToken, turnstileSecret))) {
+      return jsonResponse(false, "Bot verification failed. Please refresh the page and try again.");
+    }
+
+    // 5. Throttles: global (IP limits are not possible in Apps Script) plus per email
+    var throttleMessage = checkThrottles(checked.clean.email);
+    if (throttleMessage) {
+      return jsonResponse(false, throttleMessage);
+    }
+
+    return isApplication ? handleApplication(checked.clean, payload.cvFile, cvInfo) : handleInquiry(checked.clean);
   } catch (error) {
-    return jsonResponse(false, "Processing error: " + error.toString());
-  } finally {
-    lock.releaseLock();
+    // Details go to the execution log only (no payload contents); the client gets a generic message.
+    Logger.log("doPost failed: " + (error && error.name ? error.name : "Error"));
+    return jsonResponse(false, GENERIC_ERROR);
   }
 }
 
 /**
- * Handles Client Consultation Inquiries
+ * Handles client consultation inquiries
  */
-function handleInquiry(data) {
-  var name = sanitize(data.name);
-  var org = sanitize(data.organization || "N/A");
-  var email = sanitize(data.email);
-  var phone = sanitize(data.phone);
-  var service = sanitize(data.service);
-  var message = sanitize(data.message);
-
-  if (!name || !email || !phone || !message) {
-    return jsonResponse(false, "Required fields missing (Name, Email, Phone, Message)");
-  }
-
+function handleInquiry(clean) {
   var sheet = getOrCreateTab("Inquiries", [
     "Timestamp",
     "Full Name",
@@ -113,57 +119,56 @@ function handleInquiry(data) {
     "Status",
   ]);
 
-  sheet.appendRow([
+  appendRowLocked(sheet, [
     new Date(),
-    name,
-    org,
-    email,
-    phone,
-    service,
-    message,
+    clean.name,
+    clean.organization,
+    sanitize(clean.email),
+    clean.phone,
+    clean.service,
+    clean.message,
     "New",
   ]);
 
   sendAlert(
-    "New Consultation Inquiry: " + name + " (" + service + ")",
+    "New Consultation Inquiry: " + clean.name + " (" + clean.service + ")",
     "A new project consultation inquiry has been submitted:\n\n" +
-      "Name: " + name + "\n" +
-      "Organization: " + org + "\n" +
-      "Email: " + email + "\n" +
-      "Phone: " + phone + "\n" +
-      "Service: " + service + "\n\n" +
-      "Project Details:\n" + message + "\n"
+      "Name: " + clean.name + "\n" +
+      "Organization: " + clean.organization + "\n" +
+      "Email: " + clean.email + "\n" +
+      "Phone: " + clean.phone + "\n" +
+      "Service: " + clean.service + "\n\n" +
+      "Project Details:\n" + clean.message + "\n"
   );
 
   return jsonResponse(true, "Thank you. Your consultation request has been registered with our team.");
 }
 
 /**
- * Handles Job Applications & CV Uploads
+ * Handles job applications and CV uploads
  */
-function handleApplication(data) {
-  var name = sanitize(data.name);
-  var email = sanitize(data.email);
-  var phone = sanitize(data.phone);
-  var role = sanitize(data.role);
-  var coverLetter = sanitize(data.coverLetter || "N/A");
-  var cvFile = data.cvFile;
-
-  if (!name || !email || !phone || !role || !cvFile) {
-    return jsonResponse(false, "Required application fields or CV document missing");
+function handleApplication(clean, cvFile, cvInfo) {
+  // CVs are personal data: refuse to store them anywhere but the dedicated folder.
+  var folderId = PropertiesService.getScriptProperties().getProperty("DRIVE_FOLDER_ID");
+  if (!folderId) {
+    Logger.log("Application refused: DRIVE_FOLDER_ID script property is not set");
+    return jsonResponse(false, GENERIC_ERROR);
   }
 
-  // Save CV file to Google Drive
-  var fileUrl = "No file attached";
+  var fileUrl;
   try {
-    var folderId = SCRIPT_PROPERTIES.getProperty("DRIVE_FOLDER_ID");
-    var folder = folderId ? DriveApp.getFolderById(folderId) : DriveApp.getRootFolder();
-    var decodedData = Utilities.base64Decode(cvFile.data);
-    var blob = Utilities.newBlob(decodedData, cvFile.type || "application/pdf", name + " - " + cvFile.name);
-    var savedFile = folder.createFile(blob);
+    var bytes = Utilities.base64Decode(cvFile.data);
+    var bytesCheck = checkCvBytes(bytes, cvInfo.ext);
+    if (!bytesCheck.ok) {
+      return jsonResponse(false, bytesCheck.message);
+    }
+    var storedName = safeCvFilename(new Date().getTime(), cvFile.name, cvInfo.ext);
+    var blob = Utilities.newBlob(bytes, cvInfo.mime, storedName);
+    var savedFile = DriveApp.getFolderById(folderId).createFile(blob);
     fileUrl = savedFile.getUrl();
   } catch (driveErr) {
-    fileUrl = "Drive upload failed: " + driveErr.toString();
+    Logger.log("CV upload failed: " + (driveErr && driveErr.name ? driveErr.name : "Error"));
+    return jsonResponse(false, GENERIC_ERROR);
   }
 
   var sheet = getOrCreateTab("Applications", [
@@ -177,41 +182,83 @@ function handleApplication(data) {
     "Status",
   ]);
 
-  sheet.appendRow([
+  appendRowLocked(sheet, [
     new Date(),
-    name,
-    role,
-    email,
-    phone,
-    coverLetter,
+    clean.name,
+    clean.role,
+    sanitize(clean.email),
+    clean.phone,
+    clean.coverLetter,
     fileUrl,
     "New",
   ]);
 
   sendAlert(
-    "New Career Application: " + name + " for " + role,
+    "New Career Application: " + clean.name + " for " + clean.role,
     "A new candidate application has been submitted:\n\n" +
-      "Candidate Name: " + name + "\n" +
-      "Position: " + role + "\n" +
-      "Email: " + email + "\n" +
-      "Phone: " + phone + "\n" +
+      "Candidate Name: " + clean.name + "\n" +
+      "Position: " + clean.role + "\n" +
+      "Email: " + clean.email + "\n" +
+      "Phone: " + clean.phone + "\n" +
       "CV Attachment Link: " + fileUrl + "\n\n" +
-      "Candidate Note:\n" + coverLetter + "\n"
+      "Candidate Note:\n" + clean.coverLetter + "\n"
   );
 
   return jsonResponse(true, "Thank you. Your application and CV have been received.");
 }
 
 /**
- * Sanitizes input against formula injection (=, +, -, @)
+ * Appends one row while holding the script lock. This is the ONLY place the lock is taken,
+ * so slow work (Turnstile, Drive, email) never serialises other visitors.
  */
-function sanitize(val) {
-  if (val === null || val === undefined) return "";
-  var str = val.toString().trim();
-  if (/^[=+\-@]/.test(str)) {
-    return "'" + str;
+function appendRowLocked(sheet, row) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    sheet.appendRow(row);
+  } finally {
+    lock.releaseLock();
   }
-  return str;
+}
+
+/**
+ * Global throttle (all visitors together) and a per-email throttle.
+ * CacheService counters are approximate, which is fine for abuse control.
+ * Returns an error message, or "" when the submission may continue.
+ */
+function checkThrottles(email) {
+  var cache = CacheService.getScriptCache();
+  var minuteBucket = Math.floor(new Date().getTime() / 60000);
+  var globalKey = "global_" + minuteBucket;
+  if (isOverLimit(cache.get(globalKey), GLOBAL_LIMIT_PER_MINUTE)) {
+    return "We are receiving many requests right now. Please try again in a minute.";
+  }
+  var emailKey = "rate_" + Utilities.base64EncodeWebSafe(String(email).toLowerCase());
+  if (isOverLimit(cache.get(emailKey), EMAIL_LIMIT_PER_WINDOW)) {
+    return "Submission limit reached. Please wait a few minutes before trying again.";
+  }
+  cache.put(globalKey, String(Number(cache.get(globalKey) || 0) + 1), 120);
+  cache.put(emailKey, String(Number(cache.get(emailKey) || 0) + 1), 600);
+  return "";
+}
+
+function getTurnstileSecret() {
+  var props = PropertiesService.getScriptProperties();
+  return props.getProperty("TURNSTILE_SECRET") || props.getProperty("TURNSTILE_SECRET_KEY") || "";
+}
+
+function getAllowedRoles() {
+  var raw = PropertiesService.getScriptProperties().getProperty("ALLOWED_ROLES");
+  if (!raw) return null;
+  var roles = raw
+    .split("|")
+    .map(function (r) {
+      return r.trim();
+    })
+    .filter(function (r) {
+      return r.length > 0;
+    });
+  return roles.length > 0 ? roles : null;
 }
 
 /**
@@ -233,23 +280,23 @@ function getOrCreateTab(tabName, headers) {
  * Sends an email alert to the designated notifications inbox
  */
 function sendAlert(subject, body) {
-  var notifyEmail = SCRIPT_PROPERTIES.getProperty("NOTIFY_EMAIL");
+  var notifyEmail = PropertiesService.getScriptProperties().getProperty("NOTIFY_EMAIL");
   if (!notifyEmail) return;
 
   try {
     MailApp.sendEmail({
       to: notifyEmail,
-      subject: "[Envirosphere Web] " + subject,
+      subject: "[Envirosphere Web] " + subject.replace(/[\r\n]+/g, " "),
       body: body,
     });
   } catch (e) {
-    // Log mail failure without interrupting sheet append
-    Logger.log("Failed to send notification email: " + e.toString());
+    // Log mail failure without interrupting the request
+    Logger.log("Failed to send notification email: " + (e && e.name ? e.name : "Error"));
   }
 }
 
 /**
- * Validates Cloudflare Turnstile captcha
+ * Validates a Cloudflare Turnstile token
  */
 function verifyTurnstile(token, secret) {
   try {
@@ -264,7 +311,7 @@ function verifyTurnstile(token, secret) {
     var result = JSON.parse(response.getContentText());
     return result.success === true;
   } catch (e) {
-    Logger.log("Turnstile validation error: " + e.toString());
+    Logger.log("Turnstile validation error: " + (e && e.name ? e.name : "Error"));
     return false;
   }
 }
