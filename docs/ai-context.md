@@ -16,6 +16,8 @@ Google Sheet and stores CVs in Drive. No server, DB or login.
 
 ## Key modules
 - `content/`: owner-editable "database" · `public/media/`: assets
+- `scripts/optimize-images.ts` (`pnpm optimize:images`): resizes + WebP-converts `public/media`;
+  `tests/unit/media-weight.test.ts` enforces the budget (photo ≤ 400 KB, total ≤ 6 MB).
 - `src/app/globals.css`: all design tokens (palette, type scale, motion durations/easings)
 - `src/components/ui`: CVA primitives · `src/components/motion`: LenisProvider, Reveal,
   Parallax, SplitText, Marquee, Counter, Pin · `src/components/sections`: page blocks

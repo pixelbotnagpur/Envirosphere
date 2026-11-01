@@ -22,6 +22,13 @@ for example: `content/site.yaml → contact.email: Invalid email address`.
 2. If you use a new file name, open `content/media.yaml` and change the `src:` line for that image.
 3. Update `alt:` to describe the picture in a few words. Screen readers and Google read it.
 
+### Add or replace a picture: size and format
+- Accepted: JPG, PNG or WebP photos. Logos: SVG, or a small WebP with a transparent background.
+- Recommended size: full-width pictures (Home banner, service pictures) at least 2400 px wide; gallery, card and portrait pictures about 1200 px wide. Smaller files look soft on large and high-density screens, and the site never enlarges a picture.
+- After putting new JPG/PNG files in `public/media/`, run `pnpm optimize:images`. It resizes them and writes a `.webp` next to each (about 80 percent smaller). Then change the `src:` in `content/media.yaml` to the `.webp` name and delete the old JPG/PNG (the original stays in git history).
+- `pnpm optimize:images --dry` only shows what it would do; `--force` redoes files that already have a newer `.webp`. The social-sharing picture `brand/og-image.jpg` stays a JPG on purpose.
+- A test keeps `public/media` under 6 MB in total and every photo under 400 KB, so an oversized upload is caught before the site is built.
+
 Image file names are case-sensitive on the live server: `Logo.svg` and `logo.svg` are different files.
 Always use the exact same capitals in `media.yaml`.
 
