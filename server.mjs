@@ -118,6 +118,16 @@ export function parseTarget(rawUrl) {
   return { segments, trailingSlash, urlPath, search };
 }
 
+/**
+ * Builds a Location value from a parsed target: path segments are re-encoded (so non-ASCII, DEL or spaces
+ * never make an invalid header) and the raw query keeps only printable ASCII. Always starts with a single "/".
+ */
+function locationFor(target, { slash = target.trailingSlash } = {}) {
+  const pathPart = "/" + target.segments.map(encodeURIComponent).join("/") + (slash && target.segments.length ? "/" : "");
+  const search = target.search.replace(/[^!-~]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"));
+  return pathPart + search;
+}
+
 const inside = (rootReal, p) => p === rootReal || p.startsWith(rootReal + path.sep);
 
 async function statSafe(p) {
@@ -138,7 +148,7 @@ async function resolveTarget(rootReal, target) {
     const index = path.join(candidate, "index.html");
     const indexStats = await statSafe(index);
     if (!indexStats || !indexStats.isFile()) return null;
-    if (!target.trailingSlash) return { redirect: target.urlPath + "/" + target.search };
+    if (!target.trailingSlash) return { redirect: locationFor(target, { slash: true }) };
     candidate = index;
     stats = indexStats;
   } else if (target.trailingSlash && target.segments.length) {
@@ -317,7 +327,7 @@ export function createHandler({ root, env = {}, log = () => {} }) {
     if (proto !== undefined && String(proto).split(",")[0].trim().toLowerCase() !== "https") {
       const host = String(req.headers.host ?? "");
       if (/^[a-z0-9.-]+(:\d+)?$/i.test(host)) {
-        return redirect(req, res, `https://${host}${target.urlPath}${target.search}`);
+        return redirect(req, res, `https://${host}${locationFor(target)}`);
       }
     }
     const found = await resolveTarget(rootReal, target);

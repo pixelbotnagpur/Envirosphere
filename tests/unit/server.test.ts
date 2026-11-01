@@ -192,6 +192,29 @@ describe("HTTPS redirect", () => {
     expect(res.status).toBe(200);
   });
 
+  it("encodes the path in the redirect: non-ASCII, DEL and spaces never cause a 500", async () => {
+    const h = { "x-forwarded-proto": "http", host: "example.com" };
+    for (const [raw, loc] of [
+      ["/%E2%9C%93", "https://example.com/%E2%9C%93"],
+      ["/%7F", "https://example.com/%7F"],
+      ["/a%20b", "https://example.com/a%20b"],
+      ["/a%20b/?q=1&r=%E2%9C%93", "https://example.com/a%20b/?q=1&r=%E2%9C%93"],
+    ] as const) {
+      const res = await get(raw, { headers: h });
+      expect(res.status, raw).toBe(308);
+      expect(res.headers.location, raw).toBe(loc);
+    }
+  });
+
+  it("never turns the redirect into an open redirect", async () => {
+    const h = { "x-forwarded-proto": "http", host: "example.com" };
+    for (const raw of ["//evil.com", "//evil.com/x", "/%2F%2Fevil.com", "/%2Fevil.com", "///evil.com"]) {
+      const res = await get(raw, { headers: h });
+      if (res.status === 308) expect(res.headers.location, raw).toMatch(/^https:\/\/example\.com\//);
+      expect(res.status, raw).not.toBe(500);
+    }
+  });
+
   it("does not build a redirect from an unusual Host header", async () => {
     const res = await get("/", { headers: { "x-forwarded-proto": "http", host: "evil.com/path" } });
     expect(res.headers.location ?? "").not.toContain("evil.com/path");
