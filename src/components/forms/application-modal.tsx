@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, AlertCircle, UploadCloud, X, FileText } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,8 @@ export interface ApplicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   emailFallback?: string;
+  /** Called while focus is being returned after close; call preventDefault() to move it elsewhere. */
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
 export function ApplicationModal({
@@ -26,7 +29,12 @@ export function ApplicationModal({
   isOpen,
   onClose,
   emailFallback = "careers@envirosphere.co.in",
+  onCloseAutoFocus,
 }: ApplicationModalProps) {
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  // Radix only restores focus to a <Dialog.Trigger>; this dialog is opened from the outside, so
+  // remember the element that had focus when it opened and return to it on close.
+  const returnFocusRef = React.useRef<HTMLElement | null>(null);
   const [formData, setFormData] = React.useState<Omit<ApplicationInput, "cvFile">>({
     type: "application",
     name: "",
@@ -49,18 +57,6 @@ export function ApplicationModal({
   React.useEffect(() => {
     if (isOpen) openedAtRef.current = performance.now();
   }, [isOpen]);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -158,7 +154,10 @@ export function ApplicationModal({
     setFieldErrors({});
     setStatus("submitting");
 
-    const result = await submitForm({ ...parsed.data, turnstileToken: turnstileToken ?? undefined });
+    const result = await submitForm({
+      ...parsed.data,
+      turnstileToken: turnstileToken ?? undefined,
+    });
     setTurnstileReset((n) => n + 1);
 
     if (result.success) {
@@ -176,233 +175,267 @@ export function ApplicationModal({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-foreground/50 backdrop-blur-sm"
-    >
-      <div className="relative w-full max-w-xl rounded-card border border-border bg-background p-6 sm:p-8 shadow-card my-8">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close modal"
-          className="absolute right-4 top-4 p-2 text-muted-foreground hover:text-foreground transition-colors rounded-pill"
+    <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? undefined : onClose())}>
+      <Dialog.Portal>
+        {/* The overlay is the scroll container: Lenis ignores wheel events inside data-lenis-prevent. */}
+        <Dialog.Overlay
+          data-modal-overlay=""
+          data-lenis-prevent=""
+          className="modal-fade fixed inset-0 z-(--z-modal) flex items-start justify-center overflow-y-auto overscroll-contain bg-foreground/50 p-4 backdrop-blur-sm sm:p-6"
         >
-          <X className="size-5" aria-hidden="true" />
-        </button>
-
-        {status === "success" ? (
-          <div role="status" className="py-6 text-center">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-pill bg-primary/10 text-primary">
-              <CheckCircle2 className="size-8" aria-hidden="true" />
-            </div>
-            <h3 id="modal-title" className="mt-6 font-heading text-h3 text-foreground">
-              Application Submitted
-            </h3>
-            <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Our HR and technical appraisal team will review your profile and reach out if there is a
-              mutual fit.
-            </p>
-            <div className="mt-8 flex justify-center gap-4">
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <h3 id="modal-title" className="font-heading text-h3 text-foreground">
-              Apply for {role}
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Submit your curriculum vitae and contact details directly to our technical recruitment
-              panel.
-            </p>
-
-            <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
-              {/* Honeypot */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  width: 1,
-                  height: 1,
-                  padding: 0,
-                  margin: -1,
-                  overflow: "hidden",
-                  clip: "rect(0, 0, 0, 0)",
-                  border: 0,
-                }}
+          <Dialog.Content
+            onOpenAutoFocus={(event) => {
+              if (document.activeElement instanceof HTMLElement) {
+                returnFocusRef.current = document.activeElement;
+              }
+              if (nameRef.current) {
+                event.preventDefault();
+                nameRef.current.focus();
+              }
+            }}
+            onCloseAutoFocus={(event) => {
+              onCloseAutoFocus?.(event);
+              if (event.defaultPrevented) return;
+              event.preventDefault();
+              returnFocusRef.current?.focus();
+            }}
+            className="modal-pop relative my-auto w-full max-w-xl rounded-card border border-border bg-background p-6 shadow-card sm:p-8"
+          >
+            <Dialog.Close asChild>
+              <button
+                type="button"
+                aria-label="Close modal"
+                className="absolute right-4 top-4 p-2 text-muted-foreground hover:text-foreground transition-colors rounded-pill"
               >
-                <label htmlFor="app-website">Website</label>
-                <input
-                  id="app-website"
-                  type="text"
-                  name="website"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={formData.website || ""}
-                  onChange={handleChange}
-                />
-              </div>
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            </Dialog.Close>
 
-              <div>
-                <label htmlFor="app-name" className="block text-sm text-foreground/90">
-                  Full Name <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="app-name"
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="e.g. Pooja Deshmukh"
-                  value={formData.name}
-                  onChange={handleChange}
-                  hasError={Boolean(fieldErrors.name)}
-                  className="mt-1.5"
-                />
-                {fieldErrors.name ? (
-                  <p className="mt-1 text-sm text-destructive">{fieldErrors.name}</p>
-                ) : null}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="app-email" className="block text-sm text-foreground/90">
-                    Email Address <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="app-email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="pooja@domain.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    hasError={Boolean(fieldErrors.email)}
-                    className="mt-1.5"
-                  />
-                  {fieldErrors.email ? (
-                    <p className="mt-1 text-sm text-destructive">{fieldErrors.email}</p>
-                  ) : null}
+            {status === "success" ? (
+              <div role="status" className="py-6 text-center">
+                <div className="mx-auto flex size-14 items-center justify-center rounded-pill bg-primary/10 text-primary">
+                  <CheckCircle2 className="size-8" aria-hidden="true" />
                 </div>
-
-                <div>
-                  <label htmlFor="app-phone" className="block text-sm text-foreground/90">
-                    Phone Number <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="app-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    placeholder="+91 98602 20550"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    hasError={Boolean(fieldErrors.phone)}
-                    className="mt-1.5"
-                  />
-                  {fieldErrors.phone ? (
-                    <p className="mt-1 text-sm text-destructive">{fieldErrors.phone}</p>
-                  ) : null}
+                <Dialog.Title className="mt-6 font-heading text-h3 text-foreground">
+                  Application Submitted
+                </Dialog.Title>
+                <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
+                <Dialog.Description className="mt-2 text-sm text-muted-foreground">
+                  Our HR and technical appraisal team will review your profile and reach out if
+                  there is a mutual fit.
+                </Dialog.Description>
+                <div className="mt-8 flex justify-center gap-4">
+                  <Dialog.Close asChild>
+                    <Button variant="outline">Close</Button>
+                  </Dialog.Close>
                 </div>
               </div>
-
+            ) : (
               <div>
-                <label htmlFor="app-cover" className="block text-sm text-foreground/90">
-                  Brief Introduction & Key Clearances Handled
-                </label>
-                <Textarea
-                  id="app-cover"
-                  name="coverLetter"
-                  rows={3}
-                  placeholder="Highlight key sectors (EIA, SPCB, auditing) or technical qualifications..."
-                  value={formData.coverLetter || ""}
-                  onChange={handleChange}
-                  className="mt-1.5"
-                />
-              </div>
+                <Dialog.Title className="font-heading text-h3 text-foreground">
+                  Apply for {role}
+                </Dialog.Title>
+                <Dialog.Description className="mt-1 text-sm text-muted-foreground">
+                  Submit your curriculum vitae and contact details directly to our technical
+                  recruitment panel.
+                </Dialog.Description>
 
-              <div>
-                <label className="block text-sm text-foreground/90">
-                  Curriculum Vitae (PDF or DOC, max 5 MB) <span className="text-destructive">*</span>
-                </label>
-
-                {cvFile ? (
-                  <div className="mt-2 flex items-center justify-between rounded-control border border-border bg-surface/50 px-4 py-3 text-sm">
-                    <div className="flex items-center gap-2 truncate">
-                      <FileText className="size-4 shrink-0 text-primary" aria-hidden="true" />
-                      <span className="truncate text-foreground font-normal">{cvFile.name}</span>
-                      <span className="text-sm text-muted-foreground shrink-0">
-                        ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleRemoveFile}
-                      className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
-                      aria-label="Remove selected CV"
-                    >
-                      <X className="size-4" aria-hidden="true" />
-                    </button>
-                  </div>
-                ) : (
-                  <label className="mt-2 flex flex-col items-center justify-center rounded-control border border-dashed border-border hover:border-foreground/40 bg-surface/30 px-6 py-6 text-center cursor-pointer transition-colors">
-                    <UploadCloud className="size-8 text-muted-foreground" aria-hidden="true" />
-                    <span className="mt-2 text-sm text-foreground font-normal">
-                      Click to choose or drag CV file
-                    </span>
-                    <span className="mt-1 text-sm text-muted-foreground">PDF, DOC, or DOCX (up to 5 MB)</span>
+                <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+                  {/* Honeypot */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      width: 1,
+                      height: 1,
+                      padding: 0,
+                      margin: -1,
+                      overflow: "hidden",
+                      clip: "rect(0, 0, 0, 0)",
+                      border: 0,
+                    }}
+                  >
+                    <label htmlFor="app-website">Website</label>
                     <input
-                      type="file"
-                      accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                      onChange={handleFileChange}
-                      className="sr-only"
+                      id="app-website"
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={formData.website || ""}
+                      onChange={handleChange}
                     />
-                  </label>
-                )}
+                  </div>
 
-                {fileError ? (
-                  <p className="mt-1.5 text-sm text-destructive">{fileError}</p>
-                ) : null}
-              </div>
+                  <div>
+                    <label htmlFor="app-name" className="block text-sm text-foreground/90">
+                      Full Name <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="app-name"
+                      ref={nameRef}
+                      name="name"
+                      type="text"
+                      required
+                      placeholder="e.g. Pooja Deshmukh"
+                      value={formData.name}
+                      onChange={handleChange}
+                      hasError={Boolean(fieldErrors.name)}
+                      className="mt-1.5"
+                    />
+                    {fieldErrors.name ? (
+                      <p className="mt-1 text-sm text-destructive">{fieldErrors.name}</p>
+                    ) : null}
+                  </div>
 
-              <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="app-email" className="block text-sm text-foreground/90">
+                        Email Address <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="app-email"
+                        name="email"
+                        type="email"
+                        required
+                        placeholder="pooja@domain.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        hasError={Boolean(fieldErrors.email)}
+                        className="mt-1.5"
+                      />
+                      {fieldErrors.email ? (
+                        <p className="mt-1 text-sm text-destructive">{fieldErrors.email}</p>
+                      ) : null}
+                    </div>
 
-              {status === "error" ? (
-                <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="size-5 shrink-0 text-destructive mt-0.5" aria-hidden="true" />
-                    <div className="flex-1">
-                      <p className="text-destructive">{statusMessage}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Please email your CV directly with subject &quot;Application: {role}&quot;:
-                      </p>
-                      <a
-                        href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
-                        className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
-                      >
-                        {emailFallback}
-                      </a>
+                    <div>
+                      <label htmlFor="app-phone" className="block text-sm text-foreground/90">
+                        Phone Number <span className="text-destructive">*</span>
+                      </label>
+                      <Input
+                        id="app-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        placeholder="+91 98602 20550"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        hasError={Boolean(fieldErrors.phone)}
+                        className="mt-1.5"
+                      />
+                      {fieldErrors.phone ? (
+                        <p className="mt-1 text-sm text-destructive">{fieldErrors.phone}</p>
+                      ) : null}
                     </div>
                   </div>
-                </div>
-              ) : null}
 
-              <div className="mt-6 flex items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="accent" disabled={status === "submitting"}>
-                  {status === "submitting" ? "Transmitting..." : "Submit Application"}
-                </Button>
+                  <div>
+                    <label htmlFor="app-cover" className="block text-sm text-foreground/90">
+                      Brief Introduction & Key Clearances Handled
+                    </label>
+                    <Textarea
+                      id="app-cover"
+                      name="coverLetter"
+                      rows={3}
+                      placeholder="Highlight key sectors (EIA, SPCB, auditing) or technical qualifications..."
+                      value={formData.coverLetter || ""}
+                      onChange={handleChange}
+                      className="mt-1.5"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-foreground/90">
+                      Curriculum Vitae (PDF or DOC, max 5 MB){" "}
+                      <span className="text-destructive">*</span>
+                    </label>
+
+                    {cvFile ? (
+                      <div className="mt-2 flex items-center justify-between rounded-control border border-border bg-surface/50 px-4 py-3 text-sm">
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                          <span className="truncate text-foreground font-normal">
+                            {cvFile.name}
+                          </span>
+                          <span className="text-sm text-muted-foreground shrink-0">
+                            ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
+                          aria-label="Remove selected CV"
+                        >
+                          <X className="size-4" aria-hidden="true" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="mt-2 flex flex-col items-center justify-center rounded-control border border-dashed border-border hover:border-foreground/40 bg-surface/30 px-6 py-6 text-center cursor-pointer transition-colors">
+                        <UploadCloud className="size-8 text-muted-foreground" aria-hidden="true" />
+                        <span className="mt-2 text-sm text-foreground font-normal">
+                          Click to choose or drag CV file
+                        </span>
+                        <span className="mt-1 text-sm text-muted-foreground">
+                          PDF, DOC, or DOCX (up to 5 MB)
+                        </span>
+                        <input
+                          type="file"
+                          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          onChange={handleFileChange}
+                          className="sr-only"
+                        />
+                      </label>
+                    )}
+
+                    {fileError ? (
+                      <p className="mt-1.5 text-sm text-destructive">{fileError}</p>
+                    ) : null}
+                  </div>
+
+                  <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
+
+                  {status === "error" ? (
+                    <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle
+                          className="size-5 shrink-0 text-destructive mt-0.5"
+                          aria-hidden="true"
+                        />
+                        <div className="flex-1">
+                          <p className="text-destructive">{statusMessage}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Please email your CV directly with subject &quot;Application: {role}
+                            &quot;:
+                          </p>
+                          <a
+                            href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
+                            className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
+                          >
+                            {emailFallback}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-6 flex items-center justify-end gap-3 pt-2">
+                    <Dialog.Close asChild>
+                      <Button type="button" variant="outline">
+                        Cancel
+                      </Button>
+                    </Dialog.Close>
+                    <Button type="submit" variant="accent" disabled={status === "submitting"}>
+                      {status === "submitting" ? "Transmitting..." : "Submit Application"}
+                    </Button>
+                  </div>
+                </form>
               </div>
-            </form>
-          </div>
-        )}
-      </div>
-    </div>
+            )}
+          </Dialog.Content>
+        </Dialog.Overlay>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApplicationModal } from "./application-modal";
@@ -108,5 +109,86 @@ describe("ApplicationModal", () => {
 
     vi.unstubAllEnvs();
     delete window.turnstile;
+  });
+
+  describe("dialog behaviour", () => {
+    function Harness() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Open application
+          </button>
+          <ApplicationModal role="Senior EIA Coordinator" isOpen={open} onClose={() => setOpen(false)} />
+        </>
+      );
+    }
+
+    it("is labelled by its title and described by its description", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog).toHaveAccessibleName("Apply for Senior EIA Coordinator");
+      expect(dialog).toHaveAccessibleDescription(/curriculum vitae/i);
+    });
+
+    it("moves focus to the first field when it opens", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await waitFor(() => expect(screen.getByLabelText(/Full Name/)).toHaveFocus());
+    });
+
+    it("closes on Escape and returns focus to the trigger", async () => {
+      const user = userEvent.setup();
+      render(<Harness />);
+      const trigger = screen.getByRole("button", { name: "Open application" });
+      await user.click(trigger);
+      await screen.findByRole("dialog");
+      await user.keyboard("{Escape}");
+      await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+      await waitFor(() => expect(trigger).toHaveFocus());
+    });
+
+    it("closes when the overlay is clicked", async () => {
+      const onClose = vi.fn();
+      const user = userEvent.setup();
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={onClose} />);
+      await screen.findByRole("dialog");
+      const overlay = document.querySelector("[data-modal-overlay]") as HTMLElement;
+      await user.click(overlay);
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it("keeps Tab focus inside the dialog", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <button type="button">Outside</button>
+          <ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />
+        </>,
+      );
+      const dialog = await screen.findByRole("dialog");
+      for (let i = 0; i < 25; i += 1) {
+        await user.tab();
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+      for (let i = 0; i < 25; i += 1) {
+        await user.tab({ shift: true });
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+    });
+
+    it("marks the scrolling container so Lenis lets the form scroll", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await screen.findByRole("dialog");
+      const scroller = document.querySelector("[data-modal-overlay]") as HTMLElement;
+      expect(scroller).toHaveAttribute("data-lenis-prevent");
+      expect(scroller.className).toMatch(/overflow-y-auto/);
+    });
+
+    it("sits above the header through the --z-modal token", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await screen.findByRole("dialog");
+      const scroller = document.querySelector("[data-modal-overlay]") as HTMLElement;
+      expect(scroller.className).toContain("z-(--z-modal)");
+    });
   });
 });

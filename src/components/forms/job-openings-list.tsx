@@ -14,6 +14,8 @@ export interface JobOpeningsListProps {
 
 export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
   const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
+  // Safari and Firefox on macOS do not focus a button on click, so remember it explicitly.
+  const triggerRef = React.useRef<HTMLElement | null>(null);
 
   return (
     <>
@@ -66,19 +68,17 @@ export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
                 <Button
                   variant="accent"
                   size="lg"
-                  onClick={() => setSelectedRole(job.title)}
+                  onClick={(event) => {
+                    triggerRef.current = event.currentTarget;
+                    setSelectedRole(job.title);
+                  }}
                   className="w-full gap-2"
                 >
                   <FileUp className="size-4" aria-hidden="true" />
                   Apply with CV
                 </Button>
                 <Button asChild variant="outline" size="sm" className="w-full gap-2">
-                  <a
-                    href={mailtoHref(
-                      contactEmail,
-                      `Application for ${job.title} - [Your Name]`,
-                    )}
-                  >
+                  <a href={mailtoHref(contactEmail, `Application for ${job.title} - [Your Name]`)}>
                     <Mail className="size-3.5" aria-hidden="true" />
                     Apply via Email
                   </a>
@@ -97,6 +97,10 @@ export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
         role={selectedRole || ""}
         isOpen={Boolean(selectedRole)}
         onClose={() => setSelectedRole(null)}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          triggerRef.current?.focus();
+        }}
         emailFallback={contactEmail}
       />
     </>
