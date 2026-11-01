@@ -16,3 +16,6 @@ next-env.d.ts
 .claude/worktrees/
 .next-shot-*/
 hostinger-dist/
+.env*.local
+.env.production*
+!.env.example
