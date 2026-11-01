@@ -84,7 +84,9 @@ describe("ApplicationModal", () => {
       reset: vi.fn(),
       remove: vi.fn(),
     };
-    const submitSpy = vi.spyOn(submitClient, "submitForm").mockResolvedValue({ success: true, message: "ok" });
+    const submitSpy = vi
+      .spyOn(submitClient, "submitForm")
+      .mockResolvedValue({ success: true, message: "ok" });
     const user = userEvent.setup();
     render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
 
@@ -105,7 +107,10 @@ describe("ApplicationModal", () => {
     act(() => callback?.("tok-xyz"));
     await user.click(screen.getByRole("button", { name: "Submit Application" }));
     await waitFor(() => expect(submitSpy).toHaveBeenCalled());
-    expect(submitSpy.mock.calls[0]![0]).toMatchObject({ turnstileToken: "tok-xyz", type: "application" });
+    expect(submitSpy.mock.calls[0]![0]).toMatchObject({
+      turnstileToken: "tok-xyz",
+      type: "application",
+    });
 
     vi.unstubAllEnvs();
     delete window.turnstile;
@@ -119,7 +124,11 @@ describe("ApplicationModal", () => {
           <button type="button" onClick={() => setOpen(true)}>
             Open application
           </button>
-          <ApplicationModal role="Senior EIA Coordinator" isOpen={open} onClose={() => setOpen(false)} />
+          <ApplicationModal
+            role="Senior EIA Coordinator"
+            isOpen={open}
+            onClose={() => setOpen(false)}
+          />
         </>
       );
     }
@@ -189,6 +198,134 @@ describe("ApplicationModal", () => {
       await screen.findByRole("dialog");
       const scroller = document.querySelector("[data-modal-overlay]") as HTMLElement;
       expect(scroller.className).toContain("z-(--z-modal)");
+    });
+  });
+
+  describe("CV handling", () => {
+    async function fillDetails(user: ReturnType<typeof userEvent.setup>) {
+      await user.type(screen.getByLabelText(/Full Name/), "Pooja Deshmukh");
+      await user.type(screen.getByLabelText(/Email Address/), "pooja@gmail.com");
+      await user.type(screen.getByLabelText(/Phone Number/), "+91 98602 20550");
+    }
+    const fileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement;
+    const dropZone = () => fileInput().closest("label") as HTMLElement;
+
+    it("accepts a PDF whose browser MIME type is empty and sends the PDF type", async () => {
+      const submitSpy = vi
+        .spyOn(submitClient, "submitForm")
+        .mockResolvedValue({ success: true, message: "ok" });
+      const user = userEvent.setup();
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await fillDetails(user);
+      fireEvent.change(fileInput(), {
+        target: { files: [new File(["x"], "resume.pdf", { type: "" })] },
+      });
+      await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
+      await user.click(screen.getByRole("button", { name: "Submit Application" }));
+      await waitFor(() => expect(submitSpy).toHaveBeenCalled());
+      expect(submitSpy.mock.calls[0]![0]).toMatchObject({
+        cvFile: { type: "application/pdf", name: "resume.pdf" },
+      });
+    });
+
+    it("accepts a DOCX with an odd browser MIME type", async () => {
+      const submitSpy = vi
+        .spyOn(submitClient, "submitForm")
+        .mockResolvedValue({ success: true, message: "ok" });
+      const user = userEvent.setup();
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await fillDetails(user);
+      fireEvent.change(fileInput(), {
+        target: { files: [new File(["x"], "resume.docx", { type: "application/zip" })] },
+      });
+      await waitFor(() => expect(screen.getByText("resume.docx")).toBeInTheDocument());
+      await user.click(screen.getByRole("button", { name: "Submit Application" }));
+      await waitFor(() => expect(submitSpy).toHaveBeenCalled());
+      expect(submitSpy.mock.calls[0]![0]).toMatchObject({
+        cvFile: { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+      });
+    });
+
+    it("explains in plain language why a .doc file was refused, at selection time", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      fireEvent.change(fileInput(), {
+        target: { files: [new File(["x"], "old.doc", { type: "application/msword" })] },
+      });
+      expect(await screen.findByText(/PDF or DOCX file/)).toBeInTheDocument();
+      expect(screen.queryByText("old.doc")).toBeNull();
+    });
+
+    it("no longer mentions the unsupported DOC format in the instructions", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog.textContent).not.toMatch(/DOC/);
+      expect(dialog.textContent).toMatch(/PDF or DOCX/);
+    });
+
+    it("keeps a real file input that has an accessible name", () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      const input = screen.getByLabelText(/Click to choose or drag/);
+      expect(input).toBe(fileInput());
+      expect(input).not.toHaveAttribute("tabindex", "-1");
+    });
+
+    it("accepts a file dropped on the drop zone and shows the dragging state", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      const zone = dropZone();
+      fireEvent.dragEnter(zone, { dataTransfer: { files: [], types: ["Files"] } });
+      expect(zone).toHaveAttribute("data-dragging", "true");
+      fireEvent.dragLeave(zone, { dataTransfer: { files: [], types: ["Files"] } });
+      expect(zone).not.toHaveAttribute("data-dragging", "true");
+      fireEvent.drop(zone, {
+        dataTransfer: {
+          files: [new File(["x"], "dropped.pdf", { type: "application/pdf" })],
+          types: ["Files"],
+        },
+      });
+      await waitFor(() => expect(screen.getByText("dropped.pdf")).toBeInTheDocument());
+    });
+
+    it("validates dropped files the same way", async () => {
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      fireEvent.drop(dropZone(), {
+        dataTransfer: {
+          files: [new File(["x"], "photo.png", { type: "image/png" })],
+          types: ["Files"],
+        },
+      });
+      expect(await screen.findByText(/PDF or DOCX file/)).toBeInTheDocument();
+    });
+
+    it("treats a filled honeypot as a silent fake success once everything else is valid", async () => {
+      const submitSpy = vi.spyOn(submitClient, "submitForm");
+      const user = userEvent.setup();
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      await fillDetails(user);
+      fireEvent.change(document.getElementById("app-website") as HTMLInputElement, {
+        target: { value: "https://autofilled.example" },
+      });
+      fireEvent.change(fileInput(), {
+        target: { files: [new File(["x"], "resume.pdf", { type: "application/pdf" })] },
+      });
+      await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
+      await user.click(screen.getByRole("button", { name: "Submit Application" }));
+      expect(await screen.findByText("Application Submitted")).toBeInTheDocument();
+      expect(submitSpy).not.toHaveBeenCalled();
+    });
+
+    it("still shows the real errors when the honeypot is filled but a field is invalid", async () => {
+      const user = userEvent.setup();
+      render(<ApplicationModal role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+      fireEvent.change(document.getElementById("app-website") as HTMLInputElement, {
+        target: { value: "https://autofilled.example" },
+      });
+      fireEvent.change(fileInput(), {
+        target: { files: [new File(["x"], "resume.pdf", { type: "application/pdf" })] },
+      });
+      await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
+      await user.click(screen.getByRole("button", { name: "Submit Application" }));
+      expect(await screen.findByText(/Name must be at least 2 characters/)).toBeInTheDocument();
+      expect(screen.queryByText(/Bot detected/)).toBeNull();
     });
   });
 });

@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
+import { cn } from "@/lib/utils";
+import { validateCvFile } from "@/lib/forms/cv";
+import { collectFieldErrors } from "@/lib/forms/errors";
 import { submitForm } from "@/lib/forms/submit";
 import {
   applicationSchema,
@@ -47,6 +50,7 @@ export function ApplicationModal({
 
   const [cvFile, setCvFile] = React.useState<CvFileInput | null>(null);
   const [fileError, setFileError] = React.useState<string | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
   const openedAtRef = React.useRef<number>(0);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -70,39 +74,56 @@ export function ApplicationModal({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const acceptFile = (file: File) => {
     setFileError(null);
+    setFieldErrors((prev) => {
+      if (!prev.cvFile) return prev;
+      const next = { ...prev };
+      delete next.cvFile;
+      return next;
+    });
 
-    // Validate size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      setFileError("CV file size exceeds the 5 MB limit.");
-      return;
-    }
-
-    // Validate type
-    const validExtensions = /\.(pdf|docx)$/i;
-    if (!validExtensions.test(file.name)) {
-      setFileError("Only PDF, DOC, or DOCX files are accepted.");
+    // Checked once, here, by extension and size. file.type is not trusted: browsers report an
+    // empty or odd type for ordinary documents.
+    const check = validateCvFile(file);
+    if (!check.ok) {
+      setFileError(check.error);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
       const base64Data = (reader.result as string).split(",")[1] || "";
-      setCvFile({
-        name: file.name,
-        type: (file.type as CvFileInput["type"]) || "application/pdf",
-        size: file.size,
-        data: base64Data,
-      });
+      setCvFile({ name: file.name, type: check.mimeType, size: file.size, data: base64Data });
     };
     reader.onerror = () => {
       setFileError("Could not read file. Please try another document.");
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // Reset so choosing the same file again after an error still fires a change event.
+    e.target.value = "";
+    if (file) acceptFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLElement>) => {
+    if (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) acceptFile(file);
   };
 
   const handleRemoveFile = () => {
@@ -114,7 +135,7 @@ export function ApplicationModal({
     e.preventDefault();
 
     if (!cvFile) {
-      setFileError("Please upload your CV document (PDF, DOC, or DOCX).");
+      setFileError("Please upload your CV document (PDF or DOCX).");
       return;
     }
 
@@ -128,15 +149,13 @@ export function ApplicationModal({
     const parsed = applicationSchema.safeParse(payload);
 
     if (!parsed.success) {
-      const errors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
-        if (field && typeof field === "string" && !errors[field]) {
-          errors[field] = issue.message;
-        }
+      const { errors, honeypotOnly } = collectFieldErrors(parsed.error.issues);
+      if (!honeypotOnly) {
+        setFieldErrors(errors);
+        return;
       }
-      setFieldErrors(errors);
-      return;
+      // Only the hidden trap field failed (a bot, or a password manager that filled it): never
+      // leave a person stuck on an error they cannot see. Fall through to the silent fake success.
     }
 
     if (isBotSubmission({ website: formData.website, fillMs })) {
@@ -347,7 +366,7 @@ export function ApplicationModal({
 
                   <div>
                     <label className="block text-sm text-foreground/90">
-                      Curriculum Vitae (PDF or DOC, max 5 MB){" "}
+                      Curriculum Vitae (PDF or DOCX, max 5 MB){" "}
                       <span className="text-destructive">*</span>
                     </label>
 
@@ -372,13 +391,25 @@ export function ApplicationModal({
                         </button>
                       </div>
                     ) : (
-                      <label className="mt-2 flex flex-col items-center justify-center rounded-control border border-dashed border-border hover:border-foreground/40 bg-surface/30 px-6 py-6 text-center cursor-pointer transition-colors">
+                      <label
+                        data-dragging={isDragging ? "true" : undefined}
+                        onDragEnter={handleDragOver}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={cn(
+                          "mt-2 flex cursor-pointer flex-col items-center justify-center rounded-control border border-dashed px-6 py-6 text-center transition-colors has-[:focus-visible]:border-primary has-[:focus-visible]:bg-primary/5",
+                          isDragging
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-surface/30 hover:border-foreground/40",
+                        )}
+                      >
                         <UploadCloud className="size-8 text-muted-foreground" aria-hidden="true" />
                         <span className="mt-2 text-sm text-foreground font-normal">
                           Click to choose or drag CV file
                         </span>
                         <span className="mt-1 text-sm text-muted-foreground">
-                          PDF, DOC, or DOCX (up to 5 MB)
+                          PDF or DOCX (up to 5 MB)
                         </span>
                         <input
                           type="file"

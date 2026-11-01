@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InquiryForm } from "./inquiry-form";
@@ -48,8 +48,14 @@ describe("InquiryForm", () => {
     await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
     await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
     await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-    await user.selectOptions(screen.getByLabelText(/Service of Interest/), "environmental-clearance");
-    await user.type(screen.getByLabelText(/Project Brief/), "We require full EIA scoping and appraisal.");
+    await user.selectOptions(
+      screen.getByLabelText(/Service of Interest/),
+      "environmental-clearance",
+    );
+    await user.type(
+      screen.getByLabelText(/Project Brief/),
+      "We require full EIA scoping and appraisal.",
+    );
 
     await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
 
@@ -67,20 +73,35 @@ describe("InquiryForm", () => {
     });
 
     const user = userEvent.setup();
-    render(<InquiryForm services={services} phoneFallback="+91 98602 20550" emailFallback="info@envirosphere.co.in" />);
+    render(
+      <InquiryForm
+        services={services}
+        phoneFallback="+91 98602 20550"
+        emailFallback="info@envirosphere.co.in"
+      />,
+    );
 
     await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
     await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
     await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
     await user.selectOptions(screen.getByLabelText(/Service of Interest/), "water-audit");
-    await user.type(screen.getByLabelText(/Project Brief/), "Comprehensive water balance and audit required.");
+    await user.type(
+      screen.getByLabelText(/Project Brief/),
+      "Comprehensive water balance and audit required.",
+    );
 
     await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
 
     await waitFor(() => {
       expect(screen.getByText("Gateway timeout. Please contact support.")).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "+91 98602 20550" })).toHaveAttribute("href", "tel:+919860220550");
-      expect(screen.getByRole("link", { name: "info@envirosphere.co.in" })).toHaveAttribute("href", "mailto:info@envirosphere.co.in");
+      expect(screen.getByRole("link", { name: "+91 98602 20550" })).toHaveAttribute(
+        "href",
+        "tel:+919860220550",
+      );
+      expect(screen.getByRole("link", { name: "info@envirosphere.co.in" })).toHaveAttribute(
+        "href",
+        "mailto:info@envirosphere.co.in",
+      );
     });
   });
 
@@ -111,7 +132,10 @@ describe("InquiryForm", () => {
       await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
       await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
       await user.selectOptions(screen.getByLabelText(/Service of Interest/), "water-audit");
-      await user.type(screen.getByLabelText(/Project Brief/), "Comprehensive water balance and audit required.");
+      await user.type(
+        screen.getByLabelText(/Project Brief/),
+        "Comprehensive water balance and audit required.",
+      );
     };
 
     it("blocks submission until the challenge is solved", async () => {
@@ -135,7 +159,47 @@ describe("InquiryForm", () => {
       act(() => widget?.callback("tok-abc"));
       await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
       await waitFor(() => expect(submitSpy).toHaveBeenCalled());
-      expect(submitSpy.mock.calls[0]![0]).toMatchObject({ turnstileToken: "tok-abc", type: "inquiry" });
+      expect(submitSpy.mock.calls[0]![0]).toMatchObject({
+        turnstileToken: "tok-abc",
+        type: "inquiry",
+      });
+    });
+  });
+
+  describe("honeypot", () => {
+    async function fillValid(user: ReturnType<typeof userEvent.setup>) {
+      await user.type(screen.getByLabelText(/Full Name/), "Rajesh Sharma");
+      await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@company.com");
+      await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
+      await user.selectOptions(screen.getByLabelText(/Service of Interest/), "general");
+      await user.type(
+        screen.getByLabelText(/Project Brief/),
+        "We need an environmental clearance.",
+      );
+    }
+    const fill = () =>
+      fireEvent.change(document.getElementById("inquiry-website") as HTMLInputElement, {
+        target: { value: "https://autofilled.example" },
+      });
+
+    it("fakes success without sending when only the honeypot is filled", async () => {
+      const submitSpy = vi.spyOn(submitClient, "submitForm");
+      const user = userEvent.setup();
+      render(<InquiryForm services={services} />);
+      await fillValid(user);
+      fill();
+      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+      expect(await screen.findByRole("status")).toBeInTheDocument();
+      expect(submitSpy).not.toHaveBeenCalled();
+    });
+
+    it("still shows real errors, never the honeypot error, when a field is invalid", async () => {
+      const user = userEvent.setup();
+      render(<InquiryForm services={services} />);
+      fill();
+      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+      expect(await screen.findByText(/Name must be at least 2 characters/)).toBeInTheDocument();
+      expect(screen.queryByText(/Bot detected/)).toBeNull();
     });
   });
 });

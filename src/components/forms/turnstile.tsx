@@ -48,7 +48,8 @@ export function loadTurnstile(): Promise<TurnstileApi> {
 }
 
 /** The site key is baked in at build time; the widget is off when it is not set. */
-export const getTurnstileSiteKey = (): string => (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "").trim();
+export const getTurnstileSiteKey = (): string =>
+  (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "").trim();
 export const isTurnstileEnabled = (): boolean => getTurnstileSiteKey() !== "";
 
 export interface TurnstileProps {

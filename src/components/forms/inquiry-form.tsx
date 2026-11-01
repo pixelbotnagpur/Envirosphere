@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
+import { collectFieldErrors } from "@/lib/forms/errors";
 import { submitForm } from "@/lib/forms/submit";
 import { inquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
 
@@ -72,15 +73,13 @@ export function InquiryForm({
     });
 
     if (!parsed.success) {
-      const errors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
-        if (field && typeof field === "string" && !errors[field]) {
-          errors[field] = issue.message;
-        }
+      const { errors, honeypotOnly } = collectFieldErrors(parsed.error.issues);
+      if (!honeypotOnly) {
+        setFieldErrors(errors);
+        return;
       }
-      setFieldErrors(errors);
-      return;
+      // Only the hidden trap field failed (a bot, or a password manager that filled it): fall
+      // through to the silent fake success below instead of leaving the visitor stuck.
     }
 
     // 2. Anti-abuse check (honeypot or sub-3s submit)
@@ -101,7 +100,11 @@ export function InquiryForm({
     setStatus("submitting");
 
     // 3. Submit (a Turnstile token is single-use, so the widget is refreshed afterwards)
-    const result = await submitForm({ ...parsed.data, turnstileToken: turnstileToken ?? undefined });
+    if (!parsed.success) return;
+    const result = await submitForm({
+      ...parsed.data,
+      turnstileToken: turnstileToken ?? undefined,
+    });
     setTurnstileReset((n) => n + 1);
 
     if (result.success) {
@@ -169,7 +172,16 @@ export function InquiryForm({
       {/* Honeypot field for bot protection */}
       <div
         aria-hidden="true"
-        style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", border: 0 }}
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          border: 0,
+        }}
       >
         <label htmlFor="inquiry-website">Website</label>
         <input

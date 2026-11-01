@@ -72,6 +72,10 @@ describe("Turnstile", () => {
     const { loadTurnstile } = await import("./turnstile");
     void loadTurnstile().catch(() => undefined);
     void loadTurnstile().catch(() => undefined);
-    expect(document.querySelectorAll('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')).toHaveLength(1);
+    expect(
+      document.querySelectorAll(
+        'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]',
+      ),
+    ).toHaveLength(1);
   });
 });
