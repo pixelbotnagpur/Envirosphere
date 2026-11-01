@@ -43,7 +43,7 @@ beforeEach(() => {
 function setup() {
   const view = render(
     <>
-      <PageTransition label="Envirosphere" />
+      <PageTransition />
       <Link href="/services/">Services</Link>
       <a href="https://other.test/">External</a>
       <main id="main" tabIndex={-1} />
@@ -86,7 +86,12 @@ describe("PageTransition", () => {
 
     const el = panel() as HTMLElement;
     expect(el).toHaveAttribute("aria-hidden", "true");
-    expect(el).toHaveTextContent("Envirosphere");
+    expect(el.textContent).toBe("");
+    const art = el.querySelector("[data-transition-art]") as HTMLElement;
+    expect(art).toHaveAttribute("aria-hidden", "true");
+    expect(art.className).toContain("pointer-events-none");
+    expect(el.querySelector("[data-transition-leaf]")).not.toBeNull();
+    expect(el.querySelector("path[stroke='currentColor']")).not.toBeNull();
     expect(el.className).toContain("z-(--z-transition)");
     expect(el.className).toContain("bg-primary");
 
@@ -97,7 +102,7 @@ describe("PageTransition", () => {
     await act(async () => {
       view.rerender(
         <>
-          <PageTransition label="Envirosphere" />
+          <PageTransition />
           <Link href="/services/">Services</Link>
           <a href="https://other.test/">External</a>
           <main id="main" tabIndex={-1} />
@@ -105,10 +110,30 @@ describe("PageTransition", () => {
       );
     });
 
-    await waitFor(() => expect(panel()).toBeNull());
+    // The curtain holds until the leaf has finished its trip (about 0.85s from the click).
+    await waitFor(() => expect(panel()).toBeNull(), { timeout: 3000 });
     expect(document.getElementById("main")).toHaveFocus();
     expect(document.querySelector("[data-route-announcer]") as HTMLElement).toHaveTextContent("Services page");
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+  });
+
+  it("keeps the curtain up for the leaf's trip even when the route is ready at once", async () => {
+    const view = setup();
+    fireEvent.click(screen.getByText("Services"));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    pathname = "/services/";
+    await act(async () => {
+      view.rerender(
+        <>
+          <PageTransition />
+          <Link href="/services/">Services</Link>
+          <main id="main" tabIndex={-1} />
+        </>,
+      );
+      await new Promise((r) => setTimeout(r, 100));
+    });
+    expect(panel()).toHaveAttribute("data-page-transition", "wait");
+    await waitFor(() => expect(panel()).toBeNull(), { timeout: 3000 });
   });
 
   it("cancels the pending push when Back is pressed during the cover phase", async () => {

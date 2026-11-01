@@ -4,7 +4,7 @@ export const duration = {
   base: 0.4,
   slow: 0.9,
   /** Leaf travel along the route-curtain line; the curtain stays up at least this long. */
-  travel: 0.9,
+  travel: 0.85,
   transition: { cover: 0.45, reveal: 0.5 },
 } as const;
 

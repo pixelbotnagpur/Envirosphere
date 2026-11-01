@@ -5,7 +5,8 @@ import { animate } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { duration, ease, TRANSITION_SAFETY_MS } from "@/lib/motion";
-import { shouldIntercept } from "./page-transition-utils";
+import { revealWaitMs, shouldIntercept } from "./page-transition-utils";
+import { RouteLeaf } from "./route-leaf";
 
 type Phase = "idle" | "cover" | "wait" | "reveal";
 
@@ -20,7 +21,7 @@ const reducedQuery = "(prefers-reduced-motion: reduce)";
  * delegation, so no link needs to know about it. The panel is only ever rendered on the client after
  * a click, so the static HTML and first paint are untouched.
  */
-export function PageTransition({ label }: { label: string }) {
+export function PageTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const lenis = useLenis();
@@ -32,6 +33,9 @@ export function PageTransition({ label }: { label: string }) {
   const lastPathRef = useRef(pathname);
   const panelRef = useRef<HTMLDivElement>(null);
   const safetyRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startedAtRef = useRef(0);
+  const safetyAtRef = useRef(0);
   const lenisRef = useRef(lenis);
   useEffect(() => {
     lenisRef.current = lenis;
@@ -45,6 +49,8 @@ export function PageTransition({ label }: { label: string }) {
   const clearSafety = useCallback(() => {
     if (safetyRef.current) clearTimeout(safetyRef.current);
     safetyRef.current = null;
+    if (dwellRef.current) clearTimeout(dwellRef.current);
+    dwellRef.current = null;
   }, []);
 
   const scrollToTop = useCallback(() => {
@@ -77,6 +83,7 @@ export function PageTransition({ label }: { label: string }) {
       event.preventDefault();
       if (phaseRef.current !== "idle") return;
       hrefRef.current = anchor.getAttribute("href") as string;
+      startedAtRef.current = performance.now();
       setPhase("cover");
     };
     document.addEventListener("click", onClick, true);
@@ -106,6 +113,7 @@ export function PageTransition({ label }: { label: string }) {
       if (cancelled || phaseRef.current !== "cover") return;
       setPhase("wait");
       clearSafety();
+      safetyAtRef.current = performance.now() + TRANSITION_SAFETY_MS;
       safetyRef.current = setTimeout(finish, TRANSITION_SAFETY_MS);
       router.push(hrefRef.current);
     });
@@ -122,8 +130,22 @@ export function PageTransition({ label }: { label: string }) {
     let raf = 0;
     raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame(() => {
-        if (phaseRef.current === "wait") setPhase("reveal");
-        else if (phaseRef.current === "idle") landOnPage();
+        if (phaseRef.current === "wait") {
+          // Hold the curtain until the leaf has finished its trip (zero when it already has).
+          const now = performance.now();
+          const wait = revealWaitMs(
+            now - startedAtRef.current,
+            duration.travel * 1000,
+            safetyAtRef.current - now,
+          );
+          if (wait <= 0) setPhase("reveal");
+          else {
+            dwellRef.current = setTimeout(() => {
+              dwellRef.current = null;
+              if (phaseRef.current === "wait") setPhase("reveal");
+            }, wait);
+          }
+        } else if (phaseRef.current === "idle") landOnPage();
       });
     });
     return () => cancelAnimationFrame(raf);
@@ -164,11 +186,11 @@ export function PageTransition({ label }: { label: string }) {
           data-page-transition={phase}
           style={{ clipPath: CLIP_HIDDEN_BELOW }}
           className={
-            "fixed inset-x-0 top-0 z-(--z-transition) flex h-lvh items-center justify-center bg-primary " +
+            "fixed inset-x-0 top-0 z-(--z-transition) h-lvh overflow-hidden bg-primary " +
             (phase === "reveal" ? "pointer-events-none" : "pointer-events-auto")
           }
         >
-          <span className="font-heading text-h3 text-primary-foreground">{label}</span>
+          <RouteLeaf />
         </div>
       )}
     </>

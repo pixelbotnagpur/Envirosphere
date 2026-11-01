@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* Browser extensions (e.g. Grammarly) inject attributes into <body> before hydration. */}
       <body suppressHydrationWarning>
         <LenisProvider>
-          <PageTransition label={site.shortName} />
+          <PageTransition />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-(--z-skip) focus:rounded-pill focus:bg-accent focus:px-6 focus:py-3 focus:text-accent-foreground"
