@@ -1,4 +1,4 @@
-﻿# Hostinger (LiteSpeed/Apache) rules for the static export
+# Hostinger (LiteSpeed/Apache) rules for the static export
 Options -Indexes
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
@@ -16,12 +16,20 @@ ErrorDocument 404 /404.html
 </IfModule>
 
 <IfModule mod_headers.c>
+  # ===== SECURITY HEADERS: single source of truth (server.mjs mirrors these exact values) =====
+  # Next's static export emits inline hydration scripts and style attributes, so
+  # 'unsafe-inline' is unavoidable in script-src/style-src without per-request nonces
+  # (not possible on a static host). Everything else is locked to 'self' + named origins.
+  # HSTS is STAGED: max-age=300 (5 min). Once HTTPS is confirmed on every page for a week,
+  # raise to 86400, then 2592000, then 31536000; add includeSubDomains only when ALL
+  # subdomains serve HTTPS; add preload only as a deliberate final step (hard to undo).
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
-  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://formspree.io; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io;"
+  Header always set Strict-Transport-Security "max-age=300"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://script.google.com;"
+  # ===== END SECURITY HEADERS =====
 
   # Hashed build files never change; HTML and owner-replaceable media must stay fresh.
   <FilesMatch "\.(js|css|woff2)$">
