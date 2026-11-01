@@ -111,18 +111,7 @@ function doPost(e) {
  * Handles client consultation inquiries
  */
 function handleInquiry(clean) {
-  var sheet = getOrCreateTab("Inquiries", [
-    "Timestamp",
-    "Full Name",
-    "Organization",
-    "Email",
-    "Phone Number",
-    "Service Required",
-    "Project Brief",
-    "Status",
-  ]);
-
-  appendRowLocked(sheet, [
+  appendRowLocked("Inquiries", INQUIRY_HEADERS, [
     new Date(),
     clean.name,
     clean.organization,
@@ -159,6 +148,7 @@ function handleApplication(clean, cvFile, cvInfo) {
   }
 
   var fileUrl;
+  var savedFile;
   try {
     var bytes = Utilities.base64Decode(cvFile.data);
     var bytesCheck = checkCvBytes(bytes, cvInfo.ext);
@@ -167,34 +157,34 @@ function handleApplication(clean, cvFile, cvInfo) {
     }
     var storedName = safeCvFilename(new Date().getTime(), cvFile.name, cvInfo.ext);
     var blob = Utilities.newBlob(bytes, cvInfo.mime, storedName);
-    var savedFile = DriveApp.getFolderById(folderId).createFile(blob);
+    savedFile = DriveApp.getFolderById(folderId).createFile(blob);
     fileUrl = savedFile.getUrl();
   } catch (driveErr) {
     Logger.log("CV upload failed: " + (driveErr && driveErr.name ? driveErr.name : "Error"));
     return jsonResponse(false, GENERIC_ERROR);
   }
 
-  var sheet = getOrCreateTab("Applications", [
-    "Timestamp",
-    "Candidate Name",
-    "Role Applied",
-    "Email",
-    "Phone Number",
-    "Cover Note",
-    "CV File Link",
-    "Status",
-  ]);
-
-  appendRowLocked(sheet, [
-    new Date(),
-    clean.name,
-    clean.role,
-    sanitize(clean.email),
-    phoneCell(clean.phone),
-    clean.coverLetter,
-    fileUrl,
-    "New",
-  ]);
+  try {
+    appendRowLocked("Applications", APPLICATION_HEADERS, [
+      new Date(),
+      clean.name,
+      clean.role,
+      sanitize(clean.email),
+      phoneCell(clean.phone),
+      clean.coverLetter,
+      fileUrl,
+      "New",
+    ]);
+  } catch (rowErr) {
+    // Lock timeout or Sheet error: do not leave an orphaned CV behind.
+    try {
+      savedFile.setTrashed(true);
+    } catch (trashErr) {
+      Logger.log("Could not trash orphaned CV: " + (trashErr && trashErr.name ? trashErr.name : "Error"));
+    }
+    Logger.log("Application row failed: " + (rowErr && rowErr.name ? rowErr.name : "Error"));
+    return jsonResponse(false, GENERIC_ERROR);
+  }
 
   sendAlert(
     "New Career Application: " + clean.name + " for " + clean.role,
@@ -210,15 +200,38 @@ function handleApplication(clean, cvFile, cvInfo) {
   return jsonResponse(true, "Thank you. Your application and CV have been received.");
 }
 
+var INQUIRY_HEADERS = [
+  "Timestamp",
+  "Full Name",
+  "Organization",
+  "Email",
+  "Phone Number",
+  "Service Required",
+  "Project Brief",
+  "Status",
+];
+var APPLICATION_HEADERS = [
+  "Timestamp",
+  "Candidate Name",
+  "Role Applied",
+  "Email",
+  "Phone Number",
+  "Cover Note",
+  "CV File Link",
+  "Status",
+];
+
 /**
- * Appends one row while holding the script lock. This is the ONLY place the lock is taken,
- * so slow work (Turnstile, Drive, email) never serialises other visitors.
+ * Appends one row while holding the script lock. This is the ONLY place the lock is taken
+ * (and the only place tabs are created, so two simultaneous first submissions cannot both
+ * create the tab). Slow work (Turnstile, Drive, email) never serialises other visitors.
+ * Throws when the lock cannot be taken within 10 s.
  */
-function appendRowLocked(sheet, row) {
+function appendRowLocked(tabName, headers, row) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    sheet.appendRow(row);
+    getOrCreateTab(tabName, headers).appendRow(row);
   } finally {
     lock.releaseLock();
   }

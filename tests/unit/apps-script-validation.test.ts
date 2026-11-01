@@ -325,6 +325,17 @@ describe("Code.gs wiring (source guards; Apps Script cannot run here)", () => {
     expect(codeSource).not.toMatch(/jsonResponse\([^)]*(toString\(\)|error\.message|err\.message)/);
     expect(codeSource).toContain("DRIVE_FOLDER_ID");
   });
+  it("creates tabs only inside the locked section", () => {
+    const locked = codeSource.slice(codeSource.indexOf("function appendRowLocked"), codeSource.indexOf("function checkThrottles"));
+    expect(locked).toContain("getOrCreateTab(");
+    const outside = codeSource.replace(locked, "");
+    expect(outside.match(/getOrCreateTab\(/g)).toHaveLength(1); // only its definition
+  });
+  it("trashes the saved CV when the Sheet write fails (lock timeout or error)", () => {
+    const app = codeSource.slice(codeSource.indexOf("function handleApplication"), codeSource.indexOf("function appendRowLocked"));
+    expect(app).toContain("setTrashed(true)");
+    expect(app).toMatch(/catch \(rowErr\)/);
+  });
   it("takes the lock only around the sheet append", () => {
     const doPost = codeSource.slice(codeSource.indexOf("function doPost"), codeSource.indexOf("function handleInquiry"));
     expect(doPost).not.toContain("waitLock");
