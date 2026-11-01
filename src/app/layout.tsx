@@ -3,6 +3,7 @@ import { Manrope, Syne } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { LenisProvider } from "@/components/motion/lenis-provider";
+import { PageTransition } from "@/components/motion/page-transition";
 import { getImage, loadSite, socialLinks } from "@/lib/content";
 import { baseOpenGraph } from "@/lib/page-seo";
 import "./globals.css";
@@ -87,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* Browser extensions (e.g. Grammarly) inject attributes into <body> before hydration. */}
       <body suppressHydrationWarning>
         <LenisProvider>
+          <PageTransition label={site.shortName} />
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-(--z-skip) focus:rounded-pill focus:bg-accent focus:px-6 focus:py-3 focus:text-accent-foreground"
@@ -105,7 +107,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             nav={site.nav}
             cta={site.cta}
           />
-          <main id="main">{children}</main>
+          <main id="main" tabIndex={-1}>
+            {children}
+          </main>
           <Footer
             name={site.name}
             tagline={site.tagline}
