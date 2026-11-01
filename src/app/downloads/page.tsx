@@ -1,6 +1,7 @@
 import { Download, FileText, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -43,7 +44,7 @@ export default function DownloadsPage() {
             {downloads.map((item, idx) => {
               const mediaItem = getImage(item.fileKey);
               return (
-                <Reveal key={item.id} delay={idx * 0.08} className="flex">
+                <Reveal key={item.id} delay={staggerDelay(idx, 0.08)} className="flex">
                   <div className="h-full w-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">

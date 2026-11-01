@@ -2,6 +2,7 @@ import { Briefcase, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import { JobOpeningsList } from "@/components/forms/job-openings-list";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -64,7 +65,7 @@ export default function CareersPage() {
                 desc: "Stay ahead of evolving statutory frameworks, court rulings, MoEFCC notifications, and ESG methodologies.",
               },
             ].map((item, idx) => (
-              <Reveal key={item.title} delay={idx * 0.08}>
+              <Reveal key={item.title} delay={staggerDelay(idx, 0.08)}>
                 <div className="h-full rounded-card border border-border bg-background p-8">
                   <h3 className="text-h4">{item.title}</h3>
                   <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">

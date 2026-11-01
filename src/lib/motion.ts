@@ -8,3 +8,8 @@ export const ease: Record<"outExpo" | "inOutQuart", Bezier> = {
 };
 
 export const lenisOptions = { lerp: 0.08, smoothWheel: true } as const;
+
+/** Per-item reveal delay in seconds. Capped so the last items of a long list do not wait for seconds. */
+export function staggerDelay(index: number, step = 0.08, max = 0.4): number {
+  return Math.min(index * step, max);
+}

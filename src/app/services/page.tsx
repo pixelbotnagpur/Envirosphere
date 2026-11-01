@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -46,7 +47,7 @@ export default function ServicesPage() {
               const imageAsset = service.image ? getImageAsset(service.image) : null;
               return (
                 <li key={service.slug} className="flex">
-                  <Reveal delay={idx * 0.04} className="flex w-full">
+                  <Reveal delay={staggerDelay(idx, 0.04)} className="flex w-full">
                     <Link
                       href={`/services/${service.slug}/`}
                       className="group relative flex w-full flex-col justify-between rounded-card border border-border bg-background p-8 transition-colors duration-(--duration-base) ease-out-expo hover:border-primary/40 hover:shadow-card"

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadGallery, loadSite } from "@/lib/content";
@@ -42,7 +43,7 @@ export default function GalleryPage() {
             {gallery.map((item, idx) => {
               const imageAsset = getImageAsset(item.image);
               return (
-                <Reveal key={item.id} delay={idx * 0.08}>
+                <Reveal key={item.id} delay={staggerDelay(idx, 0.08)}>
                   <figure className="group rounded-card border border-border bg-background overflow-hidden shadow-card">
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
                       <Image

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Parallax } from "@/components/motion/parallax";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -105,7 +106,7 @@ export default function AboutPage() {
                 desc: "Certified Functional Area Experts (FAEs) in Air Pollution, Water Quality, Ecology & Biodiversity, and Risk Assessment.",
               },
             ].map((item, idx) => (
-              <Reveal key={item.title} delay={idx * 0.1}>
+              <Reveal key={item.title} delay={staggerDelay(idx, 0.1)}>
                 <div className="h-full rounded-card border border-border bg-surface p-8">
                   <div className="flex size-11 items-center justify-center rounded-pill bg-primary text-primary-foreground">
                     <item.icon aria-hidden="true" className="size-5" />
@@ -160,7 +161,7 @@ export default function AboutPage() {
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {site.offices.map((office, idx) => (
-              <Reveal key={office.city} delay={idx * 0.08}>
+              <Reveal key={office.city} delay={staggerDelay(idx, 0.08)}>
                 <div className="h-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 text-label text-muted-foreground uppercase tracking-label">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -78,7 +79,7 @@ export default function WhyUsPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {pillars.map((pillar, idx) => (
               <li key={pillar.title} className="flex list-none">
-                <Reveal delay={idx * 0.06} className="flex w-full">
+                <Reveal delay={staggerDelay(idx, 0.06)} className="flex w-full">
                   <div className="h-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                     <div>
                       <div className="flex size-11 items-center justify-center rounded-pill bg-primary/10 text-primary">
