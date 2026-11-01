@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldIntercept, type ClickLike } from "./page-transition-utils";
+import { revealWaitMs, shouldIntercept, type ClickLike } from "./page-transition-utils";
 
 const here = "https://example.test/about/";
 
@@ -76,5 +76,28 @@ describe("shouldIntercept", () => {
     dialog.setAttribute("role", "dialog");
     document.body.appendChild(dialog);
     expect(shouldIntercept(click(), link({ href: "/x/" }, dialog), here)).toBe(false);
+  });
+});
+
+describe("revealWaitMs", () => {
+  it.each([
+    // elapsed, travel, safetyLeft, expected
+    [550, 900, 2000, 350], // route ready right after the cover: wait out the rest of the trip
+    [900, 900, 2000, 0], // exactly done
+    [1400, 900, 1500, 0], // slow route: leaf already waiting at the end
+    [100, 900, 2000, 800], // very early
+    [0, 900, 2000, 900], // never more than the whole trip
+    [100, 900, 500, 250], // capped below the safety timeout
+    [100, 900, 200, 0], // nothing left before safety: reveal now
+  ])("elapsed %i, travel %i, safety left %i -> %i", (elapsed, travel, safety, expected) => {
+    expect(revealWaitMs(elapsed, travel, safety)).toBe(expected);
+  });
+
+  it("never reaches the safety timeout", () => {
+    for (let elapsed = 0; elapsed <= 3000; elapsed += 100) {
+      for (const left of [0, 300, 1000, 2500]) {
+        expect(revealWaitMs(elapsed, 900, left)).toBeLessThan(Math.max(left, 1));
+      }
+    }
   });
 });

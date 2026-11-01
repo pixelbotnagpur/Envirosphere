@@ -48,3 +48,17 @@ export function shouldIntercept(
   if (next.hash) return false;
   return true;
 }
+
+/** Keep the reveal this far ahead of the safety timeout so the two never race. */
+export const SAFETY_MARGIN_MS = 250;
+
+/**
+ * How much longer the curtain must stay up once the new route is ready, so the leaf finishes its trip.
+ * `elapsedMs` is the time since the cover started, `safetyLeftMs` what remains on the safety timeout.
+ * Zero when the animation is already done; never long enough to run into the safety timeout.
+ */
+export function revealWaitMs(elapsedMs: number, travelMs: number, safetyLeftMs: number): number {
+  const remaining = travelMs - elapsedMs;
+  const ceiling = Math.max(0, safetyLeftMs - SAFETY_MARGIN_MS);
+  return Math.min(Math.max(0, remaining), ceiling);
+}

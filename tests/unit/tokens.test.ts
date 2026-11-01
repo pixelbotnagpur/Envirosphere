@@ -91,6 +91,7 @@ describe("motion tokens mirror src/lib/motion.ts", () => {
     expect(tokens.get("--duration-fast")).toBe(`${duration.fast * 1000}ms`);
     expect(tokens.get("--duration-base")).toBe(`${duration.base * 1000}ms`);
     expect(tokens.get("--duration-slow")).toBe(`${duration.slow * 1000}ms`);
+    expect(tokens.get("--duration-travel")).toBe(`${duration.travel * 1000}ms`);
     expect(tokens.get("--duration-transition-cover")).toBe(`${duration.transition.cover * 1000}ms`);
     expect(tokens.get("--duration-transition-reveal")).toBe(`${duration.transition.reveal * 1000}ms`);
   });
