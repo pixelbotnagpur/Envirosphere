@@ -2,10 +2,13 @@ import { loadAll } from "../src/lib/content/index";
 import { ContentError } from "../src/lib/content/read";
 
 try {
-  const { media, services, jobs, gallery, downloads } = loadAll();
+  const { media, services, jobs, gallery, downloads, aboutPage, whyUsPage, contactPage, galleryPage, downloadsPage, careers, servicesPage } =
+    loadAll();
+  const pageFiles = [aboutPage, whyUsPage, contactPage, galleryPage, downloadsPage, careers, servicesPage].length;
   console.log(
     `Content OK: ${Object.keys(media).length} media items, ${services.length} services, ` +
-      `${jobs.length} job openings, ${gallery.length} gallery items, ${downloads.length} downloads`,
+      `${jobs.length} job openings, ${gallery.length} gallery items, ${downloads.length} downloads, ` +
+      `${pageFiles} inner page files`,
   );
 } catch (error) {
   if (error instanceof ContentError) {

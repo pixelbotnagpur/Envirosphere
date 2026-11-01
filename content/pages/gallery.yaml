@@ -1,0 +1,10 @@
+# Text on the Gallery page. The photographs (title, category, caption, image) are in content/gallery.yaml.
+
+seo:
+  title: Gallery
+  description: Photographs from the field work and offices of Envirosphere Consultant & Engineers.
+
+hero:
+  eyebrow: Gallery
+  title: Gallery.
+  lead: Photographs from our field work and offices.

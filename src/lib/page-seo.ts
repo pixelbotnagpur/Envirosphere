@@ -22,3 +22,11 @@ export function pageSeo(routePath: string): Pick<Metadata, "alternates" | "openG
   const url = canonicalUrl(loadSite().url, routePath);
   return { alternates: { canonical: url }, openGraph: { ...baseOpenGraph(), url } };
 }
+
+/** `title`, `description`, canonical and og:url for one route, from the page's `seo` block in content/. */
+export function pageMetadata(
+  routePath: string,
+  seo: { title: string; description: string },
+): Metadata {
+  return { title: seo.title, description: seo.description, ...pageSeo(routePath) };
+}

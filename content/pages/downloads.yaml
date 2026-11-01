@@ -1,0 +1,14 @@
+# Text on the Downloads page. The files themselves are listed in content/downloads.yaml.
+# While that list is empty the page shows `emptyText` and is hidden from search engines and the sitemap.
+
+seo:
+  title: Downloads
+  description: Documents to download from Envirosphere Consultant & Engineers.
+
+hero:
+  eyebrow: Downloads
+  title: Downloads.
+
+emptyText: There are no documents to download yet.
+# Text of the button on each file card.
+downloadLabel: Download Document

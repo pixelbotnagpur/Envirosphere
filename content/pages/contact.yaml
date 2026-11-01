@@ -1,0 +1,42 @@
+# The Contact page. Phone numbers, email, address and offices are NOT written here: they come
+# from content/site.yaml, so they are only ever typed once. The enquiry form itself is built in code.
+# TODO(content): owner to review the wording.
+
+seo:
+  title: Contact Us
+  description: "Contact Envirosphere Consultant & Engineers: head office in Pune, with branch offices in Mumbai, Tarapur, Nashik and Nagpur."
+
+hero:
+  eyebrow: Contact
+  title: Contact Envirosphere.
+  lead: Tell us about your project by sending an enquiry, or call or email us.
+
+# Heading above the enquiry form.
+enquiry:
+  label: Enquiry
+  heading: Send us an enquiry
+  intro: Tell us about your project below.
+
+# Phone and email card. `phoneLabels`: one label per phone number from site.yaml, in order
+# (two labels = the first two numbers are shown; add a third label to show a third number).
+# `emailSubject` is the subject filled in when someone clicks the email address.
+direct:
+  heading: Phone and email
+  intro: "You can reach us at:"
+  phoneLabels:
+    - Primary Line
+    - Secondary Line
+  emailLabel: Office Email
+  emailSubject: Statutory Inquiry - Envirosphere
+
+# Head office card (address from site.yaml). `city` must be one of the cities in site.yaml offices.
+headOffice:
+  city: Pune
+  label: Head Office
+  heading: Pune Office
+
+# List of the other offices from site.yaml, each shown as "<city> <itemSuffix>".
+branches:
+  label: Offices
+  heading: Branch offices
+  itemSuffix: Branch

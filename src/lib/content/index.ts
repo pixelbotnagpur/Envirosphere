@@ -1,8 +1,12 @@
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import {
+  aboutPageSchema,
   careersSchema,
+  contactPageSchema,
+  downloadsPageSchema,
   downloadsSchema,
+  galleryPageSchema,
   gallerySchema,
   homeSchema,
   jobsSchema,
@@ -10,15 +14,21 @@ import {
   serviceFrontMatterSchema,
   servicesPageSchema,
   siteSchema,
+  whyUsPageSchema,
+  type AboutPageContent,
   type Careers,
+  type ContactPageContent,
   type DownloadItem,
+  type DownloadsPageContent,
   type GalleryItem,
+  type GalleryPageContent,
   type Home,
   type Job,
   type Media,
   type ServiceFrontMatter,
   type ServicesPage,
   type Site,
+  type WhyUsPageContent,
 } from "../validators/content";
 import { resolveMedia, toImageAsset, verifyAllMedia, type ImageAsset, type ResolvedMedia } from "./media";
 import { CONTENT_ROOT, ContentError, PUBLIC_ROOT, readMarkdownFile, readYamlFile } from "./read";
@@ -37,6 +47,21 @@ export const loadServicesPage = (root = CONTENT_ROOT): ServicesPage =>
 
 export const loadCareers = (root = CONTENT_ROOT): Careers =>
   readYamlFile("pages/careers.yaml", careersSchema, root);
+
+export const loadAboutPage = (root = CONTENT_ROOT): AboutPageContent =>
+  readYamlFile("pages/about.yaml", aboutPageSchema, root);
+
+export const loadWhyUsPage = (root = CONTENT_ROOT): WhyUsPageContent =>
+  readYamlFile("pages/why-us.yaml", whyUsPageSchema, root);
+
+export const loadContactPage = (root = CONTENT_ROOT): ContactPageContent =>
+  readYamlFile("pages/contact.yaml", contactPageSchema, root);
+
+export const loadGalleryPage = (root = CONTENT_ROOT): GalleryPageContent =>
+  readYamlFile("pages/gallery.yaml", galleryPageSchema, root);
+
+export const loadDownloadsPage = (root = CONTENT_ROOT): DownloadsPageContent =>
+  readYamlFile("pages/downloads.yaml", downloadsPageSchema, root);
 
 export const loadJobs = (root = CONTENT_ROOT): Job[] => {
   const file = path.join(root, "jobs.yaml");
@@ -106,11 +131,21 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const services = loadServices(root);
   const servicesPage = loadServicesPage(root);
   const careers = loadCareers(root);
+  const aboutPage = loadAboutPage(root);
+  const whyUsPage = loadWhyUsPage(root);
+  const contactPage = loadContactPage(root);
+  const galleryPage = loadGalleryPage(root);
+  const downloadsPage = loadDownloadsPage(root);
   const jobs = loadJobs(root);
   const gallery = loadGallery(root);
   const downloads = loadDownloads(root);
 
   verifyAllMedia(media, publicRoot);
+  if (!site.offices.some((office) => office.city === contactPage.headOffice.city)) {
+    throw new ContentError(
+      `content/pages/contact.yaml → headOffice.city: "${contactPage.headOffice.city}" is not one of the offices in content/site.yaml (${site.offices.map((o) => o.city).join(", ")})`,
+    );
+  }
   const references: [string | undefined, string][] = [
     [site.logoKey, "content/site.yaml → logoKey"],
     [site.seo.ogImageKey, "content/site.yaml → seo.ogImageKey"],
@@ -120,6 +155,9 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
       key,
       `content/pages/home.yaml → clients.logos[${index}]`,
     ]),
+    [aboutPage.story.image, "content/pages/about.yaml → story.image"],
+    [aboutPage.accreditation.feature.image, "content/pages/about.yaml → accreditation.feature.image"],
+    [whyUsPage.feature.image, "content/pages/why-us.yaml → feature.image"],
     ...services.map((s): [string | undefined, string] => [
       s.image,
       `content/services/${s.slug}.md → image`,
@@ -133,7 +171,22 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   for (const [key, where] of references) {
     if (key) resolveMedia(media, key, publicRoot, where);
   }
-  return { site, media, home, servicesPage, careers, services, jobs, gallery, downloads };
+  return {
+    site,
+    media,
+    home,
+    servicesPage,
+    careers,
+    aboutPage,
+    whyUsPage,
+    contactPage,
+    galleryPage,
+    downloadsPage,
+    services,
+    jobs,
+    gallery,
+    downloads,
+  };
 }
 
 export function getImage(key: string): ResolvedMedia {

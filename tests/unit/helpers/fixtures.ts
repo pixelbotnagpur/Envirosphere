@@ -109,9 +109,27 @@ Body text of the service.
 `;
 
 export const SERVICES_PAGE_YAML = `
+hub:
+  seo:
+    title: Services title
+    description: Services description.
+  hero:
+    eyebrow: Services
+    title: Services hero title
+    lead: Services hero lead.
+  listLabel: Services List
+  viewLabel: View Specifications
+  cta:
+    label: Consultation
+    heading: Not sure what you need?
+    lead: Tell us about your project.
+    primaryCta: { label: Discuss, href: /contact/ }
+    secondaryCta: { label: About us, href: /about/ }
 serviceDetail:
   breadcrumbHome: Home
   breadcrumbServices: Services
+  breadcrumbLabel: Breadcrumbs
+  notFoundTitle: Service Not Found
   label: Service
   previousLabel: Previous service
   nextLabel: Next service
@@ -125,12 +143,124 @@ serviceDetail:
 `;
 
 export const CAREERS_YAML = `
+seo:
+  title: Careers
+  description: Careers at Test Co.
+hero:
+  eyebrow: Careers
+  title: Careers at Test.
 openings:
+  label: Open Positions
+  heading: Current Vacancies
+  countOne: Showing {count} open position
+  countMany: Showing {count} open positions
   noneHeading: No open positions
   noneBody: Send a general application.
   generalApplyLabel: Send a general application
   generalRoleLabel: General application
   emailLabel: Or email us
+`;
+
+export const ABOUT_YAML = `
+seo:
+  title: About Us
+  description: About description.
+hero:
+  eyebrow: Company Profile
+  title: About heading.
+  lead: About lead.
+story:
+  heading: Our story
+  paragraphs: [First paragraph., Second paragraph.]
+  image: about-photo
+accreditation:
+  label: Accreditation
+  heading: Accreditation heading
+  lead: Accreditation lead.
+  feature:
+    image: about-photo
+    eyebrow: Event
+    title: Event title
+    text: Event text.
+offices:
+  label: Presence
+  heading: Our offices
+  lead: Office lead.
+  icon: building
+cta:
+  label: Get in touch
+  heading: Talk to us.
+  primaryCta: { label: Connect, href: /contact/ }
+  secondaryCta: { label: Services, href: /services/ }
+`;
+
+export const WHY_US_YAML = `
+seo:
+  title: Why Us
+  description: Why us description.
+hero:
+  eyebrow: Why us
+  title: Why Test.
+  lead: Why lead.
+pillars:
+  - { icon: shield-check, title: Accredited, text: Accredited text. }
+  - { icon: layers, title: Services, text: Services text. }
+feature:
+  image: about-photo
+  eyebrow: Water
+  title: Plant operation
+  text: Plant text.
+cta:
+  label: Get in touch
+  heading: Tell us.
+  primaryCta: { label: Contact us, href: /contact/ }
+`;
+
+export const CONTACT_YAML = `
+seo:
+  title: Contact Us
+  description: Contact description.
+hero:
+  eyebrow: Contact
+  title: Contact Test.
+enquiry:
+  label: Enquiry
+  heading: Send us an enquiry
+  intro: Tell us below.
+direct:
+  heading: Phone and email
+  intro: "You can reach us at:"
+  phoneLabels: [Primary Line]
+  emailLabel: Office Email
+  emailSubject: Enquiry
+headOffice:
+  city: Pune
+  label: Head Office
+  heading: Pune Office
+branches:
+  label: Offices
+  heading: Branch offices
+  itemSuffix: Branch
+`;
+
+export const GALLERY_PAGE_YAML = `
+seo:
+  title: Gallery
+  description: Gallery description.
+hero:
+  eyebrow: Gallery
+  title: Gallery.
+`;
+
+export const DOWNLOADS_PAGE_YAML = `
+seo:
+  title: Downloads
+  description: Downloads description.
+hero:
+  eyebrow: Downloads
+  title: Downloads.
+emptyText: No documents yet.
+downloadLabel: Download Document
 `;
 
 export const JOBS_YAML = `
@@ -167,6 +297,11 @@ export function validFiles(): Record<string, string> {
     "content/services/environmental-audit.md": SERVICE_MD,
     "content/pages/services.yaml": SERVICES_PAGE_YAML,
     "content/pages/careers.yaml": CAREERS_YAML,
+    "content/pages/about.yaml": ABOUT_YAML,
+    "content/pages/why-us.yaml": WHY_US_YAML,
+    "content/pages/contact.yaml": CONTACT_YAML,
+    "content/pages/gallery.yaml": GALLERY_PAGE_YAML,
+    "content/pages/downloads.yaml": DOWNLOADS_PAGE_YAML,
     "content/jobs.yaml": JOBS_YAML,
     "content/gallery.yaml": GALLERY_YAML,
     "content/downloads.yaml": DOWNLOADS_YAML,

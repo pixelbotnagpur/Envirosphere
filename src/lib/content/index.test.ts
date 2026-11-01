@@ -2,7 +2,18 @@
 import { describe, expect, it } from "vitest";
 import { makeTree } from "@tests/unit/helpers/tree";
 import { validFiles } from "@tests/unit/helpers/fixtures";
-import { loadAll, loadService, loadServices, loadServicesPage, socialLinks } from "./index";
+import {
+  loadAboutPage,
+  loadAll,
+  loadContactPage,
+  loadDownloadsPage,
+  loadGalleryPage,
+  loadService,
+  loadServices,
+  loadServicesPage,
+  loadWhyUsPage,
+  socialLinks,
+} from "./index";
 import { ContentError } from "./read";
 
 describe("loadAll", () => {
@@ -19,6 +30,68 @@ describe("loadAll", () => {
     const all = loadAll(content, publicDir);
     expect(all.servicesPage.serviceDetail.previousLabel).toBe("Previous service");
     expect(loadServicesPage(content).serviceDetail.contact.primaryCta.href).toBe("/contact/");
+  });
+
+  it("loads the inner page files", () => {
+    const { content, publicDir } = makeTree(validFiles());
+    const all = loadAll(content, publicDir);
+    expect(all.aboutPage.hero.title).toBe("About heading.");
+    expect(all.whyUsPage.pillars.map((p) => p.icon)).toEqual(["shield-check", "layers"]);
+    expect(all.contactPage.headOffice.city).toBe("Pune");
+    expect(all.galleryPage.seo.title).toBe("Gallery");
+    expect(all.downloadsPage.emptyText).toBe("No documents yet.");
+    expect(all.servicesPage.hub.viewLabel).toBe("View Specifications");
+    expect(all.careers.hero.title).toBe("Careers at Test.");
+    expect(loadAboutPage(content).story.image).toBe("about-photo");
+    expect(loadWhyUsPage(content).feature.image).toBe("about-photo");
+    expect(loadContactPage(content).branches.itemSuffix).toBe("Branch");
+    expect(loadGalleryPage(content).hero.eyebrow).toBe("Gallery");
+    expect(loadDownloadsPage(content).downloadLabel).toBe("Download Document");
+  });
+
+  it.each([
+    ["about.yaml", "story:\n  heading: Our story\n  paragraphs: [First paragraph., Second paragraph.]\n  image: about-photo", "story:\n  heading: Our story\n  paragraphs: [First paragraph., Second paragraph.]\n  image: nope", /content\/pages\/about\.yaml → story\.image: "nope" is not listed/],
+    ["about.yaml", "    image: about-photo", "    image: nope", /content\/pages\/about\.yaml → accreditation\.feature\.image: "nope" is not listed/],
+    ["why-us.yaml", "feature:\n  image: about-photo", "feature:\n  image: nope", /content\/pages\/why-us\.yaml → feature\.image: "nope" is not listed/],
+  ])("fails when an image key in %s is unknown", (file, from, to, message) => {
+    const files = validFiles();
+    const key = `content/pages/${file}`;
+    expect(files[key]).toContain(from);
+    files[key] = files[key].replace(from, to);
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(message);
+  });
+
+  it("fails with a plain message when a page file is missing", () => {
+    const files = validFiles();
+    delete files["content/pages/about.yaml"];
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/about\.yaml/);
+  });
+
+  it("names the file and field when a page text is missing", () => {
+    const files = validFiles();
+    files["content/pages/gallery.yaml"] = files["content/pages/gallery.yaml"].replace("  title: Gallery.\n", "");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/gallery\.yaml → hero\.title/);
+  });
+
+  it("names the allowed icons when an icon is unknown", () => {
+    const files = validFiles();
+    files["content/pages/why-us.yaml"] = files["content/pages/why-us.yaml"].replace("icon: layers", "icon: rocket");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/why-us\.yaml → pillars\[1\]\.icon: unknown icon; use one of: award/,
+    );
+  });
+
+  it("fails when the contact head office city is not an office in site.yaml", () => {
+    const files = validFiles();
+    files["content/pages/contact.yaml"] = files["content/pages/contact.yaml"].replace("city: Pune", "city: Goa");
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/contact\.yaml → headOffice\.city: "Goa" is not one of the offices in content\/site\.yaml \(Pune\)/,
+    );
   });
 
   it("fails with a plain message when a serviceDetail label is missing", () => {

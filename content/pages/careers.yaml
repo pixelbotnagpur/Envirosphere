@@ -1,6 +1,21 @@
-# Careers page texts that depend on whether there are open positions (see content/jobs.yaml).
+# Text on the Careers page. The openings themselves are in content/jobs.yaml.
 # TODO(content): owner to review the wording.
+
+seo:
+  title: Careers
+  description: Careers at Envirosphere Consultant & Engineers, Pune.
+
+hero:
+  eyebrow: Careers
+  title: Careers at Envirosphere.
+
 openings:
+  label: Open Positions
+  heading: Current Vacancies
+  # Shown when there are openings; {count} becomes the number.
+  countOne: Showing {count} open position
+  countMany: Showing {count} open positions
+  # Shown while content/jobs.yaml is empty:
   noneHeading: No open positions right now
   noneBody: You can still send us a general application with your CV.
   generalApplyLabel: Send a general application

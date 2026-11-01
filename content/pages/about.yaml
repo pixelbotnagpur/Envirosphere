@@ -1,0 +1,47 @@
+# The About page, top to bottom. TODO(content): owner to review the wording.
+
+# Title and description shown in Google results and link previews.
+seo:
+  title: About Us
+  description: "Learn about Envirosphere Consultant & Engineers, a QCI NABET Category A accredited environmental consultant with offices in Pune, Mumbai, Tarapur, Nashik, and Nagpur."
+
+# Green banner at the top. `lead` is the short text to the right of the title.
+hero:
+  eyebrow: Company Profile
+  title: Environmental consultants and engineers, based in Pune.
+  lead: Envirosphere Consultant and Engineers is a QCI NABET Accredited Consultant (Cat A), providing services to the public and private sector.
+
+# Heading and paragraphs next to a large picture. `image` is a key from media.yaml.
+story:
+  heading: "Our Mission & Philosophy"
+  paragraphs:
+    - Our firm provides strategic planning and cost-effective, sustainable solutions to public and private sector clients for obtaining statutory clearances and consents from MoEFCC, State Pollution Control Boards, MIDC, and other government authorities.
+    - The organisation is guided by a code of ethics and professional practices, working towards its stated vision and mission.
+  image: about-photo
+
+# Accreditation section with a picture card. `feature.image` is a key from media.yaml.
+accreditation:
+  label: Accreditation Standards
+  heading: QCI NABET Accredited Consultant
+  lead: Envirosphere is a QCI NABET Accredited Consultant (Cat A).
+  feature:
+    image: photo-aco-meet
+    eyebrow: ACO Meet 2026
+    title: Photograph from the ACO Meet 2026
+    text: The ACO Meet 2026 was a meeting of NABET accredited consultant organisations.
+
+# One card per office. The offices themselves (city, address) come from content/site.yaml.
+# `icon` is one of: award, briefcase, building, factory, file-check, file-text, globe, layers,
+# leaf, map-pin, shield-check, users, waves.
+offices:
+  label: Presence
+  heading: Our offices
+  lead: Head office in Pune, with branch offices in Mumbai, Tarapur, Nashik and Nagpur.
+  icon: building
+
+# Green call-to-action panel at the bottom. `secondaryCta` is optional.
+cta:
+  label: Get in touch
+  heading: Talk to our team about your project.
+  primaryCta: { label: Connect With Our Team, href: /contact/ }
+  secondaryCta: { label: Explore Our Services, href: /services/ }

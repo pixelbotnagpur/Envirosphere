@@ -1,0 +1,42 @@
+# The Why Us page, top to bottom. The numbers band in the middle is the "stats" block of
+# content/pages/home.yaml, so the figures are edited in one place.
+# TODO(content): owner to review the wording.
+
+seo:
+  title: Why Us
+  description: "Envirosphere Consultant & Engineers is a QCI NABET accredited environmental consultant in Pune offering environmental clearances, compliance and treatment plant services."
+
+hero:
+  eyebrow: Why us
+  title: Why Envirosphere.
+  lead: Environmental clearances, compliance and engineering services from one firm.
+
+# One card per reason, shown two per row. Add or remove entries freely.
+# `icon` is one of: award, briefcase, building, factory, file-check, file-text, globe, layers,
+# leaf, map-pin, shield-check, users, waves.
+pillars:
+  - icon: shield-check
+    title: QCI NABET Accredited Consultant (Cat A)
+    text: Envirosphere Consultant and Engineers is a QCI NABET Accredited Consultant, providing services to the public and private sector.
+  - icon: layers
+    title: Thirteen services
+    text: From environmental clearances and compliance to environmental monitoring and the operation of treatment plants.
+  - icon: file-check
+    title: Statutory clearances and consents
+    text: We help clients obtain clearances and consents from MoEFCC, Pollution Control Boards, MIDC and other government authorities.
+  - icon: factory
+    title: ETP and STP operation
+    text: Our services include the operation and maintenance of effluent treatment plants (ETP) and sewage treatment plants (STP).
+
+# Picture card below the reasons. `image` is a key from media.yaml.
+feature:
+  image: photo-treatment-plant
+  eyebrow: Water and wastewater
+  title: ETP and STP operation and maintenance
+  text: Alongside clearances and compliance, our services include the operation and maintenance of effluent treatment plants (ETP) and sewage treatment plants (STP).
+
+cta:
+  label: Get in touch
+  heading: Tell us about your project.
+  primaryCta: { label: Contact us, href: /contact/ }
+  secondaryCta: { label: Our services, href: /services/ }

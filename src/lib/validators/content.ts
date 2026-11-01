@@ -1,16 +1,18 @@
 import { z } from "zod";
+import {
+  ctaPanelSchema,
+  mediaKey,
+  navItemSchema,
+  pageHeroSchema,
+  pageSeoSchema,
+} from "./shared";
 
-const mediaKey = z
-  .string()
-  .regex(/^[a-z0-9][a-z0-9-]*$/, "use lowercase letters, numbers and dashes, e.g. hero-home");
-const href = z
-  .string()
-  .regex(/^(\/|https?:\/\/|mailto:|tel:)/, "must start with / or https://");
+export * from "./pages";
+export { ctaPanelSchema, iconName, pageHeroSchema, pageSeoSchema } from "./shared";
+
 const phone = z
   .string()
   .regex(/^(?=(?:\D*\d){8})\+?[0-9 ()-]{8,20}$/, "must look like +91 98602 20550");
-
-const navItemSchema = z.object({ label: z.string().min(1), href });
 
 export const mediaItemSchema = z.object({
   src: z
@@ -137,11 +139,20 @@ export const homeSchema = z.object({
   }),
 });
 
-/** content/pages/services.yaml: labels and call-to-action used on every service page. */
+/** content/pages/services.yaml: the Services page (hub) and the labels used on every service page. */
 export const servicesPageSchema = z.object({
+  hub: z.object({
+    seo: pageSeoSchema,
+    hero: pageHeroSchema,
+    listLabel: z.string().min(1),
+    viewLabel: z.string().min(1),
+    cta: ctaPanelSchema,
+  }),
   serviceDetail: z.object({
     breadcrumbHome: z.string().min(1),
     breadcrumbServices: z.string().min(1),
+    breadcrumbLabel: z.string().min(1),
+    notFoundTitle: z.string().min(1),
     label: z.string().min(1),
     previousLabel: z.string().min(1),
     nextLabel: z.string().min(1),
@@ -175,8 +186,15 @@ export const jobSchema = z.object({
 });
 export const jobsSchema = z.array(jobSchema);
 
+/** content/pages/careers.yaml (the openings themselves are in content/jobs.yaml) */
 export const careersSchema = z.object({
+  seo: pageSeoSchema,
+  hero: pageHeroSchema,
   openings: z.object({
+    label: z.string().min(1),
+    heading: z.string().min(1),
+    countOne: z.string().includes("{count}", { error: 'must contain {count}, e.g. "Showing {count} open position"' }),
+    countMany: z.string().includes("{count}", { error: 'must contain {count}, e.g. "Showing {count} open positions"' }),
     noneHeading: z.string().min(1),
     noneBody: z.string().min(1),
     generalApplyLabel: z.string().min(1),
