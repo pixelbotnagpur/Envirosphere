@@ -46,6 +46,9 @@ var MAX_BODY_CHARS = CV_MAX_BASE64_CHARS + 20000;
 
 var GLOBAL_LIMIT_PER_MINUTE = 20;
 var EMAIL_LIMIT_PER_WINDOW = 5;
+/** CV uploads are costlier and riskier than inquiries: separate, tighter caps for the whole site. */
+var APPLICATION_LIMIT_PER_HOUR = 5;
+var APPLICATION_LIMIT_PER_DAY = 15;
 
 var CV_TYPES = {
   pdf: { mime: "application/pdf", magic: [0x25, 0x50, 0x44, 0x46] },
@@ -251,6 +254,25 @@ function isOverLimit(currentCount, max) {
   return Number(currentCount || 0) >= max;
 }
 
+/** Returns "hour", "day" or "" when an application may continue. */
+function applicationLimitHit(hourCount, dayCount) {
+  if (isOverLimit(hourCount, APPLICATION_LIMIT_PER_HOUR)) return "hour";
+  if (isOverLimit(dayCount, APPLICATION_LIMIT_PER_DAY)) return "day";
+  return "";
+}
+
+/** Counters are stored as "bucket:count"; a different bucket means the window has rolled over. */
+function windowValue(bucket, count) {
+  return bucket + ":" + count;
+}
+
+function windowCount(stored, bucket) {
+  var parts = String(stored === null || stored === undefined ? "" : stored).split(":");
+  if (parts.length !== 2 || Number(parts[0]) !== bucket) return 0;
+  var n = Number(parts[1]);
+  return isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
 /**
  * Decides what to do about Turnstile. `secret` is the TURNSTILE_SECRET script property.
  * Returns "skip" (no secret configured), "reject" (secret set but no usable token) or "verify".
@@ -293,6 +315,11 @@ if (typeof module !== "undefined" && module.exports) {
     MAX_BODY_CHARS: MAX_BODY_CHARS,
     GLOBAL_LIMIT_PER_MINUTE: GLOBAL_LIMIT_PER_MINUTE,
     EMAIL_LIMIT_PER_WINDOW: EMAIL_LIMIT_PER_WINDOW,
+    APPLICATION_LIMIT_PER_HOUR: APPLICATION_LIMIT_PER_HOUR,
+    APPLICATION_LIMIT_PER_DAY: APPLICATION_LIMIT_PER_DAY,
+    applicationLimitHit: applicationLimitHit,
+    windowCount: windowCount,
+    windowValue: windowValue,
     sanitize: sanitize,
     phoneCell: phoneCell,
     isValidEmail: isValidEmail,

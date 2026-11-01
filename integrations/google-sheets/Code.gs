@@ -92,8 +92,9 @@ function doPost(e) {
       return jsonResponse(false, "Bot verification failed. Please refresh the page and try again.");
     }
 
-    // 5. Throttles: global (IP limits are not possible in Apps Script) plus per email
-    var throttleMessage = checkThrottles(checked.clean.email);
+    // 5. Throttles: global (IP limits are not possible in Apps Script), per email, and a
+    //    tighter site-wide cap for applications (CV uploads)
+    var throttleMessage = checkThrottles(checked.clean.email, isApplication);
     if (throttleMessage) {
       return jsonResponse(false, throttleMessage);
     }
@@ -224,13 +225,16 @@ function appendRowLocked(sheet, row) {
 }
 
 /**
- * Global throttle (all visitors together) and a per-email throttle.
- * CacheService counters are approximate, which is fine for abuse control.
+ * Global throttle (all visitors together), a per-email throttle, and for applications a
+ * separate, tighter site-wide cap (APPLICATION_LIMIT_PER_HOUR / _PER_DAY).
+ * CacheService counters are approximate, which is fine for abuse control. The per-day
+ * counter lives in Script Properties because CacheService entries last 6 hours at most.
  * Returns an error message, or "" when the submission may continue.
  */
-function checkThrottles(email) {
+function checkThrottles(email, isApplication) {
   var cache = CacheService.getScriptCache();
-  var minuteBucket = Math.floor(new Date().getTime() / 60000);
+  var now = new Date().getTime();
+  var minuteBucket = Math.floor(now / 60000);
   var globalKey = "global_" + minuteBucket;
   if (isOverLimit(cache.get(globalKey), GLOBAL_LIMIT_PER_MINUTE)) {
     return "We are receiving many requests right now. Please try again in a minute.";
@@ -239,8 +243,27 @@ function checkThrottles(email) {
   if (isOverLimit(cache.get(emailKey), EMAIL_LIMIT_PER_WINDOW)) {
     return "Submission limit reached. Please wait a few minutes before trying again.";
   }
+
+  var hourBucket = Math.floor(now / 3600000);
+  var dayBucket = Math.floor(now / 86400000);
+  var props = PropertiesService.getScriptProperties();
+  var hourCount = 0;
+  var dayCount = 0;
+  if (isApplication) {
+    hourCount = windowCount(cache.get("app_hour"), hourBucket);
+    dayCount = windowCount(props.getProperty("APP_DAY_COUNTER"), dayBucket);
+    var hit = applicationLimitHit(hourCount, dayCount);
+    if (hit) {
+      return "We have received many applications. Please try again later or email us your CV directly.";
+    }
+  }
+
   cache.put(globalKey, String(Number(cache.get(globalKey) || 0) + 1), 120);
   cache.put(emailKey, String(Number(cache.get(emailKey) || 0) + 1), 600);
+  if (isApplication) {
+    cache.put("app_hour", windowValue(hourBucket, hourCount + 1), 7200);
+    props.setProperty("APP_DAY_COUNTER", windowValue(dayBucket, dayCount + 1));
+  }
   return "";
 }
 

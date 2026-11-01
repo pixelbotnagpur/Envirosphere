@@ -27,6 +27,12 @@ interface Validation {
   safeCvFilename(now: number, name: string, ext: string): string;
   isOverLimit(count: unknown, max: number): boolean;
   turnstileHostnameOk(result: unknown, allowed: string | null): boolean;
+  APPLICATION_LIMIT_PER_HOUR: number;
+  APPLICATION_LIMIT_PER_DAY: number;
+  GLOBAL_LIMIT_PER_MINUTE: number;
+  applicationLimitHit(hourCount: unknown, dayCount: unknown): "" | "hour" | "day";
+  windowCount(stored: unknown, bucket: number): number;
+  windowValue(bucket: number, count: number): string;
   turnstileAction(secret: string | null, token: unknown): "skip" | "reject" | "verify";
 }
 const mod = { exports: {} as unknown as Validation };
@@ -246,6 +252,32 @@ describe("throttle and Turnstile decisions", () => {
     expect(v.turnstileAction("secret", "")).toBe("reject");
     expect(v.turnstileAction("secret", "x".repeat(5000))).toBe("reject");
     expect(v.turnstileAction("secret", "tok")).toBe("verify");
+  });
+});
+
+describe("application (CV upload) throttle", () => {
+  it("has its own tight caps, independent of the 20/min global inquiry cap", () => {
+    expect(v.APPLICATION_LIMIT_PER_HOUR).toBe(5);
+    expect(v.APPLICATION_LIMIT_PER_DAY).toBe(15);
+    expect(v.GLOBAL_LIMIT_PER_MINUTE).toBe(20);
+  });
+  it("trips at 5 per hour and at 15 per day overall", () => {
+    expect(v.applicationLimitHit(0, 0)).toBe("");
+    expect(v.applicationLimitHit(4, 14)).toBe("");
+    expect(v.applicationLimitHit("5", 5)).toBe("hour");
+    expect(v.applicationLimitHit(1, 15)).toBe("day");
+    expect(v.applicationLimitHit(undefined, undefined)).toBe("");
+  });
+  it("counts within a time bucket and starts over in a new one", () => {
+    expect(v.windowCount(undefined, 7)).toBe(0);
+    expect(v.windowCount(v.windowValue(7, 3), 7)).toBe(3);
+    expect(v.windowCount(v.windowValue(7, 3), 8)).toBe(0);
+    expect(v.windowCount("garbage", 7)).toBe(0);
+  });
+  it("is wired into checkThrottles only for applications", () => {
+    expect(codeSource).toMatch(/function checkThrottles\(email, isApplication\)/);
+    expect(codeSource).toContain("checkThrottles(checked.clean.email, isApplication)");
+    expect(codeSource).toContain("applicationLimitHit(");
   });
 });
 

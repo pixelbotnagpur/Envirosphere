@@ -111,6 +111,7 @@ Turn both on together. If the secret is set in Apps Script but the site was buil
 - CVs: only `.pdf` and `.docx` (legacy `.doc` is refused because any OLE file, including macro-enabled ones, shares its signature); the declared type must match the extension; the file content must start with the right signature (`%PDF`, or the zip header for `.docx`); at most 5 MB; stored under a generated name (timestamp plus a cleaned-up version of the file name).
 - Turnstile verification whenever `TURNSTILE_SECRET` is set (fails closed).
 - Throttling: at most 20 submissions per minute across the whole site (Apps Script cannot see visitor IP addresses, so this is a global limit) and at most 5 per email address per 10 minutes. If a real burst hits the global limit, visitors see a "try again in a minute" message.
+- Job applications (CV uploads) have their own, tighter site-wide cap: at most 5 per hour and 15 per day, independent of the 20 per minute inquiry limit. Change `APPLICATION_LIMIT_PER_HOUR` / `APPLICATION_LIMIT_PER_DAY` at the top of `validation.js` if hiring season needs more. The daily counter is kept in the `APP_DAY_COUNTER` script property (do not edit it).
 - The Sheet is locked only for the moment a row is written; Drive uploads and emails do not block other visitors.
 - Errors shown to visitors are generic. Details are written to **Executions** in the Apps Script editor (no submitted text is logged).
 
