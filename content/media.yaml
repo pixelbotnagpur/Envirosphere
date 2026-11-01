@@ -7,7 +7,7 @@ logo:
 
 og-image:
   src: /media/brand/og-image.jpg
-  alt: Environmental field surveyor recording notes beside a marked quadrat in forest
+  alt: Field surveyor recording notes beside a marked quadrat in a forest
 
 client-perkins:
   src: /media/clients/perkins.webp
@@ -167,15 +167,15 @@ client-paladin-paints:
 
 about-photo:
   src: /media/images/about.jpg
-  alt: Modern sustainable architecture integrated with lush landscape and reflection pond
+  alt: Illustrative image of a modern house with a green roof set in a garden with a pond
 
 photo-aco-meet:
   src: /media/photos/aco-meet-2026.jpg
-  alt: Envirosphere at the ACO Meet 2026 in Delhi, a national meet of NABET accredited consultant organisations
+  alt: Speaker at the podium at the ACO Meet 2026, a meeting of NABET accredited consultant organisations
 
 photo-treatment-plant:
   src: /media/photos/treatment-plant-aerial.jpg
-  alt: Aerial view of a modern industrial wastewater treatment plant with clarifiers and aeration basins
+  alt: Aerial photograph of a wastewater treatment plant with circular tanks and basins
 
 photo-hands-soil:
   src: /media/photos/hands-soil-sapling.jpg
@@ -183,7 +183,7 @@ photo-hands-soil:
 
 photo-hand-globe:
   src: /media/photos/hand-green-globe.jpg
-  alt: Hand holding a leaf-covered globe against the sky representing global environmental stewardship
+  alt: Illustrative image of a hand holding a globe covered with leaves
 
 photo-sapling-bokeh:
   src: /media/photos/sapling-in-hands-bokeh.jpg
@@ -191,7 +191,7 @@ photo-sapling-bokeh:
 
 photo-g01:
   src: /media/gallery/g01.jpg
-  alt: Field team surveying dry deciduous forest vegetation for statutory clearance
+  alt: Field team surveying forest vegetation
 
 photo-g02:
   src: /media/gallery/g02.jpg
@@ -199,7 +199,7 @@ photo-g02:
 
 photo-g03:
   src: /media/gallery/g03.jpg
-  alt: Marine water sampling from a vessel off the Nicobar Islands
+  alt: Marine water sampling from a vessel
 
 photo-g04:
   src: /media/gallery/g04.jpg
@@ -211,7 +211,7 @@ photo-g05:
 
 photo-g06:
   src: /media/gallery/g06.jpg
-  alt: Crew in safety coveralls preparing sampling gear at sea near Nicobar Islands
+  alt: Crew in safety coveralls preparing sampling gear at sea
 
 photo-g07:
   src: /media/gallery/g07.jpg
@@ -251,7 +251,7 @@ photo-g15:
 
 photo-g16:
   src: /media/gallery/g16.png
-  alt: Bagged soil sample collected for certified laboratory analysis
+  alt: Bagged and labelled sediment sample
 
 photo-g17:
   src: /media/gallery/g17.jpg
@@ -263,7 +263,7 @@ photo-g18:
 
 photo-g19:
   src: /media/gallery/g19.png
-  alt: Workstation cabin with panoramic city views at Envirosphere
+  alt: Workstation cabin at the Envirosphere office
 
 photo-g20:
   src: /media/gallery/g20.png
@@ -279,22 +279,22 @@ photo-g22:
 
 photo-g23:
   src: /media/gallery/g23.png
-  alt: Envirosphere team at the ACO Meet 2026 in Delhi
+  alt: Group at the ACO Meet 2026, a meeting of NABET accredited consultant organisations
 
 hero-eco-architecture:
   src: /media/images/hero-eco-architecture.jpg
-  alt: Modern sustainable environmental engineering pavilion nestled in a lush green valley with morning mist
+  alt: Illustrative image of a modern building with a green roof beside a pond in a misty forest valley
 
 clean-water-facility:
   src: /media/images/clean-water-facility.jpg
-  alt: Modern sustainable high-tech water treatment and conservation facility with crystal clear aeration basins
+  alt: Illustrative image of a modern water facility with clear water basins
 
 ecological-survey:
   src: /media/images/ecological-survey.jpg
-  alt: Environmental research team observing a pristine mountain landscape and river valley from a modern eco-deck
+  alt: Illustrative image of people on a viewing deck overlooking a mountain landscape and river valley
 
 sustainable-industrial-park:
   src: /media/images/sustainable-industrial-park.jpg
-  alt: Next-generation green industrial estate with solar canopy roofs, integrated bio-swale gardens, and living vertical green walls
+  alt: Illustrative image of an industrial estate with solar roofs and green walls
 
 

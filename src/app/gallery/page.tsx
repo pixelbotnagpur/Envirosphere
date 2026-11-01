@@ -10,9 +10,9 @@ import { pageSeo } from "@/lib/page-seo";
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
-    title: "Project & Field Gallery | Environmental Operations in Action",
+    title: "Gallery",
     ...pageSeo("/gallery/"),
-    description: `View field monitoring, wastewater treatment plant engineering, and site due diligence projects by ${site.name}.`,
+    description: `Photographs from the field work and offices of ${site.name}.`,
   };
 }
 
@@ -24,13 +24,13 @@ export default function GalleryPage() {
       {/* Page Hero */}
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel tone="inverse" index="001">Field Documentation</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Gallery</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Environmental engineering & field monitoring in action.
+              Gallery.
             </h1>
             <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              A visual record of our accredited field surveys, stack emission assessments, on-site effluent treatment engineering, and public hearings.
+              Photographs from our field work and offices.
             </p>
           </div>
         </Container>
