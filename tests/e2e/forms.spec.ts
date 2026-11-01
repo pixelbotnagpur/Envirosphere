@@ -72,8 +72,8 @@ test.describe("career application modal", () => {
 
     await page.goto("/careers/");
 
-    // Click Apply with CV on the first opening
-    const applyButton = page.getByRole("button", { name: /Apply with CV/i }).first();
+    // content/jobs.yaml is empty, so the page offers a general application; with openings it is "Apply with CV".
+    const applyButton = page.getByRole("button", { name: /Send a general application|Apply with CV/i }).first();
     await applyButton.click();
 
     // Verify modal is open
@@ -84,7 +84,7 @@ test.describe("career application modal", () => {
     await dialog.locator('#app-name').fill("Sunil Joshi");
     await dialog.locator('#app-email').fill("sunil.j@gmail.com");
     await dialog.locator('#app-phone').fill("+91 98220 12345");
-    await dialog.locator('#app-cover').fill("7 years of experience in SPCB compliance and consent management.");
+    await dialog.locator('#app-cover').fill("A short introduction for the general application.");
 
     // Upload dummy CV
     await dialog.locator('input[type="file"]').setInputFiles({

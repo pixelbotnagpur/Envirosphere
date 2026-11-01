@@ -1,6 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import {
+  careersSchema,
   downloadsSchema,
   gallerySchema,
   homeSchema,
@@ -8,6 +9,7 @@ import {
   mediaSchema,
   serviceFrontMatterSchema,
   siteSchema,
+  type Careers,
   type DownloadItem,
   type GalleryItem,
   type Home,
@@ -27,6 +29,9 @@ export const loadSite = (root = CONTENT_ROOT): Site => readYamlFile("site.yaml",
 export const loadMedia = (root = CONTENT_ROOT): Media => readYamlFile("media.yaml", mediaSchema, root);
 export const loadHome = (root = CONTENT_ROOT): Home =>
   readYamlFile("pages/home.yaml", homeSchema, root);
+
+export const loadCareers = (root = CONTENT_ROOT): Careers =>
+  readYamlFile("pages/careers.yaml", careersSchema, root);
 
 export const loadJobs = (root = CONTENT_ROOT): Job[] => {
   const file = path.join(root, "jobs.yaml");
@@ -89,6 +94,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const media = loadMedia(root);
   const home = loadHome(root);
   const services = loadServices(root);
+  const careers = loadCareers(root);
   const jobs = loadJobs(root);
   const gallery = loadGallery(root);
   const downloads = loadDownloads(root);
@@ -116,7 +122,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   for (const [key, where] of references) {
     if (key) resolveMedia(media, key, publicRoot, where);
   }
-  return { site, media, home, services, jobs, gallery, downloads };
+  return { site, media, home, careers, services, jobs, gallery, downloads };
 }
 
 export function getImage(key: string): ResolvedMedia {

@@ -108,6 +108,15 @@ summary: Independent audit of compliance.
 Body text of the service.
 `;
 
+export const CAREERS_YAML = `
+openings:
+  noneHeading: No open positions
+  noneBody: Send a general application.
+  generalApplyLabel: Send a general application
+  generalRoleLabel: General application
+  emailLabel: Or email us
+`;
+
 export const JOBS_YAML = `
 - id: engineer
   title: Environmental Engineer
@@ -140,6 +149,7 @@ export function validFiles(): Record<string, string> {
     "content/media.yaml": MEDIA_YAML,
     "content/pages/home.yaml": HOME_YAML,
     "content/services/environmental-audit.md": SERVICE_MD,
+    "content/pages/careers.yaml": CAREERS_YAML,
     "content/jobs.yaml": JOBS_YAML,
     "content/gallery.yaml": GALLERY_YAML,
     "content/downloads.yaml": DOWNLOADS_YAML,

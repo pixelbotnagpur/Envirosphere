@@ -48,7 +48,7 @@ export function ApplicationModal({
   role,
   isOpen,
   onClose,
-  emailFallback = "careers@envirosphere.co.in",
+  emailFallback,
   onCloseAutoFocus,
 }: ApplicationModalProps) {
   const nameRef = React.useRef<HTMLInputElement>(null);
@@ -291,8 +291,7 @@ export function ApplicationModal({
                 </Dialog.Title>
                 <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
                 <Dialog.Description className="mt-2 text-sm text-muted-foreground">
-                  Our HR and technical appraisal team will review your profile and reach out if
-                  there is a mutual fit.
+                  We have received your application.
                 </Dialog.Description>
                 <div className="mt-8 flex justify-center gap-4">
                   <Dialog.Close asChild>
@@ -493,16 +492,20 @@ export function ApplicationModal({
                         />
                         <div className="flex-1">
                           <p className="text-destructive">{statusMessage}</p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Please email your CV directly with subject &quot;Application: {role}
-                            &quot;:
-                          </p>
-                          <a
-                            href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
-                            className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
-                          >
-                            {emailFallback}
-                          </a>
+                          {emailFallback ? (
+                            <>
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                Please email your CV directly with subject &quot;Application: {role}
+                                &quot;:
+                              </p>
+                              <a
+                                href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
+                                className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
+                              >
+                                {emailFallback}
+                              </a>
+                            </>
+                          ) : null}
                         </div>
                       </div>
                     </div>

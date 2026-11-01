@@ -1,0 +1,8 @@
+# Careers page texts that depend on whether there are open positions (see content/jobs.yaml).
+# TODO(content): owner to review the wording.
+openings:
+  noneHeading: No open positions right now
+  noneBody: You can still send us a general application with your CV.
+  generalApplyLabel: Send a general application
+  generalRoleLabel: General application
+  emailLabel: Or email us

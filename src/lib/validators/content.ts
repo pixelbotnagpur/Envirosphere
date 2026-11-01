@@ -156,6 +156,16 @@ export const jobSchema = z.object({
 });
 export const jobsSchema = z.array(jobSchema);
 
+export const careersSchema = z.object({
+  openings: z.object({
+    noneHeading: z.string().min(1),
+    noneBody: z.string().min(1),
+    generalApplyLabel: z.string().min(1),
+    generalRoleLabel: z.string().min(1),
+    emailLabel: z.string().min(1),
+  }),
+});
+
 export const downloadItemSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
@@ -181,6 +191,7 @@ export type Media = z.infer<typeof mediaSchema>;
 export type MediaItem = z.infer<typeof mediaItemSchema>;
 export type Home = z.infer<typeof homeSchema>;
 export type ServiceFrontMatter = z.infer<typeof serviceFrontMatterSchema>;
+export type Careers = z.infer<typeof careersSchema>;
 export type Job = z.infer<typeof jobSchema>;
 export type DownloadItem = z.infer<typeof downloadItemSchema>;
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
