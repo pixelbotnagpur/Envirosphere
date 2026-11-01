@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { staggerDelay } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
+import { Stats } from "@/components/sections/stats";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadHome, loadSite } from "@/lib/content";
@@ -20,6 +21,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function WhyUsPage() {
+  const site = loadSite();
   const home = loadHome();
   const treatmentImage = getImageAsset("photo-treatment-plant");
 
@@ -66,11 +68,11 @@ export default function WhyUsPage() {
       {/* Pillars Grid */}
       <section className="border-t border-border bg-surface py-section">
         <Container>
-          <div className="grid gap-6 md:grid-cols-2">
+          <ul data-card-grid="" className="grid gap-6 md:grid-cols-2">
             {pillars.map((pillar, idx) => (
-              <li key={pillar.title} className="flex list-none">
+              <li key={pillar.title} data-card="" className="flex list-none">
                 <Reveal delay={staggerDelay(idx, 0.06)} className="flex w-full">
-                  <div className="h-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
+                  <div className="flex w-full flex-col justify-between rounded-card border border-border bg-background p-8">
                     <div>
                       <div className="flex size-11 items-center justify-center rounded-pill bg-primary/10 text-primary">
                         <pillar.icon aria-hidden="true" className="size-5" />
@@ -87,7 +89,7 @@ export default function WhyUsPage() {
                 </Reveal>
               </li>
             ))}
-          </div>
+          </ul>
 
           {/* Practical Engineering Visual Feature */}
           <Reveal className="mt-14">
@@ -120,26 +122,13 @@ export default function WhyUsPage() {
       </section>
 
       {/* Stats Counter Banner */}
-      <section className="border-t border-border bg-secondary py-section text-secondary-foreground">
-        <Container>
-          <SectionLabel index="002" className="text-secondary-foreground">
-            In numbers
-          </SectionLabel>
-          <div className="mt-12 grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {home.stats.items.map((item) => (
-              <div key={item.label} className="border-t border-secondary-foreground/45 pt-6">
-                <p className="font-heading text-display tracking-tight">
-                  {item.value}
-                  {item.suffix ? <span>{item.suffix}</span> : null}
-                </p>
-                <p className="mt-2 text-lead font-light text-secondary-foreground/90">
-                  {item.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+      <Stats
+        index="002"
+        label={home.stats.label}
+        items={home.stats.items}
+        locale={site.locale}
+        tone="background"
+      />
 
       {/* Bottom CTA */}
       <section className="py-section">

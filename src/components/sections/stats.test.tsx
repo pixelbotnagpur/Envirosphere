@@ -25,4 +25,19 @@ describe("Stats", () => {
     render(<Stats {...props} />);
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
+
+  it("renders each stat as a Forest card on a light section", () => {
+    const { container } = render(<Stats {...props} />);
+    const cards = container.querySelectorAll("[data-card]");
+    expect(cards).toHaveLength(2);
+    expect(container.querySelector("[data-card-grid]")).not.toBeNull();
+    expect(container.querySelectorAll(".bg-primary.text-primary-foreground.rounded-card")).toHaveLength(2);
+    expect(container.querySelector("section")).toHaveClass("bg-surface");
+    expect(container.querySelector("section")).not.toHaveClass("bg-secondary");
+  });
+
+  it("can sit on the Bone background instead", () => {
+    const { container } = render(<Stats {...props} tone="background" />);
+    expect(container.querySelector("section")).toHaveClass("bg-background");
+  });
 });
