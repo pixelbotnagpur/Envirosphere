@@ -13,7 +13,7 @@
  *   DRIVE_FOLDER_ID   REQUIRED for job applications; CVs are refused when this is not set
  *   TURNSTILE_SECRET  optional; when SET, every submission needs a valid Turnstile token
  *   ALLOWED_ROLES     optional, job titles separated by | ; when set, only these roles
- *                     (plus "General Application") are accepted
+ *                     are accepted
  */
 
 var GENERIC_ERROR = "We could not process your submission right now. Please try again or contact us directly.";

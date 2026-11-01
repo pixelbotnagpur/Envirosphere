@@ -2,6 +2,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { parse } from "yaml";
 
 const dir = path.join(process.cwd(), "integrations", "google-sheets");
 const validationSource = readFileSync(path.join(dir, "validation.js"), "utf8");
@@ -12,6 +13,7 @@ type Result = { ok: boolean; message?: string; clean?: Record<string, string>; e
 interface Validation {
   SERVICE_SLUGS: string[];
   LIMITS: Record<string, number>;
+  ROLE_PATTERN: RegExp;
   CV_MAX_BYTES: number;
   sanitize(v: unknown): string;
   phoneCell(v: unknown): string;
@@ -141,13 +143,42 @@ describe("validateApplication", () => {
     expect(v.validateApplication(goodApplication, null).ok).toBe(true);
     expect(v.validateApplication(goodApplication, ["Senior EIA Coordinator"]).ok).toBe(true);
     expect(v.validateApplication(goodApplication, ["Other Role"]).ok).toBe(false);
-    expect(v.validateApplication({ ...goodApplication, role: "General Application" }, ["Other"]).ok).toBe(true);
+    // No client path sends a generic role (the modal is always opened for a listed job).
+    expect(v.validateApplication({ ...goodApplication, role: "General Application" }, ["Other"]).ok).toBe(false);
   });
   it("rejects odd role text, long fields and missing CV", () => {
     expect(v.validateApplication({ ...goodApplication, role: "=cmd|' /C calc'!A0" }, null).ok).toBe(false);
     expect(v.validateApplication({ ...goodApplication, role: "a".repeat(121) }, null).ok).toBe(false);
     expect(v.validateApplication({ ...goodApplication, coverLetter: "x".repeat(2001) }, null).ok).toBe(false);
     expect(v.validateApplication({ ...goodApplication, cvFile: undefined }, null).ok).toBe(false);
+  });
+});
+
+describe("role titles", () => {
+  it("every title in content/jobs.yaml matches ROLE_PATTERN and the length limit (empty list passes)", () => {
+    const jobs = parse(readFileSync(path.join(process.cwd(), "content", "jobs.yaml"), "utf8")) as
+      | { title: string }[]
+      | null;
+    for (const job of jobs ?? []) {
+      expect(job.title, job.title).toMatch(v.ROLE_PATTERN);
+      expect(job.title.length).toBeLessThanOrEqual(v.LIMITS.role);
+    }
+  });
+  it("accepts common title punctuation and non-ASCII letters", () => {
+    for (const title of [
+      "Environmental Engineer (ETP / STP)",
+      "Senior EIA Coordinator \u2013 Pune",
+      "Lead, Water & Wastewater: Projects",
+      "Chargé d'études / Café Manager",
+      "Hydrogeologist (Jr.) \u2014 Site",
+    ]) {
+      expect(v.ROLE_PATTERN.test(title), title).toBe(true);
+    }
+  });
+  it("still rejects leading formula characters, control characters and markup", () => {
+    for (const bad of ["=cmd", "+cmd", "-cmd", "@cmd", " Role", "Role"+String.fromCharCode(0)+"X", "Role\nX", "Role\tX", "<b>Role</b>", "Role=1"]) {
+      expect(v.ROLE_PATTERN.test(bad), JSON.stringify(bad)).toBe(false);
+    }
   });
 });
 

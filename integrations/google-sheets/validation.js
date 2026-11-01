@@ -24,8 +24,6 @@ var SERVICE_SLUGS = [
   "general",
 ];
 
-var GENERAL_ROLE = "General Application";
-
 var LIMITS = {
   name: 100,
   organization: 100,
@@ -59,7 +57,8 @@ var CV_TYPES = {
 
 var PHONE_PATTERN = /^(?=(?:\D*\d){8})\+?[0-9 ()-]{8,20}$/;
 var EMAIL_PATTERN = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/;
-var ROLE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9 .,&()'\/+-]*$/;
+/** Letters/digits (any script) first, then common title punctuation. No = @ or control characters. */
+var ROLE_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M} .,:&()'\u2019\/+\u2013\u2014-]*$/u;
 
 /** Neutralises spreadsheet formulas and removes control characters. Returns a trimmed string. */
 function sanitize(val) {
@@ -149,7 +148,8 @@ function validateInquiry(payload) {
 
 /**
  * Validates the text fields of an application. `allowedRoles` is an array of role titles
- * or null when the owner has not set the ALLOWED_ROLES script property.
+ * or null when the owner has not set the ALLOWED_ROLES script property. The application form is
+ * only reachable from a listed job, so there is no generic role.
  */
 function validateApplication(payload, allowedRoles) {
   var fields = ["name", "email", "phone", "role", "coverLetter"];
@@ -170,7 +170,7 @@ function validateApplication(payload, allowedRoles) {
   if (!isValidEmail(email)) return { ok: false, message: "Please enter a valid email address" };
   if (!PHONE_PATTERN.test(phone)) return { ok: false, message: "Please enter a valid phone number" };
   if (!ROLE_PATTERN.test(role)) return { ok: false, message: "Please select a valid position" };
-  if (allowedRoles && role !== GENERAL_ROLE && allowedRoles.indexOf(role) === -1) {
+  if (allowedRoles && allowedRoles.indexOf(role) === -1) {
     return { ok: false, message: "Please select a valid position" };
   }
   return {
@@ -266,7 +266,7 @@ function turnstileAction(secret, token) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     SERVICE_SLUGS: SERVICE_SLUGS,
-    GENERAL_ROLE: GENERAL_ROLE,
+    ROLE_PATTERN: ROLE_PATTERN,
     LIMITS: LIMITS,
     MIN_FILL_MS: MIN_FILL_MS,
     MAX_FILL_MS: MAX_FILL_MS,
