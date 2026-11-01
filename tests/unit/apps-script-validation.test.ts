@@ -14,6 +14,7 @@ interface Validation {
   SERVICE_SLUGS: string[];
   LIMITS: Record<string, number>;
   ROLE_PATTERN: RegExp;
+  GENERAL_APPLICATION_ROLE: string;
   CV_MAX_BYTES: number;
   sanitize(v: unknown): string;
   phoneCell(v: unknown): string;
@@ -150,8 +151,25 @@ describe("validateApplication", () => {
     expect(v.validateApplication(goodApplication, null).ok).toBe(true);
     expect(v.validateApplication(goodApplication, ["Senior EIA Coordinator"]).ok).toBe(true);
     expect(v.validateApplication(goodApplication, ["Other Role"]).ok).toBe(false);
-    // No client path sends a generic role (the modal is always opened for a listed job).
-    expect(v.validateApplication({ ...goodApplication, role: "General Application" }, ["Other"]).ok).toBe(false);
+  });
+  it("always accepts the general application role, whatever ALLOWED_ROLES says", () => {
+    const careers = parse(readFileSync(path.join(process.cwd(), "content", "pages", "careers.yaml"), "utf8")) as {
+      openings: { generalRoleLabel: string };
+    };
+    expect(v.validateApplication({ ...goodApplication, role: careers.openings.generalRoleLabel }, ["Other Role"]).ok).toBe(true);
+    expect(v.validateApplication({ ...goodApplication, role: "  GENERAL   application " }, ["Other Role"]).ok).toBe(true);
+    // Allowed titles also match ignoring case and spacing.
+    expect(v.validateApplication({ ...goodApplication, role: "senior  eia coordinator" }, ["Senior EIA Coordinator"]).ok).toBe(true);
+    // Only that one extra role is whitelisted.
+    expect(v.validateApplication({ ...goodApplication, role: "General application team" }, ["Other Role"]).ok).toBe(false);
+  });
+  it("keeps GENERAL_APPLICATION_ROLE in sync with content/pages/careers.yaml", () => {
+    const careers = parse(readFileSync(path.join(process.cwd(), "content", "pages", "careers.yaml"), "utf8")) as {
+      openings: { generalRoleLabel: string };
+    };
+    expect(careers.openings.generalRoleLabel.replace(/\s+/g, " ").trim().toLowerCase()).toBe(
+      v.GENERAL_APPLICATION_ROLE.toLowerCase(),
+    );
   });
   it("rejects odd role text, long fields and missing CV", () => {
     expect(v.validateApplication({ ...goodApplication, role: "=cmd|' /C calc'!A0" }, null).ok).toBe(false);

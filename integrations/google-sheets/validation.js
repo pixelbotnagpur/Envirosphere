@@ -61,6 +61,28 @@ var CV_TYPES = {
 var PHONE_PATTERN = /^(?=(?:\D*\d){8})\+?[0-9 ()-]{8,20}$/;
 var EMAIL_PATTERN = /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/;
 /** Letters/digits (any script) first, then common title punctuation. No = @ or control characters. */
+/**
+ * The role the careers page sends for "send us your CV without a listed job". It is ALWAYS accepted,
+ * even when the owner sets ALLOWED_ROLES. Keep in sync with `generalRoleLabel` in
+ * content/pages/careers.yaml (a unit test enforces this; matching ignores case and extra spaces).
+ */
+var GENERAL_APPLICATION_ROLE = "General application";
+
+/** Case-insensitive, whitespace-normalised key used to compare role titles. */
+function roleKey(role) {
+  return String(role || "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function isAllowedRole(role, allowedRoles) {
+  if (!allowedRoles) return true;
+  var key = roleKey(role);
+  if (key === roleKey(GENERAL_APPLICATION_ROLE)) return true;
+  for (var i = 0; i < allowedRoles.length; i++) {
+    if (roleKey(allowedRoles[i]) === key) return true;
+  }
+  return false;
+}
+
 var ROLE_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M} .,:&()'\u2019\/+\u2013\u2014-]*$/u;
 
 /** Neutralises spreadsheet formulas and removes control characters. Returns a trimmed string. */
@@ -151,8 +173,8 @@ function validateInquiry(payload) {
 
 /**
  * Validates the text fields of an application. `allowedRoles` is an array of role titles
- * or null when the owner has not set the ALLOWED_ROLES script property. The application form is
- * only reachable from a listed job, so there is no generic role.
+ * or null when the owner has not set the ALLOWED_ROLES script property. The general-application
+ * role (GENERAL_APPLICATION_ROLE) is always accepted.
  */
 function validateApplication(payload, allowedRoles) {
   var fields = ["name", "email", "phone", "role", "coverLetter"];
@@ -173,7 +195,7 @@ function validateApplication(payload, allowedRoles) {
   if (!isValidEmail(email)) return { ok: false, message: "Please enter a valid email address" };
   if (!PHONE_PATTERN.test(phone)) return { ok: false, message: "Please enter a valid phone number" };
   if (!ROLE_PATTERN.test(role)) return { ok: false, message: "Please select a valid position" };
-  if (allowedRoles && allowedRoles.indexOf(role) === -1) {
+  if (!isAllowedRole(role, allowedRoles)) {
     return { ok: false, message: "Please select a valid position" };
   }
   return {
@@ -307,6 +329,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     SERVICE_SLUGS: SERVICE_SLUGS,
     ROLE_PATTERN: ROLE_PATTERN,
+    GENERAL_APPLICATION_ROLE: GENERAL_APPLICATION_ROLE,
     LIMITS: LIMITS,
     MIN_FILL_MS: MIN_FILL_MS,
     MAX_FILL_MS: MAX_FILL_MS,

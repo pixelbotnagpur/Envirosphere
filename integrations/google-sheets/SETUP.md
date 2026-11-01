@@ -69,7 +69,7 @@ The script is made of **two files** that you paste into the Apps Script editor:
    - `DRIVE_FOLDER_ID`: The Folder ID copied from Step 2. **Required.**
    - `TURNSTILE_SECRET`: **Required for launch.** Your Cloudflare Turnstile **secret** key (see Step 7). When it is set, every submission must carry a valid Turnstile token; a missing or invalid one is rejected. (If it is left out, the script skips the check, which is only acceptable while you are testing.)
    - `TURNSTILE_ALLOWED_HOSTNAMES`: (Recommended; part of the launch checklist) Comma-separated site hostnames, e.g. `envirosphere.co.in,www.envirosphere.co.in`. When set, a Turnstile token is only accepted if Cloudflare reports one of these hostnames for it, so tokens minted on another site are refused.
-   - `ALLOWED_ROLES`: (Optional) Job titles separated by `|`, for example `Senior EIA Coordinator|Environmental Engineer`. When set, only these roles are accepted. Keep it equal to the titles in `content/jobs.yaml`.
+   - `ALLOWED_ROLES`: (Optional) Job titles separated by `|`, for example `Senior EIA Coordinator|Environmental Engineer`. When set, only these roles are accepted (capital letters and extra spaces are ignored). Keep it equal to the titles in `content/jobs.yaml`. The "General application" option on the Careers page is always accepted, so you do not need to list it.
 4. Click **Save script properties**.
 
 ---
