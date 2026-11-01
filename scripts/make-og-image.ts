@@ -3,9 +3,9 @@ import path from "node:path";
 import sharp from "sharp";
 
 // Builds the social-sharing image (1200x630 JPEG) from a real operational photo.
-// Source: public/media/gallery/g22.png (ecological quadrat survey, forest). Re-running overwrites the output.
+// Source: public/media/gallery/g22.webp (ecological quadrat survey, forest). Re-running overwrites the output.
 // Usage: pnpm exec tsx scripts/make-og-image.ts
-const SOURCE = "public/media/gallery/g22.png";
+const SOURCE = "public/media/gallery/g22.webp";
 const OUTPUT = "public/media/brand/og-image.jpg";
 const WIDTH = 1200;
 const HEIGHT = 630;
