@@ -9,6 +9,8 @@ common:
   # Name used in the list above for a problem that belongs to no field.
   formLabel: Form
   verificationRequired: Please complete the verification check, then submit again.
+  # Shown (nothing is sent) when the form is submitted within the first 3 seconds, for example after autofill.
+  tooFast: Almost there. Please wait a moment, then press the button again to send.
   submitting: Transmitting...
   # Label of the hidden spam-trap field. Visitors never see it.
   honeypotLabel: Website

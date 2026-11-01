@@ -21,7 +21,8 @@ import { submitForm, submitMessage } from "@/lib/forms/submit";
 import { fillText } from "@/lib/forms/text";
 import {
   createApplicationSchema,
-  isBotSubmission,
+  isHoneypotFilled,
+  isTooFast,
   type ApplicationInput,
   type CvFileInput,
 } from "@/lib/validators/forms";
@@ -86,6 +87,7 @@ export function ApplicationModal({
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
+  const [tooFast, setTooFast] = React.useState(false);
   const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
   const [turnstileReset, setTurnstileReset] = React.useState(0);
 
@@ -202,6 +204,7 @@ export function ApplicationModal({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setTooFast(false);
 
     const fillMs = Math.round(performance.now() - openedAtRef.current);
     const payload = { ...formData, cvFile: cvFile ?? undefined, fillMs };
@@ -227,9 +230,14 @@ export function ApplicationModal({
       return;
     }
 
-    if (isBotSubmission({ website: formData.website, fillMs })) {
+    if (isHoneypotFilled({ website: formData.website })) {
       setStatus("success");
       setStatusMessage(application.success.logged);
+      return;
+    }
+    // A fast submit (autofill) would be refused by the server: ask the person to press again.
+    if (isTooFast(fillMs)) {
+      setTooFast(true);
       return;
     }
 
@@ -517,6 +525,10 @@ export function ApplicationModal({
                       </div>
                     </div>
                   ) : null}
+
+                  <p role="status" className="text-sm text-muted-foreground">
+                    {tooFast ? common.tooFast : null}
+                  </p>
 
                   <div className="mt-6 flex items-center justify-end gap-3 pt-2">
                     <Dialog.Close asChild>

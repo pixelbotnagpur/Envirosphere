@@ -101,11 +101,21 @@ export function isBotSubmission(
   data: { website?: string; fillMs?: number },
   minFillTimeMs = process.env.NODE_ENV === "test" ? 0 : 3000,
 ): boolean {
-  if (data.website && data.website.trim().length > 0) {
-    return true;
-  }
-  if (typeof data.fillMs === "number" && data.fillMs < minFillTimeMs) {
-    return true;
-  }
-  return false;
+  return isHoneypotFilled(data) || isTooFast(data.fillMs, minFillTimeMs);
+}
+
+/** True when the hidden trap field has text in it (only bots and some autofill do that). */
+export function isHoneypotFilled(data: { website?: string }): boolean {
+  return Boolean(data.website && data.website.trim().length > 0);
+}
+
+/**
+ * True when the form was sent sooner than the server accepts. This is NOT proof of a bot (autofill
+ * is fast), so the form asks the visitor to press submit again instead of pretending it was sent.
+ */
+export function isTooFast(
+  fillMs: number | undefined,
+  minFillTimeMs = process.env.NODE_ENV === "test" ? 0 : 3000,
+): boolean {
+  return typeof fillMs === "number" && fillMs < minFillTimeMs;
 }

@@ -16,7 +16,7 @@ import {
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { collectFieldErrors, firstInvalidField } from "@/lib/forms/errors";
 import { submitForm, submitMessage } from "@/lib/forms/submit";
-import { createInquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
+import { createInquirySchema, isHoneypotFilled, isTooFast, type InquiryInput } from "@/lib/validators/forms";
 import type { FormsContent } from "@/lib/validators/forms-content";
 
 export interface InquiryFormProps {
@@ -68,6 +68,7 @@ export function InquiryForm({
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
+  const [tooFast, setTooFast] = React.useState(false);
   const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
   const [turnstileReset, setTurnstileReset] = React.useState(0);
 
@@ -116,6 +117,7 @@ export function InquiryForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setTooFast(false);
 
     // 1. Zod Validation (fill time is elapsed ms on the visitor's own clock)
     const fillMs = Math.round(performance.now() - openedAtRef.current);
@@ -139,11 +141,16 @@ export function InquiryForm({
       return;
     }
 
-    // 2. Anti-abuse check (honeypot or sub-3s submit)
-    if (isBotSubmission({ website: formData.website, fillMs })) {
-      // Fake success for bots to prevent adversarial learning
+    // 2. Anti-abuse check. A filled honeypot gets a silent fake success (bots learn nothing). A
+    // fast submit (autofill) is sent nowhere: the server would refuse it, so ask the person to
+    // press the button again instead of pretending it worked.
+    if (isHoneypotFilled({ website: formData.website })) {
       setStatus("success");
       setStatusMessage(inquiry.success.received);
+      return;
+    }
+    if (isTooFast(fillMs)) {
+      setTooFast(true);
       return;
     }
 
@@ -401,6 +408,10 @@ export function InquiryForm({
           </div>
         </div>
       ) : null}
+
+      <p role="status" className="mt-6 text-sm text-muted-foreground">
+        {tooFast ? common.tooFast : null}
+      </p>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
         <Button

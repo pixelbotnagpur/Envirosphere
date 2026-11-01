@@ -83,7 +83,7 @@ To add client logos: add the file to `public/media/clients/`, add an entry to `m
 
 ## The two forms (`content/forms.yaml`)
 Every word of the enquiry form (Contact page) and the job application window (Careers page) is in `content/forms.yaml`:
-- `common`: the "please check these fields" heading, the sending/verification texts, and `submit` (what is shown after sending when the server sends no text of its own; `{status}` and `{error}` are replaced when shown).
+- `common`: the "please check these fields" heading, the sending/verification texts, `tooFast` (shown when the form is sent within 3 seconds of opening, e.g. after autofill: nothing is sent and the visitor presses the button again), and `submit` (what is shown after sending when the server sends no text of its own; `{status}` and `{error}` are replaced when shown).
 - `inquiry` and `application`: each field's `label` and `placeholder` (`summaryLabel` is the shorter name used in the "please check" list), the error messages (`errors`), button texts and the success texts. In the application window `{role}` is replaced by the job title and `{size}` by the file size.
 - The phone number and email shown when sending fails are NOT written here: they are the ones in `content/site.yaml`. For job applications the email is `contact.careersEmail` when you add that line to `site.yaml`; if you leave it out the main `contact.email` is used (no other address is ever invented).
 - The texts of each opening on the Careers page ("Key Requirements:", "Apply with CV", "Apply via Email", the email subject with `{title}`) are in `pages/careers.yaml` under `openings`.

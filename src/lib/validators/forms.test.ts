@@ -5,6 +5,8 @@ import {
   createCvFileSchema,
   createInquirySchema,
   isBotSubmission,
+  isHoneypotFilled,
+  isTooFast,
 } from "./forms";
 
 const inquirySchema = createInquirySchema(forms.inquiry.errors);
@@ -129,6 +131,16 @@ describe("isBotSubmission", () => {
 
   it("passes legitimate submissions", () => {
     expect(isBotSubmission({ website: "", fillMs: 5000 }, 3000)).toBe(false);
+  });
+});
+
+describe("isHoneypotFilled / isTooFast", () => {
+  it("tells the trap field apart from a fast fill", () => {
+    expect(isHoneypotFilled({ website: " x " })).toBe(true);
+    expect(isHoneypotFilled({ website: "  " })).toBe(false);
+    expect(isTooFast(2999, 3000)).toBe(true);
+    expect(isTooFast(3000, 3000)).toBe(false);
+    expect(isTooFast(undefined, 3000)).toBe(false);
   });
 });
 

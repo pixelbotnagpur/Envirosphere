@@ -333,4 +333,36 @@ describe("ApplicationModal", () => {
       expect(screen.queryByText(/Bot detected/)).toBeNull();
     });
   });
+
+  async function fillValid(user: ReturnType<typeof userEvent.setup>) {
+    await user.type(screen.getByLabelText(rx(forms.application.fields.name.label)), "Pooja Deshmukh");
+    await user.type(screen.getByLabelText(rx(forms.application.fields.email.label)), "pooja@gmail.com");
+    await user.type(screen.getByLabelText(rx(forms.application.fields.phone.label)), "+91 98602 20550");
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [new File(["dummy"], "resume.pdf", { type: "application/pdf" })] } });
+    await waitFor(() => expect(screen.getByText("resume.pdf")).toBeInTheDocument());
+  }
+
+  it("does not send a too-fast submit and asks the visitor to press again", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const submitSpy = vi
+      .spyOn(submitClient, "submitForm")
+      .mockResolvedValue({ success: true, outcome: "sent", serverMessage: "ok" });
+    const user = userEvent.setup();
+    const t0 = performance.now();
+    render(<ApplicationModal copy={forms} role="Senior EIA Coordinator" isOpen={true} onClose={vi.fn()} />);
+    await fillValid(user);
+    const nowSpy = vi.spyOn(performance, "now");
+    nowSpy.mockReturnValue(t0 + 100); // 0.1 s after the form opened: far under 3 s
+    await user.click(screen.getByRole("button", { name: forms.application.submitLabel }));
+    expect(screen.getByRole("status")).toHaveTextContent(forms.common.tooFast);
+    expect(submitSpy).not.toHaveBeenCalled();
+    expect(screen.queryByText(forms.application.success.heading)).not.toBeInTheDocument();
+
+    // After the delay the same button sends it.
+    nowSpy.mockReturnValue(t0 + 5000);
+    await user.click(screen.getByRole("button", { name: forms.application.submitLabel }));
+    await waitFor(() => expect(submitSpy).toHaveBeenCalledTimes(1));
+    vi.unstubAllEnvs();
+  });
 });

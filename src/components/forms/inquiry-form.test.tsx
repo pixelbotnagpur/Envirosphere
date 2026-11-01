@@ -206,4 +206,31 @@ describe("InquiryForm", () => {
       expect(screen.queryByText(/Bot detected/)).toBeNull();
     });
   });
+
+  it("does not send a too-fast submit (autofill) and asks the visitor to press again", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const submitSpy = vi
+      .spyOn(submitClient, "submitForm")
+      .mockResolvedValue({ success: true, outcome: "sent", serverMessage: "ok" });
+    const user = userEvent.setup();
+    const t0 = performance.now();
+    render(<InquiryForm copy={forms} services={services} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} />);
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.name.label)), "Dr. Rajesh Sharma");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.email.label)), "rajesh@bharatchem.in");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.phone.label)), "+91 98602 20550");
+    await user.selectOptions(screen.getByLabelText(rx(forms.inquiry.fields.service.label)), "water-audit");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.message.label)), "Comprehensive water balance and audit required.");
+    const nowSpy = vi.spyOn(performance, "now");
+    nowSpy.mockReturnValue(t0 + 100);
+
+    await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
+    expect(screen.getByRole("status")).toHaveTextContent(forms.common.tooFast);
+    expect(submitSpy).not.toHaveBeenCalled();
+    expect(screen.queryByText(forms.inquiry.success.heading)).not.toBeInTheDocument();
+
+    nowSpy.mockReturnValue(t0 + 5000);
+    await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
+    await waitFor(() => expect(submitSpy).toHaveBeenCalledTimes(1));
+    vi.unstubAllEnvs();
+  });
 });

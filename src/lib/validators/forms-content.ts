@@ -27,6 +27,8 @@ export const formsSchema = z.object({
     /** Name used in the error summary for a problem that belongs to no field. */
     formLabel: text,
     verificationRequired: text,
+    /** Shown when the form is sent within the first seconds (autofill): asks to press submit again. */
+    tooFast: text,
     submitting: text,
     /** Label of the hidden spam-trap field (never seen by visitors, read by nobody). */
     honeypotLabel: text,
