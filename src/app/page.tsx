@@ -29,7 +29,7 @@ export default function HomePage() {
       tag: "[ WATER INFRASTRUCTURE ]",
       summary:
         "Turnkey civil-mechanical design, zero liquid discharge (ZLD) systems, and statutory consent management for industrial water treatment.",
-      href: "/services/etp-stp-operation-maintenance/",
+      href: "/services/water-wastewater-treatment/",
       image: getImageAsset("clean-water-facility"),
     },
     {
