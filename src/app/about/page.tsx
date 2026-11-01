@@ -127,10 +127,10 @@ export default function AboutPage() {
             Head office in Pune, with branch offices in Mumbai, Tarapur, Nashik and Nagpur.
           </p>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div data-card-grid="" className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {site.offices.map((office, idx) => (
-              <Reveal key={office.city} delay={staggerDelay(idx, 0.08)}>
-                <div className="h-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
+              <Reveal key={office.city} delay={staggerDelay(idx, 0.08)} data-card="" className="flex">
+                <div className="flex w-full flex-col justify-between rounded-card border border-border bg-background p-8">
                   <div>
                     <div className="flex items-center gap-2 text-label text-muted-foreground uppercase tracking-label">
                       <Building2 aria-hidden="true" className="size-4 text-primary" />

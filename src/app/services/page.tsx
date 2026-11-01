@@ -42,11 +42,11 @@ export default function ServicesPage() {
       {/* Services Grid */}
       <section aria-label="Services List" className="border-t border-border bg-surface py-section">
         <Container>
-          <ol className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ol data-card-grid="" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service, idx) => {
               const imageAsset = service.image ? getImageAsset(service.image) : null;
               return (
-                <li key={service.slug} className="flex">
+                <li key={service.slug} data-card="" className="flex">
                   <Reveal delay={staggerDelay(idx, 0.04)} className="flex w-full">
                     <Link
                       href={`/services/${service.slug}/`}

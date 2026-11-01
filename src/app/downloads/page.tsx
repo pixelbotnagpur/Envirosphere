@@ -44,11 +44,11 @@ export default function DownloadsPage() {
               There are no documents to download yet.
             </p>
           ) : null}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div data-card-grid="" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {downloads.map((item, idx) => {
               const mediaItem = getImage(item.fileKey);
               return (
-                <Reveal key={item.id} delay={staggerDelay(idx, 0.08)} className="flex">
+                <Reveal key={item.id} delay={staggerDelay(idx, 0.08)} data-card="" className="flex">
                   <div className="h-full w-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">

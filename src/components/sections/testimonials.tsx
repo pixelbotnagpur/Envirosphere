@@ -37,10 +37,10 @@ export function Testimonials({ index, label, heading, items }: TestimonialsProps
           </Reveal>
         ) : null}
         {rest.length > 0 ? (
-          <div className="mt-16 grid gap-6 md:grid-cols-3">
+          <div data-card-grid="" className="mt-16 grid gap-6 md:grid-cols-3">
             {rest.map((item, position) => (
-              <Reveal key={item.name} delay={position * 0.1}>
-                <figure className="h-full rounded-card bg-background p-8">
+              <Reveal key={item.name} delay={position * 0.1} data-card="" className="flex">
+                <figure className="w-full rounded-card bg-background p-8">
                   <blockquote className="text-lead font-light">{item.quote}</blockquote>
                   <Author name={item.name} role={item.role} />
                 </figure>
