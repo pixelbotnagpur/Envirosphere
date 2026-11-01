@@ -60,9 +60,9 @@ export function ServicesIndex({
               <Reveal key={item.title}>
                 <Link
                   href={item.href}
-                  className="group flex flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) ease-out-expo hover:shadow-xl"
+                  className="group flex flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) ease-out-expo hover:shadow-card"
                 >
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
                     <Image
                       src={item.image.src}
                       alt={item.image.alt}
@@ -70,7 +70,7 @@ export function ServicesIndex({
                       height={item.image.height}
                       className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo group-hover:scale-105"
                     />
-                    <div className="absolute top-4 left-4 rounded-full border border-primary-foreground/20 bg-primary/75 px-3 py-1 text-label uppercase tracking-label text-primary-foreground backdrop-blur-xs">
+                    <div className="absolute top-4 left-4 rounded-pill border border-primary-foreground/20 bg-primary/75 px-3 py-1 text-label uppercase tracking-label text-primary-foreground backdrop-blur-xs">
                       {item.tag}
                     </div>
                   </div>

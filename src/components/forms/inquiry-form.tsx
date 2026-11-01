@@ -190,7 +190,7 @@ export function InquiryForm({
             className="mt-2"
           />
           {fieldErrors.name ? (
-            <p className="mt-1.5 text-xs text-destructive">{fieldErrors.name}</p>
+            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.name}</p>
           ) : null}
         </div>
 
@@ -210,7 +210,7 @@ export function InquiryForm({
             className="mt-2"
           />
           {fieldErrors.organization ? (
-            <p className="mt-1.5 text-xs text-destructive">{fieldErrors.organization}</p>
+            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.organization}</p>
           ) : null}
         </div>
 
@@ -231,7 +231,7 @@ export function InquiryForm({
             className="mt-2"
           />
           {fieldErrors.email ? (
-            <p className="mt-1.5 text-xs text-destructive">{fieldErrors.email}</p>
+            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.email}</p>
           ) : null}
         </div>
 
@@ -252,7 +252,7 @@ export function InquiryForm({
             className="mt-2"
           />
           {fieldErrors.phone ? (
-            <p className="mt-1.5 text-xs text-destructive">{fieldErrors.phone}</p>
+            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.phone}</p>
           ) : null}
         </div>
       </div>
@@ -278,7 +278,7 @@ export function InquiryForm({
           ))}
         </Select>
         {fieldErrors.service ? (
-          <p className="mt-1.5 text-xs text-destructive">{fieldErrors.service}</p>
+          <p className="mt-1.5 text-sm text-destructive">{fieldErrors.service}</p>
         ) : null}
       </div>
 
@@ -298,30 +298,30 @@ export function InquiryForm({
           className="mt-2"
         />
         {fieldErrors.message ? (
-          <p className="mt-1.5 text-xs text-destructive">{fieldErrors.message}</p>
+          <p className="mt-1.5 text-sm text-destructive">{fieldErrors.message}</p>
         ) : null}
       </div>
 
       {status === "error" ? (
-        <div className="mt-6 rounded-card border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground">
+        <div className="mt-6 rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
           <div className="flex items-start gap-3">
             <AlertCircle className="size-5 shrink-0 text-destructive mt-0.5" aria-hidden="true" />
             <div className="flex-1">
               <p className="font-normal text-destructive">{statusMessage}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-sm text-muted-foreground">
                 You can reach our compliance desk directly:
               </p>
               <div className="mt-3 flex flex-wrap gap-4">
                 <a
                   href={`tel:${phoneFallback.replace(/\s+/g, "")}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-normal text-primary hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-normal text-primary hover:underline"
                 >
                   <Phone className="size-3.5" aria-hidden="true" />
                   {phoneFallback}
                 </a>
                 <a
                   href={`mailto:${emailFallback}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-normal text-primary hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-normal text-primary hover:underline"
                 >
                   <Mail className="size-3.5" aria-hidden="true" />
                   {emailFallback}
@@ -333,7 +333,7 @@ export function InquiryForm({
       ) : null}
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Your project details are kept confidential under our professional code of conduct.
         </p>
         <Button

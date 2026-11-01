@@ -63,7 +63,7 @@ export default function ServicesPage() {
                         </div>
 
                         {imageAsset ? (
-                          <div className="mt-5 aspect-[16/10] w-full overflow-hidden rounded-md border border-border bg-surface">
+                          <div className="mt-5 aspect-[16/10] w-full overflow-hidden rounded-control border border-border bg-surface">
                             <Image
                               src={imageAsset.src}
                               alt={imageAsset.alt}

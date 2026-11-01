@@ -50,7 +50,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
   }, [open]);
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-(--z-header) w-full transition-colors duration-base">
+    <header className="fixed top-0 right-0 left-0 z-(--z-header) w-full transition-colors duration-(--duration-base)">
       {/* Sliding background container that slides down on scroll */}
       <div
         aria-hidden="true"
@@ -64,7 +64,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           <span
             className={cn(
-              "inline-flex items-center justify-center rounded-full transition-all duration-base",
+              "inline-flex items-center justify-center rounded-pill transition-all duration-(--duration-base)",
               isDarkHero ? "ring-1 ring-primary-foreground/25" : "ring-0",
             )}
           >
@@ -72,7 +72,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
           </span>
           <span
             className={cn(
-              "font-heading text-h4 transition-colors duration-base",
+              "font-heading text-h4 transition-colors duration-(--duration-base)",
               isDarkHero ? "text-primary-foreground" : "text-foreground",
             )}
           >
@@ -86,7 +86,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
               key={item.href}
               href={item.href}
               className={cn(
-                "text-sm underline-offset-8 transition-colors duration-base hover:underline",
+                "text-sm underline-offset-8 transition-colors duration-(--duration-base) hover:underline",
                 isDarkHero
                   ? "text-primary-foreground/80 hover:text-primary-foreground"
                   : "text-foreground/80 hover:text-foreground",
@@ -107,7 +107,7 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
             ref={toggleRef}
             type="button"
             className={cn(
-              "inline-flex size-11 items-center justify-center rounded-pill border transition-colors duration-base lg:hidden",
+              "inline-flex size-11 items-center justify-center rounded-pill border transition-colors duration-(--duration-base) lg:hidden",
               isDarkHero
                 ? "border-primary-foreground/30 text-primary-foreground"
                 : "border-border text-foreground",

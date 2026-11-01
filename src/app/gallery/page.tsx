@@ -50,7 +50,7 @@ export default function GalleryPage() {
                         height={imageAsset.height}
                         className="h-full w-full object-cover transition-transform duration-(--duration-base) ease-out-expo group-hover:scale-105"
                       />
-                      <span className="absolute top-4 left-4 rounded-pill bg-background/90 backdrop-blur-sm border border-border px-3 py-1 text-xs uppercase tracking-label font-normal text-foreground">
+                      <span className="absolute top-4 left-4 rounded-pill bg-background/90 backdrop-blur-sm border border-border px-3 py-1 text-label uppercase tracking-label font-normal text-foreground">
                         {item.category}
                       </span>
                     </div>

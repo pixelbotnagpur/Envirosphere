@@ -90,7 +90,7 @@ export default function WhyUsPage() {
                       </p>
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-xs text-primary font-normal">
+                    <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-sm text-primary font-normal">
                       <CheckCircle2 aria-hidden="true" className="size-3.5" />
                       <span>Verified Compliance Delivery</span>
                     </div>

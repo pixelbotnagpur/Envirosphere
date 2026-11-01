@@ -58,7 +58,7 @@ export default function ContactPage() {
                 />
               </div>
 
-              <div className="mt-8 pt-6 border-t border-border flex items-center gap-2 text-xs text-muted-foreground font-light">
+              <div className="mt-8 pt-6 border-t border-border flex items-center gap-2 text-sm text-muted-foreground font-light">
                 <ShieldCheck aria-hidden="true" className="size-4 text-primary shrink-0" />
                 <span>Your project data is handled under strict professional non-disclosure protocols.</span>
               </div>
@@ -83,7 +83,7 @@ export default function ContactPage() {
                     <Phone aria-hidden="true" className="size-4" />
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-label text-muted-foreground">Primary Line</span>
+                    <span className="block text-label uppercase tracking-label text-muted-foreground">Primary Line</span>
                     <span className="text-sm font-normal text-foreground">{site.contact.phones[0]}</span>
                   </div>
                 </a>
@@ -97,7 +97,7 @@ export default function ContactPage() {
                       <Phone aria-hidden="true" className="size-4" />
                     </div>
                     <div>
-                      <span className="block text-xs uppercase tracking-label text-muted-foreground">Secondary Line</span>
+                      <span className="block text-label uppercase tracking-label text-muted-foreground">Secondary Line</span>
                       <span className="text-sm font-normal text-foreground">{site.contact.phones[1]}</span>
                     </div>
                   </a>
@@ -111,7 +111,7 @@ export default function ContactPage() {
                     <Mail aria-hidden="true" className="size-4" />
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-label text-muted-foreground">Office Email</span>
+                    <span className="block text-label uppercase tracking-label text-muted-foreground">Office Email</span>
                     <span className="text-sm font-normal text-foreground">{site.contact.email}</span>
                   </div>
                 </a>
@@ -126,7 +126,7 @@ export default function ContactPage() {
                     <MessageSquare aria-hidden="true" className="size-4" />
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-label text-muted-foreground">WhatsApp Business</span>
+                    <span className="block text-label uppercase tracking-label text-muted-foreground">WhatsApp Business</span>
                     <span className="text-sm font-normal text-foreground">Direct Technical Messaging</span>
                   </div>
                 </a>
@@ -135,7 +135,7 @@ export default function ContactPage() {
 
             {/* Pune Head Office Card */}
             <div className="rounded-card border border-border bg-background p-8">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-label">
+              <div className="flex items-center gap-2 text-label text-muted-foreground uppercase tracking-label">
                 <Building2 aria-hidden="true" className="size-4 text-primary" />
                 <span>Corporate Headquarters</span>
               </div>
@@ -144,7 +144,7 @@ export default function ContactPage() {
                 {site.contact.address}
               </p>
 
-              <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock aria-hidden="true" className="size-4 text-primary" />
                 <span>Monday – Saturday: 9:30 AM – 6:30 PM IST</span>
               </div>
@@ -152,7 +152,7 @@ export default function ContactPage() {
 
             {/* Branch Network Summary */}
             <div className="rounded-card border border-border bg-background p-8">
-              <span className="text-xs text-muted-foreground uppercase tracking-label">Regional Presence</span>
+              <span className="text-label text-muted-foreground uppercase tracking-label">Regional Presence</span>
               <h4 className="mt-2 text-h4">Branch Office Network</h4>
               <ul className="mt-4 grid grid-cols-2 gap-3 text-sm text-foreground/80 font-light">
                 {site.offices.filter((o) => o.city !== "Pune").map((office) => (

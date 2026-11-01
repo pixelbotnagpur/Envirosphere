@@ -45,10 +45,10 @@ export default function DownloadsPage() {
                   <div className="h-full w-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="rounded-pill border border-border bg-surface px-3 py-1 text-xs uppercase tracking-label font-normal text-muted-foreground">
+                        <span className="rounded-pill border border-border bg-surface px-3 py-1 text-label uppercase tracking-label font-normal text-muted-foreground">
                           {item.category}
                         </span>
-                        <span className="text-xs text-muted-foreground tabular-nums font-mono">
+                        <span className="text-sm text-muted-foreground tabular-nums ">
                           {item.format} {item.size ? `• ${item.size}` : ""}
                         </span>
                       </div>

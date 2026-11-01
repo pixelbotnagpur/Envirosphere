@@ -161,7 +161,7 @@ export default function AboutPage() {
               <Reveal key={office.city} delay={idx * 0.08}>
                 <div className="h-full rounded-card border border-border bg-background p-8 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-label">
+                    <div className="flex items-center gap-2 text-label text-muted-foreground uppercase tracking-label">
                       <Building2 aria-hidden="true" className="size-4 text-primary" />
                       <span>{office.name}</span>
                     </div>
@@ -170,7 +170,7 @@ export default function AboutPage() {
                       {office.address ?? `${office.city} Regional Operations Office, Maharashtra, India.`}
                     </p>
                   </div>
-                  <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
                     <MapPin aria-hidden="true" className="size-3.5 text-primary" />
                     <span>Active Regulatory Jurisdiction</span>
                   </div>

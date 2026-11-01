@@ -253,7 +253,7 @@ export function ApplicationModal({
                   className="mt-1.5"
                 />
                 {fieldErrors.name ? (
-                  <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+                  <p className="mt-1 text-sm text-destructive">{fieldErrors.name}</p>
                 ) : null}
               </div>
 
@@ -274,7 +274,7 @@ export function ApplicationModal({
                     className="mt-1.5"
                   />
                   {fieldErrors.email ? (
-                    <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+                    <p className="mt-1 text-sm text-destructive">{fieldErrors.email}</p>
                   ) : null}
                 </div>
 
@@ -294,7 +294,7 @@ export function ApplicationModal({
                     className="mt-1.5"
                   />
                   {fieldErrors.phone ? (
-                    <p className="mt-1 text-xs text-destructive">{fieldErrors.phone}</p>
+                    <p className="mt-1 text-sm text-destructive">{fieldErrors.phone}</p>
                   ) : null}
                 </div>
               </div>
@@ -324,7 +324,7 @@ export function ApplicationModal({
                     <div className="flex items-center gap-2 truncate">
                       <FileText className="size-4 shrink-0 text-primary" aria-hidden="true" />
                       <span className="truncate text-foreground font-normal">{cvFile.name}</span>
-                      <span className="text-xs text-muted-foreground shrink-0">
+                      <span className="text-sm text-muted-foreground shrink-0">
                         ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
@@ -343,7 +343,7 @@ export function ApplicationModal({
                     <span className="mt-2 text-sm text-foreground font-normal">
                       Click to choose or drag CV file
                     </span>
-                    <span className="mt-1 text-xs text-muted-foreground">PDF, DOC, or DOCX (up to 5 MB)</span>
+                    <span className="mt-1 text-sm text-muted-foreground">PDF, DOC, or DOCX (up to 5 MB)</span>
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -354,22 +354,22 @@ export function ApplicationModal({
                 )}
 
                 {fileError ? (
-                  <p className="mt-1.5 text-xs text-destructive">{fileError}</p>
+                  <p className="mt-1.5 text-sm text-destructive">{fileError}</p>
                 ) : null}
               </div>
 
               {status === "error" ? (
-                <div className="rounded-card border border-destructive/30 bg-destructive/5 p-4 text-sm text-foreground">
+                <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
                   <div className="flex items-start gap-3">
                     <AlertCircle className="size-5 shrink-0 text-destructive mt-0.5" aria-hidden="true" />
                     <div className="flex-1">
                       <p className="text-destructive">{statusMessage}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Please email your CV directly with subject &quot;Application: {role}&quot;:
                       </p>
                       <a
                         href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
-                        className="mt-2 inline-block text-xs text-primary font-normal hover:underline"
+                        className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
                       >
                         {emailFallback}
                       </a>

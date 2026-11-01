@@ -44,7 +44,7 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
               ].map((pill) => (
                 <span
                   key={pill}
-                  className="rounded-full border border-border bg-surface px-4 py-1.5 text-label uppercase tracking-label text-muted-foreground"
+                  className="rounded-pill border border-border bg-surface px-4 py-1.5 text-label uppercase tracking-label text-muted-foreground"
                 >
                   {pill}
                 </span>
@@ -60,7 +60,7 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
         </div>
         <div className="lg:col-span-5">
           <div className="relative">
-            <Parallax className="aspect-[4/5] overflow-hidden rounded-card border border-border bg-muted shadow-2xl">
+            <Parallax className="aspect-[4/5] overflow-hidden rounded-card border border-border bg-surface shadow-card">
               <Image
                 src={image.src}
                 alt={image.alt}
@@ -69,7 +69,7 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
                 className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo hover:scale-105"
               />
             </Parallax>
-            <div className="absolute -bottom-6 -left-6 hidden max-w-xs rounded-card border border-border/80 bg-background/95 p-6 shadow-xl backdrop-blur-md sm:block">
+            <div className="absolute -bottom-6 -left-6 hidden max-w-xs rounded-card border border-border/80 bg-background/95 p-6 shadow-card backdrop-blur-md sm:block">
               <span className="text-label uppercase tracking-label text-secondary">
                 [ 25+ YEARS PRACTICE ]
               </span>

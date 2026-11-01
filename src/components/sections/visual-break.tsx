@@ -20,7 +20,7 @@ export function VisualBreak({
     <section className="bg-background py-8 sm:py-12">
       <Container>
         <Reveal>
-          <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-card border border-border bg-muted shadow-2xl sm:aspect-[2/1] lg:aspect-[2.4/1]">
+          <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-card border border-border bg-surface shadow-card sm:aspect-[2/1] lg:aspect-[2.4/1]">
             <Image
               src={image.src}
               alt={image.alt}
@@ -33,8 +33,8 @@ export function VisualBreak({
 
             {/* Top pill badge */}
             <div className="absolute top-6 left-6 flex items-center gap-3">
-              <span className="flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary/70 px-4 py-1.5 text-label uppercase tracking-label text-primary-foreground backdrop-blur-md">
-                <span className="size-1.5 rounded-full bg-accent" />
+              <span className="flex items-center gap-2 rounded-pill border border-primary-foreground/25 bg-primary/70 px-4 py-1.5 text-label uppercase tracking-label text-primary-foreground backdrop-blur-md">
+                <span className="size-1.5 rounded-pill bg-accent" />
                 <span>{tag}</span>
               </span>
             </div>

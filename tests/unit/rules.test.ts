@@ -64,6 +64,37 @@ describe("project rules are enforced in src/", () => {
     expect(offenders(/\boutline-(?:none|hidden|0)\b/, /\.tsx?$/)).toEqual([]);
   });
 
+  it("no font-mono (exactly two font families)", () => {
+    expect(offenders(/(?<![\w-])font-mono\b/, /\.tsx?$/)).toEqual([]);
+  });
+
+  it("no Tailwind default radius utilities (use rounded-control|card|pill)", () => {
+    expect(
+      offenders(
+        /(?<![\w-])rounded(?:-[trblse]{1,2})?-(?:xs|sm|md|lg|xl|2xl|3xl|4xl|full)\b/,
+        /\.tsx?$/,
+      ),
+    ).toEqual([]);
+  });
+
+  it("no Tailwind default shadow utilities (use shadow-card)", () => {
+    expect(
+      offenders(/(?<![\w-])shadow-(?:2xs|xs|sm|md|lg|xl|2xl|inner)\b/, /\.tsx$/),
+    ).toEqual([]);
+  });
+
+  it("no Tailwind default text-size utilities (use text-display|h1..h4|lead|base|sm|label)", () => {
+    expect(
+      offenders(/(?<![\w-])text-(?:xs|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/, /\.tsx$/),
+    ).toEqual([]);
+  });
+
+  it("no dead classes that Tailwind never generates for our tokens", () => {
+    expect(offenders(/(?<![\w-])bg-muted\b/, /\.tsx$/)).toEqual([]);
+    expect(offenders(/(?<![\w-])duration-base\b/, /\.tsx$/)).toEqual([]);
+    expect(offenders(/bg-destructive\/5\b|border-destructive\/30\b/, /\.tsx$/)).toEqual([]);
+  });
+
   it("ui and motion never import content, sections or app (rule 70)", () => {
     const forbidden = ["lib/content", "components/sections", "app"].map((d) => path.join(root, d));
     const bad: string[] = [];

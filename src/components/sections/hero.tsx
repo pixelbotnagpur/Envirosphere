@@ -88,20 +88,20 @@ export function Hero({
           <div className="flex flex-wrap items-center justify-between gap-6 border-t border-primary-foreground/20 pt-6">
             <div className="flex flex-wrap items-center gap-6 text-label uppercase tracking-label text-primary-foreground/80">
               <div className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-accent" />
+                <span className="size-2 rounded-pill bg-accent" />
                 <span>250+ Clearances Delivered</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-secondary" />
+                <span className="size-2 rounded-pill bg-secondary" />
                 <span>Category A QCI NABET</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-accent" />
+                <span className="size-2 rounded-pill bg-accent" />
                 <span>Zero Compliance Violations</span>
               </div>
             </div>
 
-            <div className="hidden rounded-full border border-primary-foreground/25 bg-primary/60 px-4 py-1.5 text-label uppercase tracking-label text-secondary backdrop-blur-md sm:block">
+            <div className="hidden rounded-pill border border-primary-foreground/25 bg-primary/60 px-4 py-1.5 text-label uppercase tracking-label text-secondary backdrop-blur-md sm:block">
               [ PUNE &bull; MUMBAI &bull; DELHI &bull; PAN-INDIA ]
             </div>
           </div>
@@ -109,7 +109,7 @@ export function Hero({
           {/* Bottom Scroll Indicator Bar */}
           <div className="mt-6 flex items-center justify-between border-t border-primary-foreground/20 pt-4 text-label uppercase tracking-label text-primary-foreground/80">
             <div className="flex items-center gap-3">
-              <span className="flex size-7 items-center justify-center rounded-full border border-primary-foreground/40">
+              <span className="flex size-7 items-center justify-center rounded-pill border border-primary-foreground/40">
                 <ArrowDown aria-hidden="true" className="size-3.5 animate-bounce" />
               </span>
               <span>{scrollLabel}</span>

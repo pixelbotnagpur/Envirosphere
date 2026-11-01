@@ -25,7 +25,7 @@ export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
           >
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               <div className="max-w-2xl">
-                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground uppercase tracking-label">
+                <div className="flex flex-wrap items-center gap-3 text-label text-muted-foreground uppercase tracking-label">
                   <span className="flex items-center gap-1.5">
                     <Building2 aria-hidden="true" className="size-3.5 text-primary" />
                     {job.department}
@@ -48,7 +48,7 @@ export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
                 </p>
 
                 <div className="mt-6">
-                  <h4 className="text-xs uppercase tracking-label text-muted-foreground">
+                  <h4 className="text-label uppercase tracking-label text-muted-foreground">
                     Key Requirements:
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground font-light">
@@ -83,7 +83,7 @@ export function JobOpeningsList({ jobs, contactEmail }: JobOpeningsListProps) {
                     Apply via Email
                   </a>
                 </Button>
-                <span className="text-xs text-muted-foreground text-center">
+                <span className="text-sm text-muted-foreground text-center">
                   Direct submission to HR panel
                 </span>
               </div>

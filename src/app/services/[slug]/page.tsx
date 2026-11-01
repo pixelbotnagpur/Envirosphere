@@ -47,7 +47,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
           {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumbs" className="mb-8 flex items-center gap-2 text-xs text-primary-foreground/70 uppercase tracking-label">
+          <nav aria-label="Breadcrumbs" className="mb-8 flex items-center gap-2 text-label text-primary-foreground/70 uppercase tracking-label">
             <Link href="/" className="hover:text-primary-foreground transition-colors">Home</Link>
             <span aria-hidden="true">/</span>
             <Link href="/services/" className="hover:text-primary-foreground transition-colors">Services</Link>
@@ -88,7 +88,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                       priority
                     />
                   </div>
-                  <div className="border-t border-border px-6 py-3.5 text-xs text-muted-foreground flex items-center justify-between">
+                  <div className="border-t border-border px-6 py-3.5 text-sm text-muted-foreground flex items-center justify-between">
                     <span>Field Documentation &bull; {service.title}</span>
                     <span className="uppercase tracking-label text-primary font-normal">Authentic Field Record</span>
                   </div>
@@ -147,7 +147,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 ].map((auth) => (
                   <li
                     key={auth}
-                    className="rounded-pill border border-border bg-surface px-4 py-2 text-xs font-normal text-foreground"
+                    className="rounded-pill border border-border bg-surface px-4 py-2 text-sm font-normal text-foreground"
                   >
                     {auth}
                   </li>
@@ -176,7 +176,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 </Button>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-border text-xs text-muted-foreground font-light space-y-2">
+              <div className="mt-8 pt-6 border-t border-border text-sm text-muted-foreground font-light space-y-2">
                 <p>Fast turnaround on statutory queries.</p>
                 <p>NABET Accredited Category A Consultant.</p>
               </div>
