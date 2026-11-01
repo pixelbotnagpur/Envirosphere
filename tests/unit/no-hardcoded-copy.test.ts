@@ -2,7 +2,7 @@
 /**
  * Guard for rule 33 (content-driven): visible prose lives in content/, never in JSX.
  *
- * Scans src/app/**\/page.tsx and src/components/sections/**\/*.tsx (not tests) with the TypeScript
+ * Scans src/app/**\/page.tsx and src/components/{sections,forms,layout,ui,motion}/**\/*.tsx (not tests) with the TypeScript
  * parser and reports file:line for:
  *  - JSX text that shows words (any run of 3+ letters, after dropping HTML entities);
  *  - string props / object properties named title, description, label, alt, aria-label, placeholder,
@@ -52,10 +52,10 @@ function listFiles(): string[] {
       rel(path.join(dir, f)),
     );
   const pages = walk("src/app").filter((f) => f.endsWith("/page.tsx"));
-  const sections = walk("src/components/sections").filter(
-    (f) => f.endsWith(".tsx") && !/\.test\./.test(f),
+  const components = ["sections", "forms", "layout", "ui", "motion"].flatMap((dir) =>
+    walk(`src/components/${dir}`).filter((f) => f.endsWith(".tsx") && !/\.test\./.test(f)),
   );
-  return [...pages, ...sections].sort();
+  return [...pages, ...components].sort();
 }
 
 const words = (s: string) => s.split(/\s+/).filter((w) => /[A-Za-z]{2,}/.test(w));
@@ -131,6 +131,19 @@ describe("no hardcoded copy in pages and sections (rule 33)", () => {
 
   it("scans the pages and the sections", () => {
     expect(files.length).toBeGreaterThan(15);
+    // Forms, layout, ui and motion are scanned too, with no exceptions.
+    for (const file of [
+      "src/app/page.tsx",
+      "src/components/sections/hero.tsx",
+      "src/components/forms/inquiry-form.tsx",
+      "src/components/forms/application-modal.tsx",
+      "src/components/forms/job-openings-list.tsx",
+      "src/components/layout/header.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/motion/marquee.tsx",
+    ]) {
+      expect(files, file).toContain(file);
+    }
   });
 
   it("detects prose the heuristic is meant to catch", () => {
