@@ -23,6 +23,11 @@ function project(name: string, files: Record<string, string>) {
   return dir;
 }
 
+const REAL = "https://script.google.com/macros/s/AKfycbyREAL123/exec";
+const KEY = "0x4AAAAAAAreal_site_key";
+const ENV = { NEXT_PUBLIC_FORMS_ENDPOINT: REAL, NEXT_PUBLIC_TURNSTILE_SITE_KEY: KEY };
+const BUNDLE = { "out/index.html": "<html/>", "out/_next/static/a.js": `x="${REAL}";y="${KEY}"` };
+
 const list = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? list(path.join(dir, e.name)).map((f) => `${e.name}/${f}`) : [e.name],
@@ -30,8 +35,8 @@ const list = (dir: string): string[] =>
 
 describe("packageHostinger", () => {
   it("assembles hostinger-dist with out/, server.mjs and a minimal package.json only", () => {
-    const dir = project("ok", { "out/index.html": "<html/>", "out/_next/static/a.js": "1" });
-    const dest = packageHostinger({ rootDir: dir });
+    const dir = project("ok", BUNDLE);
+    const dest = packageHostinger({ rootDir: dir, env: ENV });
     expect(list(dest).sort()).toEqual(["out/_next/static/a.js", "out/index.html", "package.json", "server.mjs"]);
     const pkg = JSON.parse(readFileSync(path.join(dest, "package.json"), "utf8"));
     expect(pkg).toEqual({
@@ -45,23 +50,64 @@ describe("packageHostinger", () => {
   });
 
   it("replaces a previous hostinger-dist instead of mixing old files in", () => {
-    const dir = project("again", { "out/index.html": "<html/>", "hostinger-dist/stale.txt": "old" });
-    const dest = packageHostinger({ rootDir: dir });
+    const dir = project("again", { ...BUNDLE, "hostinger-dist/stale.txt": "old" });
+    const dest = packageHostinger({ rootDir: dir, env: ENV });
     expect(list(dest)).not.toContain("stale.txt");
   });
 
   it("refuses when out/ is missing", () => {
     const dir = project("missing", {});
-    expect(() => packageHostinger({ rootDir: dir })).toThrow(/pnpm build/);
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/pnpm build/);
   });
 
   it("refuses when check:out finds test-only values", () => {
     const dir = project("dirty", { "out/index.html": "https://script.google.com/macros/s/e2e/exec" });
-    expect(() => packageHostinger({ rootDir: dir })).toThrow(/test-only/);
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/test-only/);
   });
 
   it("refuses when out/ has no index.html", () => {
     const dir = project("empty", { "out/robots.txt": "x" });
-    expect(() => packageHostinger({ rootDir: dir })).toThrow(/index\.html/);
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/index\.html/);
+  });
+
+  it("fails when the built site has no real forms endpoint", () => {
+    const dir = project("noep", { "out/index.html": "<html/>", "out/a.js": `y="${KEY}"` });
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/forms endpoint/);
+  });
+
+  it("fails when the built site uses the e2e endpoint", () => {
+    const dir = project("e2eep", { "out/index.html": "<html/>", "out/a.js": `x="https://script.google.com/macros/s/e2e/exec";y="${KEY}"` });
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/test-only/);
+  });
+
+  it("fails when the bundle was built with a different endpoint than the settings", () => {
+    const dir = project("otherep", { "out/index.html": "<html/>", "out/a.js": `x="https://script.google.com/macros/s/OLD/exec";y="${KEY}"` });
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/different forms endpoint/);
+  });
+
+  it("fails when the Turnstile key is not set", () => {
+    const dir = project("nokey", BUNDLE);
+    expect(() => packageHostinger({ rootDir: dir, env: { NEXT_PUBLIC_FORMS_ENDPOINT: REAL } })).toThrow(/TURNSTILE_SITE_KEY is missing/);
+  });
+
+  it("fails when the Turnstile key is not in the built site", () => {
+    const dir = project("keynotbuilt", { "out/index.html": "<html/>", "out/a.js": `x="${REAL}"` });
+    expect(() => packageHostinger({ rootDir: dir, env: ENV })).toThrow(/Turnstile site key/);
+  });
+
+  it("--allow-missing-forms skips the checks with a loud warning", () => {
+    const dir = project("dry", { "out/index.html": "<html/>" });
+    const warnings: string[] = [];
+    packageHostinger({ rootDir: dir, env: {}, allowMissingForms: true, onWarn: (m) => warnings.push(m) });
+    expect(warnings.join(" ")).toMatch(/WARNING.*dry run/);
+  });
+
+  it("--allow-missing-forms still refuses test-only values", () => {
+    const dir = project("drytest", { "out/index.html": "<html/>" });
+    expect(() =>
+      packageHostinger({ rootDir: dir, env: { NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA" }, allowMissingForms: true }),
+    ).toThrow(/Test-only/);
+    const dirty = project("drytest2", { "out/index.html": "https://script.google.com/macros/s/e2e/exec" });
+    expect(() => packageHostinger({ rootDir: dirty, env: {}, allowMissingForms: true })).toThrow(/test-only/);
   });
 });

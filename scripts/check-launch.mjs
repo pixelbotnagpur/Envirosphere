@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const DUMMY_TURNSTILE_KEY = /^[123]x0{15,}[A-Z]{2}$/;
+export const DUMMY_TURNSTILE_KEY = /^[123]x0{15,}[A-Z]{2}$/;
 
 /** Parses KEY=value lines (comments and blank lines ignored, optional surrounding quotes removed). */
 export function parseEnvFile(text) {
@@ -55,7 +55,7 @@ export function checkLaunchEnv(env) {
   return { ok: problems.length === 0, problems };
 }
 
-function loadEnv(cwd) {
+export function loadEnv(cwd) {
   const merged = {};
   for (const file of [".env", ".env.local"]) {
     const full = path.join(cwd, file);

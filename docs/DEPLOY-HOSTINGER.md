@@ -33,8 +33,15 @@ Step 4 creates a folder called **`hostinger-dist`** holding exactly what must be
 | `server.mjs` | the small program that serves the pages |
 | `package.json` | tells Hostinger how to start it (Node 24, `npm start`) |
 
-It refuses to run if the build is missing or still contains test values, so you cannot upload
-the wrong thing by mistake.
+It refuses to run if the build is missing, still contains test values, or was built without your
+real form address and Turnstile key (it reads the built pages to be sure), so you cannot upload
+the wrong thing by mistake. If it says the settings are not ready, fix `.env.local`, run
+`pnpm build` again, then repeat step 4.
+
+The `.htaccess` file is not used on the Node.js plan, so there is nothing to upload or edit for it.
+
+For a practice run only (never to upload), `pnpm package:hostinger --allow-missing-forms` skips the
+form checks and prints a loud warning. It still refuses test values.
 
 ## 3. First-time setup in Hostinger
 
