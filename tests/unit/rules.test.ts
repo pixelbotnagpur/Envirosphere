@@ -83,7 +83,7 @@ describe("project rules are enforced in src/", () => {
     ).toEqual([]);
   });
 
-  it("no Tailwind default text-size utilities (use text-display|h1..h4|lead|base|sm|label)", () => {
+  it("no Tailwind default text-size utilities (use text-display|h1..h4|lead|base|sm|label|micro)", () => {
     expect(
       offenders(/(?<![\w-])text-(?:xs|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)\b/, /\.tsx$/),
     ).toEqual([]);

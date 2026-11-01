@@ -55,12 +55,12 @@ export function ServicesIndex({
       {/* Featured Visual Cards Showcase (Neiden Architecture Style) */}
       {featured && featured.length > 0 ? (
         <Container className="mt-14">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div data-card-grid="" className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((item) => (
-              <Reveal key={item.title}>
+              <Reveal key={item.title} data-card="" className="flex">
                 <Link
                   href={item.href}
-                  className="group flex flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) ease-out-expo hover:shadow-card"
+                  className="group flex w-full flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) ease-out-expo hover:shadow-card"
                 >
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
                     <Image
@@ -70,7 +70,7 @@ export function ServicesIndex({
                       height={item.image.height}
                       className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo group-hover:scale-105"
                     />
-                    <div className="absolute top-4 left-4 rounded-pill border border-primary-foreground/20 bg-primary/75 px-3 py-1 text-label uppercase tracking-label text-primary-foreground backdrop-blur-xs">
+                    <div className="absolute top-4 left-4 rounded-pill border border-primary-foreground/20 bg-primary/75 px-3 py-1 text-micro uppercase tracking-label text-primary-foreground backdrop-blur-xs">
                       {item.tag}
                     </div>
                   </div>

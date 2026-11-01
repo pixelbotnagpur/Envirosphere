@@ -44,10 +44,10 @@ export function FieldArchive({
           </div>
         </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div data-card-grid="" className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => (
-            <Reveal key={item.caption}>
-              <div className="group relative flex flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) hover:shadow-card">
+            <Reveal key={item.caption} data-card="" className="flex">
+              <div className="group relative flex w-full flex-col overflow-hidden rounded-card border border-border bg-background transition-shadow duration-(--duration-base) hover:shadow-card">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
                   <Image
                     src={item.image.src}
@@ -56,11 +56,11 @@ export function FieldArchive({
                     height={item.image.height}
                     className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo group-hover:scale-105"
                   />
-                  <div className="absolute top-3 left-3 rounded-pill border border-primary-foreground/25 bg-primary/75 px-3 py-1 text-label uppercase tracking-label text-primary-foreground backdrop-blur-xs">
+                  <div className="absolute top-3 left-3 rounded-pill border border-primary-foreground/25 bg-primary/75 px-3 py-1 text-micro uppercase tracking-label text-primary-foreground backdrop-blur-xs">
                     {item.tag}
                   </div>
                 </div>
-                <div className="p-5">
+                <div className="flex-1 p-5">
                   <p className="text-sm font-light text-foreground leading-snug">
                     {item.caption}
                   </p>

@@ -121,6 +121,11 @@ describe("motion utilities and layout tokens", () => {
     expect(tokens.get("--spacing-header")).toBe("5rem");
     expect(tokens.get("--animate-marquee")).toContain("marquee");
   });
+  it("defines the micro text token for badges over images", () => {
+    expect(tokens.get("--text-micro")).toBe("0.6875rem");
+    expect(tokens.get("--text-micro--line-height")).toBe("1.4");
+    expect(tokens.get("--text-micro")).not.toBe(tokens.get("--text-label"));
+  });
   it("keeps h1 smaller than display at narrow widths", () => {
     expect(tokens.get("--text-h1")).toBe("clamp(1.85rem, 1.15rem + 2.5vw, 3.25rem)");
   });

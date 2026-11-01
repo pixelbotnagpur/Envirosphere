@@ -10,6 +10,11 @@ describe("cn", () => {
     expect(cn("text-h1", "text-primary")).toBe("text-h1 text-primary");
   });
 
+  it("keeps text-micro and a color token together", () => {
+    expect(cn("text-micro", "text-primary")).toBe("text-micro text-primary");
+    expect(cn("text-label", "text-micro")).toBe("text-micro");
+  });
+
   it("lets a later type-scale token replace an earlier one", () => {
     expect(cn("text-h1", "text-h3")).toBe("text-h3");
   });

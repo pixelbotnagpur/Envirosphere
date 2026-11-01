@@ -34,7 +34,7 @@ export function VisualBreak({
             {/* Top pill badge */}
             {tag ? (
               <div className="absolute top-6 left-6 flex items-center gap-3">
-                <span className="flex items-center gap-2 rounded-pill border border-primary-foreground/25 bg-primary/70 px-4 py-1.5 text-label uppercase tracking-label text-primary-foreground backdrop-blur-md">
+                <span className="flex items-center gap-2 rounded-pill border border-primary-foreground/25 bg-primary/80 px-4 py-1.5 text-micro uppercase tracking-label text-primary-foreground backdrop-blur-md">
                   <span className="size-1.5 rounded-pill bg-accent" />
                   <span>{tag}</span>
                 </span>
