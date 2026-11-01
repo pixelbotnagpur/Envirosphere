@@ -15,9 +15,13 @@ export interface AboutProps {
   paragraphs: string[];
   image: ImageAsset;
   cta: Cta;
+  /** Accreditation pills shown under the text (from site.yaml). */
+  accreditations?: string[];
+  /** One real figure shown on the photo (from the home stats). */
+  highlight?: { value: string; label: string };
 }
 
-export function About({ index, label, heading, paragraphs, image, cta }: AboutProps) {
+export function About({ index, label, heading, paragraphs, image, cta, accreditations = [], highlight }: AboutProps) {
   return (
     <section className="py-section">
       <Container className="grid items-center gap-16 lg:grid-cols-12">
@@ -34,23 +38,20 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
             ))}
           </div>
 
-          <Reveal>
-            <div className="mt-10 flex flex-wrap gap-3">
-              {[
-                "QCI NABET Accredited (Cat A)",
-                "MoEFCC Empanelled",
-                "ISO 9001:2015 Certified",
-                "Certified Testing Labs",
-              ].map((pill) => (
-                <span
-                  key={pill}
-                  className="rounded-pill border border-border bg-surface px-4 py-1.5 text-label uppercase tracking-label text-muted-foreground"
-                >
-                  {pill}
-                </span>
-              ))}
-            </div>
-          </Reveal>
+          {accreditations.length > 0 ? (
+            <Reveal>
+              <div className="mt-10 flex flex-wrap gap-3">
+                {accreditations.map((pill) => (
+                  <span
+                    key={pill}
+                    className="rounded-pill border border-border bg-surface px-4 py-1.5 text-label uppercase tracking-label text-muted-foreground"
+                  >
+                    {pill}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+          ) : null}
 
           <Reveal>
             <Button asChild variant="outline" className="mt-10">
@@ -69,15 +70,14 @@ export function About({ index, label, heading, paragraphs, image, cta }: AboutPr
                 className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out-expo hover:scale-105"
               />
             </Parallax>
-            <div className="absolute -bottom-6 -left-6 hidden max-w-xs rounded-card border border-border/80 bg-background/95 p-6 shadow-card backdrop-blur-md sm:block">
-              <span className="text-label uppercase tracking-label text-secondary">
-                [ 25+ YEARS PRACTICE ]
-              </span>
-              <p className="mt-2 font-heading text-h3">250+ Projects</p>
-              <p className="mt-1 text-sm font-light text-muted-foreground">
-                Approved across government ministries and state pollution boards.
-              </p>
-            </div>
+            {highlight ? (
+              <div className="absolute -bottom-6 -left-6 hidden max-w-xs rounded-card border border-border/80 bg-background/95 p-6 shadow-card backdrop-blur-md sm:block">
+                <p className="font-heading text-h3">{highlight.value}</p>
+                <p className="mt-1 text-label uppercase tracking-label text-muted-foreground">
+                  {highlight.label}
+                </p>
+              </div>
+            ) : null}
           </div>
         </div>
       </Container>

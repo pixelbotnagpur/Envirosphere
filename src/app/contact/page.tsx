@@ -1,4 +1,4 @@
-import { Building2, Clock, Mail, MapPin, MessageSquare, Phone, ShieldCheck } from "lucide-react";
+import { Building2, Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Container } from "@/components/ui/container";
@@ -10,9 +10,9 @@ import { mailtoHref, telHref } from "@/lib/links";
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
-    title: "Contact Us | Head Office Pune & Regional Branches",
+    title: "Contact Us",
     ...pageSeo("/contact/"),
-    description: `Connect with ${site.name} for environmental clearance inquiries, compliance audits, and engineering consultations.`,
+    description: `Contact ${site.name}: head office in Pune, with branch offices in Mumbai, Tarapur, Nashik and Nagpur.`,
   };
 }
 
@@ -25,13 +25,13 @@ export default function ContactPage() {
       {/* Page Hero */}
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel tone="inverse" index="001">Contact & Consultation</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Contact</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Start your compliance consultation with our senior team.
+              Contact Envirosphere.
             </h1>
             <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              Whether you are planning a greenfield industrial development, seeking statutory clearances, or upgrading an ETP/STP facility, we provide accountable, timely guidance.
+              Tell us about your project by sending an enquiry, or call or email us.
             </p>
           </div>
         </Container>
@@ -44,11 +44,11 @@ export default function ContactPage() {
           <div className="lg:col-span-7">
             <div className="rounded-card border border-border bg-background p-8 sm:p-12 shadow-card">
               <span className="text-label text-muted-foreground uppercase tracking-label">
-                Direct Inquiry
+                Enquiry
               </span>
-              <h2 className="mt-3 text-h2 tracking-tight">Project Consultation Request</h2>
+              <h2 className="mt-3 text-h2 tracking-tight">Send us an enquiry</h2>
               <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">
-                Fill in your project parameters below. Our accredited technical team will review your requirements and respond within one business day.
+                Tell us about your project below.
               </p>
 
               <div className="mt-8">
@@ -60,10 +60,6 @@ export default function ContactPage() {
                 />
               </div>
 
-              <div className="mt-8 pt-6 border-t border-border flex items-center gap-2 text-sm text-muted-foreground font-light">
-                <ShieldCheck aria-hidden="true" className="size-4 text-primary shrink-0" />
-                <span>Your project data is handled under strict professional non-disclosure protocols.</span>
-              </div>
             </div>
           </div>
 
@@ -71,9 +67,9 @@ export default function ContactPage() {
           <div className="lg:col-span-5 space-y-8">
             {/* Direct Communication */}
             <div className="rounded-card border border-border bg-background p-8">
-              <h3 className="text-h3">Direct Channels</h3>
+              <h3 className="text-h3">Phone and email</h3>
               <p className="mt-2 text-sm text-muted-foreground font-light">
-                For urgent clearances or immediate document submission deadlines:
+                You can reach us at:
               </p>
 
               <div className="mt-6 space-y-4">
@@ -117,21 +113,6 @@ export default function ContactPage() {
                     <span className="text-sm font-normal text-foreground">{site.contact.email}</span>
                   </div>
                 </a>
-
-                <a
-                  href={`https://wa.me/${site.contact.phones[0].replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 rounded-control border border-border bg-surface p-4 transition-colors hover:border-primary/50"
-                >
-                  <div className="flex size-10 items-center justify-center rounded-pill bg-primary/10 text-primary">
-                    <MessageSquare aria-hidden="true" className="size-4" />
-                  </div>
-                  <div>
-                    <span className="block text-label uppercase tracking-label text-muted-foreground">WhatsApp Business</span>
-                    <span className="text-sm font-normal text-foreground">Direct Technical Messaging</span>
-                  </div>
-                </a>
               </div>
             </div>
 
@@ -139,23 +120,19 @@ export default function ContactPage() {
             <div className="rounded-card border border-border bg-background p-8">
               <div className="flex items-center gap-2 text-label text-muted-foreground uppercase tracking-label">
                 <Building2 aria-hidden="true" className="size-4 text-primary" />
-                <span>Corporate Headquarters</span>
+                <span>Head Office</span>
               </div>
               <h3 className="mt-3 text-h3">Pune Office</h3>
               <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">
                 {site.contact.address}
               </p>
 
-              <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock aria-hidden="true" className="size-4 text-primary" />
-                <span>Monday – Saturday: 9:30 AM – 6:30 PM IST</span>
-              </div>
             </div>
 
             {/* Branch Network Summary */}
             <div className="rounded-card border border-border bg-background p-8">
-              <span className="text-label text-muted-foreground uppercase tracking-label">Regional Presence</span>
-              <h4 className="mt-2 text-h4">Branch Office Network</h4>
+              <span className="text-label text-muted-foreground uppercase tracking-label">Offices</span>
+              <h4 className="mt-2 text-h4">Branch offices</h4>
               <ul className="mt-4 grid grid-cols-2 gap-3 text-sm text-foreground/80 font-light">
                 {site.offices.filter((o) => o.city !== "Pune").map((office) => (
                   <li key={office.city} className="flex items-center gap-2">

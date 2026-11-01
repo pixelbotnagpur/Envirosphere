@@ -25,4 +25,15 @@ describe("About", () => {
     expect(screen.getByRole("img", { name: "A green globe" })).toBeInTheDocument();
     expect(screen.getByText(/001 \/ About us/)).toBeInTheDocument();
   });
+
+  it("shows accreditations and the highlight only when given", () => {
+    const { rerender } = render(
+      <About {...props} accreditations={["QCI NABET Accredited (Cat A)"]} highlight={{ value: "250+", label: "Clients" }} />,
+    );
+    expect(screen.getByText("QCI NABET Accredited (Cat A)")).toBeInTheDocument();
+    expect(screen.getByText("250+")).toBeInTheDocument();
+    rerender(<About {...props} />);
+    expect(screen.queryByText("250+")).toBeNull();
+    expect(screen.queryByText(/NABET/)).toBeNull();
+  });
 });

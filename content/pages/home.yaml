@@ -3,7 +3,7 @@
 
 hero:
   eyebrow: QCI NABET Accredited Consultant (Cat A)
-  title: Environmental clearances and compliance, handled with precision.
+  title: Environmental clearances and statutory compliance.
   subtitle: >-
     We help public and private sector clients secure statutory clearances and consents from
     MoEFCC, State Pollution Control Boards, MIDC and other authorities.
@@ -39,7 +39,7 @@ about:
 
 services:
   label: What we offer
-  heading: Thirteen services, one accountable team.
+  heading: Thirteen environmental services.
   intro: From environmental clearances to the operation of treatment plants.
   cta: { label: All services, href: /services/ }
 
@@ -130,7 +130,7 @@ testimonials:
 contact:
   label: Contact
   heading: Tell us about your project.
-  body: Our team will help you work out which approvals you need and the quickest route to them.
+  body: Our team will help you work out which approvals your project needs.
   primaryCta: { label: Start a conversation, href: /contact/ }
   phoneLabel: Call us
   emailLabel: Email us

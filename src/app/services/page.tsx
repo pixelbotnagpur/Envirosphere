@@ -15,7 +15,7 @@ export function generateMetadata(): Metadata {
   return {
     title: "Environmental Consultancy & Engineering Services",
     ...pageSeo("/services/"),
-    description: `Explore all 13 specialized statutory clearance, monitoring, audit, and engineering services offered by ${site.name}.`,
+    description: `The thirteen environmental services offered by ${site.name}, from clearances and compliance to treatment plant operation.`,
   };
 }
 
@@ -27,13 +27,13 @@ export default function ServicesPage() {
       {/* Page Hero */}
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel tone="inverse" index="001">Services Directory</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Services</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Thirteen environmental services. One accountable team.
+              Thirteen environmental services.
             </h1>
             <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              From statutory impact assessments and consent management to turnkey wastewater engineering, we provide comprehensive environmental support for infrastructure and industrial leaders.
+              From environmental clearances to the operation and maintenance of treatment plants.
             </p>
           </div>
         </Container>
@@ -110,14 +110,14 @@ export default function ServicesPage() {
                 Not sure which clearances or studies your project requires?
               </h2>
               <p className="mt-4 text-lead font-light">
-                Our senior environmental coordinators and accredited NABET specialists review your project specifications and guide you through the regulatory framework.
+                Tell us about your project and we will help you work out which approvals it needs.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button asChild size="lg">
                   <Link href="/contact/">Discuss Your Project</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/about/">About Our Accreditations</Link>
+                  <Link href="/about/">About us</Link>
                 </Button>
               </div>
             </div>

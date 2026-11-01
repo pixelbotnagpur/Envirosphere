@@ -122,7 +122,7 @@ export function InquiryForm({
       // Only the hidden trap field failed (a bot, or a password manager that filled it): never
       // leave a person stuck on an error they cannot see. Silent fake success.
       setStatus("success");
-      setStatusMessage("Thank you. Your consultation request has been received.");
+      setStatusMessage("Thank you. Your enquiry has been received.");
       return;
     }
 
@@ -130,7 +130,7 @@ export function InquiryForm({
     if (isBotSubmission({ website: formData.website, fillMs })) {
       // Fake success for bots to prevent adversarial learning
       setStatus("success");
-      setStatusMessage("Thank you. Your consultation request has been received.");
+      setStatusMessage("Thank you. Your enquiry has been received.");
       return;
     }
 
@@ -153,7 +153,7 @@ export function InquiryForm({
     if (result.success) {
       setStatus("success");
       setStatusMessage(
-        result.message || "Thank you. Your consultation inquiry has been securely transmitted.",
+        result.message || "Thank you. Your enquiry has been sent.",
       );
     } else {
       setStatus("error");
@@ -194,10 +194,6 @@ export function InquiryForm({
         </div>
         <h3 className="mt-6 font-heading text-h3 text-foreground">Inquiry Received</h3>
         <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          An environmental consultant from our technical appraisal team will review your project and
-          respond promptly.
-        </p>
         <div className="mt-8 flex justify-center">
           <Button variant="outline" onClick={handleReset} className="gap-2">
             <RotateCcw className="size-4" aria-hidden="true" />
@@ -332,7 +328,7 @@ export function InquiryForm({
           aria-describedby={describedBy(fieldErrors.service && errorId("inquiry-service"))}
           className="mt-2"
         >
-          <option value="">Select a compliance or engineering service...</option>
+          <option value="">Select a service...</option>
           <option value="general">General Environmental Advisory</option>
           {services.map((srv) => (
             <option key={srv.slug} value={srv.slug}>
@@ -352,7 +348,7 @@ export function InquiryForm({
           name="message"
           rows={4}
           required
-          placeholder="Please outline the industry sector, proposed capacity, MIDC / district location, and target approval timelines..."
+          placeholder="Please describe your project..."
           value={formData.message}
           onChange={handleChange}
           hasError={Boolean(fieldErrors.message)}
@@ -374,7 +370,7 @@ export function InquiryForm({
             <div className="flex-1">
               <p className="font-normal text-destructive">{statusMessage}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                You can reach our compliance desk directly:
+                You can reach us directly:
               </p>
               <div className="mt-3 flex flex-wrap gap-4">
                 <a
@@ -397,10 +393,7 @@ export function InquiryForm({
         </div>
       ) : null}
 
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground">
-          Your project details are kept confidential under our professional code of conduct.
-        </p>
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
         <Button
           type="submit"
           variant="accent"

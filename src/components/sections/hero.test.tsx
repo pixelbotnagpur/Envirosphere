@@ -33,4 +33,13 @@ describe("Hero", () => {
     expect(container.querySelector("[data-reveal]")).toBeNull();
     expect(screen.getByRole("heading", { level: 1 })).toHaveClass("rise");
   });
+
+  it("shows only the facts and cities it is given", () => {
+    const { rerender } = render(<Hero {...props} highlights={["250+ Clients"]} locations={["Pune", "Mumbai"]} />);
+    expect(screen.getByText("250+ Clients")).toBeInTheDocument();
+    expect(screen.getByText(/Pune . Mumbai/)).toBeInTheDocument();
+    rerender(<Hero {...props} />);
+    expect(screen.queryByText("250+ Clients")).toBeNull();
+    expect(screen.queryByText(/Pune/)).toBeNull();
+  });
 });

@@ -15,6 +15,10 @@ export interface HeroProps {
   scrollLabel: string;
   backgroundImage?: ImageAsset;
   featuredImage?: ImageAsset;
+  /** Short facts shown under the CTAs, e.g. "250+ Clients" (from the home stats). */
+  highlights?: string[];
+  /** Office cities shown at the right of the facts bar (from site.yaml). */
+  locations?: string[];
 }
 
 /** Entrance is CSS-only (`rise`) so the hero is readable immediately, without JavaScript. */
@@ -27,6 +31,8 @@ export function Hero({
   scrollLabel,
   backgroundImage,
   featuredImage,
+  highlights = [],
+  locations = [],
 }: HeroProps) {
   const bg = backgroundImage ?? featuredImage;
 
@@ -84,26 +90,22 @@ export function Hero({
         </div>
 
         <div className="rise rise-3 mt-8">
-          {/* Live Trust Metrics & Location Badge */}
+          {/* Facts and office cities, both from content */}
           <div className="flex flex-wrap items-center justify-between gap-6 border-t border-primary-foreground/20 pt-6">
             <div className="flex flex-wrap items-center gap-6 text-label uppercase tracking-label text-primary-foreground/80">
-              <div className="flex items-center gap-2">
-                <span className="size-2 rounded-pill bg-accent" />
-                <span>250+ Clearances Delivered</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="size-2 rounded-pill bg-secondary" />
-                <span>Category A QCI NABET</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="size-2 rounded-pill bg-accent" />
-                <span>Zero Compliance Violations</span>
-              </div>
+              {highlights.map((item, i) => (
+                <div key={item} className="flex items-center gap-2">
+                  <span className={i % 2 === 0 ? "size-2 rounded-pill bg-accent" : "size-2 rounded-pill bg-secondary"} />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
 
-            <div className="hidden rounded-pill border border-primary-foreground/25 bg-primary/60 px-4 py-1.5 text-label uppercase tracking-label text-secondary backdrop-blur-md sm:block">
-              [ PUNE &bull; MUMBAI &bull; DELHI &bull; PAN-INDIA ]
-            </div>
+            {locations.length > 0 ? (
+              <div className="hidden rounded-pill border border-primary-foreground/25 bg-primary/60 px-4 py-1.5 text-label uppercase tracking-label text-secondary backdrop-blur-md sm:block">
+                [ {locations.join(" • ")} ]
+              </div>
+            ) : null}
           </div>
 
           {/* Bottom Scroll Indicator Bar */}

@@ -1,4 +1,4 @@
-import { Award, Building2, Compass, MapPin, Shield } from "lucide-react";
+import { Building2 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import { pageSeo } from "@/lib/page-seo";
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
-    title: "About Us | Accreditations & Nationwide Presence",
+    title: "About Us",
     ...pageSeo("/about/"),
     description: `Learn about ${site.name}, a QCI NABET Category A accredited environmental consultant with offices in Pune, Mumbai, Tarapur, Nashik, and Nagpur.`,
   };
@@ -34,10 +34,10 @@ export default function AboutPage() {
           <SectionLabel tone="inverse" index="001">Company Profile</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Pioneering sustainable environmental solutions since inception.
+              Environmental consultants and engineers, based in Pune.
             </h1>
             <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              Envirosphere Consultant and Engineers is a QCI NABET Accredited Category A Consultant, delivering precision environmental engineering, statutory clearances, and compliance nationwide.
+              Envirosphere Consultant and Engineers is a QCI NABET Accredited Consultant (Cat A), providing services to the public and private sector.
             </p>
           </div>
         </Container>
@@ -59,7 +59,7 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={0.15}>
               <p>
-                The organization is guided by an uncompromising code of ethics, professional rigor, and technical depth. We bridge the gap between regulatory mandates and project velocity, ensuring that critical infrastructure and manufacturing facilities operate in total harmony with statutory environmental frameworks.
+                The organisation is guided by a code of ethics and professional practices, working towards its stated vision and mission.
               </p>
             </Reveal>
           </div>
@@ -83,42 +83,10 @@ export default function AboutPage() {
       <section className="py-section border-t border-border">
         <Container>
           <SectionLabel index="002">Accreditation Standards</SectionLabel>
-          <h2 className="mt-6 text-h2 tracking-tight">QCI NABET Category A Credentials</h2>
+          <h2 className="mt-6 text-h2 tracking-tight">QCI NABET Accredited Consultant</h2>
           <p className="mt-4 max-w-3xl text-lead text-muted-foreground font-light">
-            Category A accreditation is the highest national recognition awarded by the National Accreditation Board for Education and Training (NABET) / Quality Council of India (QCI).
+            Envirosphere is a QCI NABET Accredited Consultant (Cat A).
           </p>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: Award,
-                title: "NABET Category A",
-                desc: "Authorized to prepare EIA/EMP reports for Category A and Category B industrial, building, and mining developments.",
-              },
-              {
-                icon: Shield,
-                title: "Statutory Adherence",
-                desc: "Complete fidelity to EIA Notification 2006, Water Act 1974, Air Act 1981, and Hazardous Waste Management Rules.",
-              },
-              {
-                icon: Compass,
-                title: "Multidisciplinary Team",
-                desc: "Certified Functional Area Experts (FAEs) in Air Pollution, Water Quality, Ecology & Biodiversity, and Risk Assessment.",
-              },
-            ].map((item, idx) => (
-              <Reveal key={item.title} delay={staggerDelay(idx, 0.1)}>
-                <div className="h-full rounded-card border border-border bg-surface p-8">
-                  <div className="flex size-11 items-center justify-center rounded-pill bg-primary text-primary-foreground">
-                    <item.icon aria-hidden="true" className="size-5" />
-                  </div>
-                  <h3 className="mt-6 text-h3">{item.title}</h3>
-                  <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
 
           {/* Institutional Engagement Showcase */}
           <Reveal className="mt-12">
@@ -135,13 +103,13 @@ export default function AboutPage() {
                 </div>
                 <div className="lg:col-span-5 p-8 sm:p-10 space-y-4">
                   <span className="text-label text-primary uppercase tracking-label font-normal">
-                    National Institutional Engagement
+                    ACO Meet 2026
                   </span>
                   <h3 className="text-h3 tracking-tight">
-                    Active Participation in Central Environmental Policy
+                    Photograph from the ACO Meet 2026
                   </h3>
                   <p className="text-sm text-muted-foreground font-light leading-relaxed">
-                    Our leadership represents Envirosphere at national forums, including the National Meet of NABET Accredited Consultant Organisations (ACO) in Delhi, actively contributing to statutory appraisal standards and compliance guidelines.
+                    The ACO Meet 2026 was a meeting of NABET accredited consultant organisations.
                   </p>
                 </div>
               </div>
@@ -154,9 +122,9 @@ export default function AboutPage() {
       <section className="border-t border-border bg-surface py-section">
         <Container>
           <SectionLabel index="003">Presence</SectionLabel>
-          <h2 className="mt-6 text-h2 tracking-tight">Five Strategic Regional Offices</h2>
+          <h2 className="mt-6 text-h2 tracking-tight">Our offices</h2>
           <p className="mt-4 max-w-2xl text-lead text-muted-foreground font-light">
-            Headquartered in Pune with operational branches across major industrial hubs in Maharashtra to ensure immediate, on-the-ground support.
+            Head office in Pune, with branch offices in Mumbai, Tarapur, Nashik and Nagpur.
           </p>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -169,13 +137,11 @@ export default function AboutPage() {
                       <span>{office.name}</span>
                     </div>
                     <h3 className="mt-4 text-h3">{office.city}</h3>
-                    <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">
-                      {office.address ?? `${office.city} Regional Operations Office, Maharashtra, India.`}
-                    </p>
-                  </div>
-                  <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin aria-hidden="true" className="size-3.5 text-primary" />
-                    <span>Active Regulatory Jurisdiction</span>
+                    {office.address ? (
+                      <p className="mt-3 text-sm text-muted-foreground font-light leading-relaxed">
+                        {office.address}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               </Reveal>
@@ -190,10 +156,10 @@ export default function AboutPage() {
           <div className="rounded-card bg-primary p-8 sm:p-14 text-primary-foreground">
             <div className="max-w-3xl">
               <span className="text-label uppercase tracking-label text-secondary">
-                Partner With Us
+                Get in touch
               </span>
               <h2 className="mt-6 text-h2 tracking-tight">
-                Work with accredited experts who understand compliance from first study to final consent.
+                Talk to our team about your project.
               </h2>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button asChild variant="accent" size="lg">

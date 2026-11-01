@@ -1,4 +1,4 @@
-import { CheckCircle2, Factory, FileCheck2, FlaskConical, Milestone, ShieldCheck, Users } from "lucide-react";
+import { Factory, FileCheck2, Layers, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,9 +13,9 @@ import { pageSeo } from "@/lib/page-seo";
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
-    title: "Why Us | Proven Track Record & Engineering Precision",
+    title: "Why Us",
     ...pageSeo("/why-us/"),
-    description: `Discover why 250+ industrial and infrastructure leaders trust ${site.name} for statutory environmental clearances and compliance.`,
+    description: `${site.name} is a QCI NABET accredited environmental consultant in Pune offering environmental clearances, compliance and treatment plant services.`,
   };
 }
 
@@ -26,33 +26,23 @@ export default function WhyUsPage() {
   const pillars = [
     {
       icon: ShieldCheck,
-      title: "QCI NABET Category A Certified",
-      desc: "Our accreditation ensures every report, EIA study, and EMP submission withstands the rigorous review of State & Central Appraisal Committees.",
+      title: "QCI NABET Accredited Consultant (Cat A)",
+      desc: "Envirosphere Consultant and Engineers is a QCI NABET Accredited Consultant, providing services to the public and private sector.",
     },
     {
-      icon: Users,
-      title: "250+ Corporate & Industrial Clients",
-      desc: "Trusted by Fortune 500 multinationals, major infrastructure conglomerates, and industrial park developers across Maharashtra and India.",
-    },
-    {
-      icon: Milestone,
-      title: "25+ Active Clearances & Audits",
-      desc: "Continuous, live engagement with regulatory bodies gives us real-time insights into changing statutory norms, notifications, and portal workflows.",
+      icon: Layers,
+      title: "Thirteen services",
+      desc: "From environmental clearances and compliance to environmental monitoring and the operation of treatment plants.",
     },
     {
       icon: FileCheck2,
-      title: "Single-Window Statutory Approvals",
-      desc: "We coordinate with MoEFCC, MPCB, MIDC, DISH, PESO, and CGWA under one accountable team, eliminating multi-agency friction.",
-    },
-    {
-      icon: FlaskConical,
-      title: "Advanced In-House Monitoring",
-      desc: "Comprehensive testing for ambient air, stack emissions, noise, effluent, sewage, and ground water conducted with certified methodologies.",
+      title: "Statutory clearances and consents",
+      desc: "We help clients obtain clearances and consents from MoEFCC, Pollution Control Boards, MIDC and other government authorities.",
     },
     {
       icon: Factory,
-      title: "Turnkey Treatment Engineering",
-      desc: "From designing zero liquid discharge (ZLD) treatment plants to operating on-site ETPs and STPs, we bridge paperwork with practical engineering.",
+      title: "ETP and STP operation",
+      desc: "Our services include the operation and maintenance of effluent treatment plants (ETP) and sewage treatment plants (STP).",
     },
   ];
 
@@ -61,13 +51,13 @@ export default function WhyUsPage() {
       {/* Page Hero */}
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
-          <SectionLabel tone="inverse" index="001">Competitive Advantage</SectionLabel>
+          <SectionLabel tone="inverse" index="001">Why us</SectionLabel>
           <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
             <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Why leading enterprises partner with Envirosphere.
+              Why Envirosphere.
             </h1>
             <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              Environmental compliance should accelerate your business, not stall it. We combine accredited scientific rigor with operational agility.
+              Environmental clearances, compliance and engineering services from one firm.
             </p>
           </div>
         </Container>
@@ -76,7 +66,7 @@ export default function WhyUsPage() {
       {/* Pillars Grid */}
       <section className="border-t border-border bg-surface py-section">
         <Container>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {pillars.map((pillar, idx) => (
               <li key={pillar.title} className="flex list-none">
                 <Reveal delay={staggerDelay(idx, 0.06)} className="flex w-full">
@@ -93,10 +83,6 @@ export default function WhyUsPage() {
                       </p>
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-border flex items-center gap-2 text-sm text-primary font-normal">
-                      <CheckCircle2 aria-hidden="true" className="size-3.5" />
-                      <span>Verified Compliance Delivery</span>
-                    </div>
                   </div>
                 </Reveal>
               </li>
@@ -118,13 +104,13 @@ export default function WhyUsPage() {
                 </div>
                 <div className="lg:col-span-5 p-8 sm:p-10 space-y-4">
                   <span className="text-label text-primary uppercase tracking-label font-normal">
-                    Turnkey Engineering Depth
+                    Water and wastewater
                   </span>
                   <h3 className="text-h3 tracking-tight">
-                    Beyond Advisory: Practical On-Ground Engineering
+                    ETP and STP operation and maintenance
                   </h3>
                   <p className="text-sm text-muted-foreground font-light leading-relaxed">
-                    Unlike pure paperwork liaisons, our in-house engineering team designs, commissions, and operates biological effluent treatment (ETP) and sewage treatment (STP) plants with zero liquid discharge (ZLD) systems across Maharashtra.
+                    Alongside clearances and compliance, our services include the operation and maintenance of effluent treatment plants (ETP) and sewage treatment plants (STP).
                   </p>
                 </div>
               </div>
@@ -137,7 +123,7 @@ export default function WhyUsPage() {
       <section className="border-t border-border bg-secondary py-section text-secondary-foreground">
         <Container>
           <SectionLabel index="002" className="text-secondary-foreground">
-            Measurable Impact
+            In numbers
           </SectionLabel>
           <div className="mt-12 grid grid-cols-2 gap-8 lg:grid-cols-4">
             {home.stats.items.map((item) => (
@@ -161,17 +147,17 @@ export default function WhyUsPage() {
           <div className="rounded-card bg-primary p-8 sm:p-14 text-primary-foreground">
             <div className="max-w-3xl">
               <span className="text-label uppercase tracking-label text-secondary">
-                Get Started
+                Get in touch
               </span>
               <h2 className="mt-6 text-h2 tracking-tight">
-                Secure your project’s statutory clearance without delays or compliance exposure.
+                Tell us about your project.
               </h2>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button asChild variant="accent" size="lg">
-                  <Link href="/contact/">Schedule a Compliance Consultation</Link>
+                  <Link href="/contact/">Contact us</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="text-primary-foreground hover:bg-primary-foreground/10">
-                  <Link href="/services/">Review All Services</Link>
+                  <Link href="/services/">Our services</Link>
                 </Button>
               </div>
             </div>

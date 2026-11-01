@@ -23,9 +23,9 @@ export interface FieldArchiveProps {
 
 export function FieldArchive({
   index = "005",
-  label = "FIELD OPERATIONS",
-  heading = "On-site empirical rigor across marine, forest, and industrial domains.",
-  body = "Our multidisciplinary teams conduct baseline monitoring, ambient environmental sampling, and regulatory inspections directly in the field.",
+  label = "FIELD WORK",
+  heading = "Photographs from the field.",
+  body = "A selection of photographs from our field work and office.",
   items,
 }: FieldArchiveProps) {
   return (

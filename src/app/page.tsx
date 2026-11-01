@@ -21,59 +21,36 @@ export default function HomePage() {
   const home = loadHome();
   const services = loadServices();
 
-  const featuredDisciplines = [
-    {
-      title: "Environmental Clearances & EIA",
-      tag: "[ STATUTORY & CONSENTS ]",
-      summary:
-        "Expert preparation and statutory representation for Category A & B projects under EIA Notification 2006, ensuring zero non-compliance.",
-      href: "/services/environmental-clearance/",
-      image: getImageAsset("hero-eco-architecture"),
-    },
-    {
-      title: "Water & Effluent Treatment (ETP/STP)",
-      tag: "[ WATER INFRASTRUCTURE ]",
-      summary:
-        "Turnkey civil-mechanical design, zero liquid discharge (ZLD) systems, and statutory consent management for industrial water treatment.",
-      href: "/services/water-wastewater-treatment/",
-      image: getImageAsset("clean-water-facility"),
-    },
-    {
-      title: "Green Masterplanning & Audits",
-      tag: "[ ESG & INDUSTRIAL MASTERPLANNING ]",
-      summary:
-        "Comprehensive carbon footprinting, environmental audits, ecological surveys, and sustainable industrial park approvals.",
-      href: "/services/environmental-audit/",
-      image: getImageAsset("sustainable-industrial-park"),
-    },
+  const bySlug = (slug: string) => services.find((service) => service.slug === slug);
+  const featuredSpecs = [
+    { slug: "environmental-clearance", tag: "[ STATUTORY & CONSENTS ]", image: "hero-eco-architecture" },
+    { slug: "water-wastewater-treatment", tag: "[ WATER ]", image: "clean-water-facility" },
+    { slug: "environmental-audit", tag: "[ AUDITS ]", image: "sustainable-industrial-park" },
   ];
+  const featuredDisciplines = featuredSpecs.flatMap(({ slug, tag, image }) => {
+    const service = bySlug(slug);
+    return service
+      ? [
+          {
+            title: service.title,
+            tag,
+            summary: service.summary,
+            href: `/services/${slug}/`,
+            image: getImageAsset(image),
+          },
+        ]
+      : [];
+  });
 
   const fieldArchiveItems = [
-    {
-      image: getImageAsset("photo-g18"),
-      tag: "COASTAL / MARINE",
-      caption:
-        "Offshore marine water and benthic sampling over vessel side for baseline environmental impact assessment.",
-    },
-    {
-      image: getImageAsset("photo-g22"),
-      tag: "FOREST / BIODIVERSITY",
-      caption:
-        "Ecological quadrat survey recording floral and faunal biodiversity for statutory conservation planning.",
-    },
-    {
-      image: getImageAsset("photo-g16"),
-      tag: "LABORATORY / SOIL",
-      caption:
-        "Soil strata sampling and certified physical-chemical testing in accredited analytical laboratories.",
-    },
-    {
-      image: getImageAsset("photo-g21"),
-      tag: "PUNE / HEADQUARTERS",
-      caption:
-        "Directorate cabin and statutory GIS modeling facilities at the Envirosphere technical office in Pune.",
-    },
+    { image: getImageAsset("photo-g18"), tag: "MARINE", caption: "Water sampling over the side of a vessel at sea." },
+    { image: getImageAsset("photo-g22"), tag: "FOREST", caption: "Recording vegetation data inside a forest quadrat." },
+    { image: getImageAsset("photo-g16"), tag: "SAMPLING", caption: "A bagged and labelled sediment sample." },
+    { image: getImageAsset("photo-g21"), tag: "PUNE OFFICE", caption: "An executive cabin at the Pune office." },
   ];
+
+  const stats = home.stats.items.map((item) => ({ value: `${item.value}${item.suffix}`, label: item.label }));
+  const cities = site.offices.map((office) => office.city);
 
   return (
     <>
@@ -85,6 +62,8 @@ export default function HomePage() {
         secondaryCta={home.hero.secondaryCta}
         scrollLabel={home.hero.scrollLabel}
         backgroundImage={getImageAsset("hero-eco-architecture")}
+        highlights={stats.slice(0, 2).map((item) => `${item.value} ${item.label}`)}
+        locations={cities}
       />
       <About
         index="001"
@@ -93,12 +72,12 @@ export default function HomePage() {
         paragraphs={home.about.paragraphs}
         image={getImageAsset("ecological-survey")}
         cta={home.about.cta}
+        accreditations={site.accreditations.map((item) => item.label)}
+        highlight={stats[0]}
       />
       <VisualBreak
         image={getImageAsset("clean-water-facility")}
-        quote="Engineering at the nexus of ecological preservation and industrial expansion."
-        tag="PAN-INDIA STATUTORY PRACTICE"
-        location="PUNE • MUMBAI • DELHI • PAN-INDIA"
+        location={cities.join(" • ").toUpperCase()}
       />
       <ServicesIndex
         index="002"
@@ -118,9 +97,6 @@ export default function HomePage() {
       />
       <FieldArchive
         index="005"
-        label="FIELD OPERATIONS"
-        heading="On-site empirical rigor across marine, forest, and industrial domains."
-        body="Our multidisciplinary teams conduct baseline monitoring, ambient environmental sampling, and regulatory inspections directly in the field."
         items={fieldArchiveItems}
       />
       <Process
