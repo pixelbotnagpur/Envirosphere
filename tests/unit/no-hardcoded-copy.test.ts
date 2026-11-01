@@ -42,7 +42,6 @@ const PENDING_C2B: readonly string[] = [
  * entry and the list is deleted with the last one.
  */
 const PENDING_C2A: readonly string[] = [
-  "src/app/why-us/page.tsx",
   "src/app/contact/page.tsx",
   "src/app/careers/page.tsx",
   "src/app/gallery/page.tsx",
