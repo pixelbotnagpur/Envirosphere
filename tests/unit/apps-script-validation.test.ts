@@ -14,6 +14,7 @@ interface Validation {
   LIMITS: Record<string, number>;
   CV_MAX_BYTES: number;
   sanitize(v: unknown): string;
+  phoneCell(v: unknown): string;
   isValidEmail(v: unknown): boolean;
   checkFillTime(fillMs: unknown): boolean;
   isHoneypotTripped(p: unknown): boolean;
@@ -67,6 +68,15 @@ describe("sanitize", () => {
     expect(v.sanitize("  Hello  ")).toBe("Hello");
     expect(v.sanitize("a\u0000b")).toBe("ab");
     expect(v.sanitize(null)).toBe("");
+  });
+});
+
+describe("phoneCell", () => {
+  it("always stores a validated phone as literal text so Sheets cannot evaluate or convert it", () => {
+    expect(v.phoneCell("+12345678-9")).toBe("'+12345678-9");
+    expect(v.phoneCell("-12345678")).toBe("'-12345678");
+    expect(v.phoneCell("9860220550")).toBe("'9860220550");
+    expect(v.phoneCell(" +91 98602 20550 ")).toBe("'+91 98602 20550");
   });
 });
 
@@ -223,6 +233,10 @@ describe("Code.gs wiring (source guards; Apps Script cannot run here)", () => {
       expect(codeSource).toContain(fn + "(");
     }
     expect(codeSource).toContain("TURNSTILE_SECRET");
+  });
+  it("writes phone numbers to the Sheet through phoneCell on both paths", () => {
+    expect(codeSource.match(/phoneCell\(clean\.phone\)/g)).toHaveLength(2);
+    expect(codeSource).not.toMatch(/^\s+clean\.phone,$/m);
   });
   it("never falls back to the Drive root and never leaks error text to the client", () => {
     expect(codeSource).not.toContain("getRootFolder");

@@ -72,6 +72,11 @@ function sanitize(val) {
   return str;
 }
 
+/** Phone cell value: a leading apostrophe makes Sheets keep it as text (no formula or number conversion). */
+function phoneCell(phone) {
+  return "'" + String(phone === null || phone === undefined ? "" : phone).trim();
+}
+
 function isValidEmail(email) {
   return (
     typeof email === "string" &&
@@ -271,6 +276,7 @@ if (typeof module !== "undefined" && module.exports) {
     GLOBAL_LIMIT_PER_MINUTE: GLOBAL_LIMIT_PER_MINUTE,
     EMAIL_LIMIT_PER_WINDOW: EMAIL_LIMIT_PER_WINDOW,
     sanitize: sanitize,
+    phoneCell: phoneCell,
     isValidEmail: isValidEmail,
     checkFillTime: checkFillTime,
     isHoneypotTripped: isHoneypotTripped,
