@@ -37,7 +37,7 @@ test.describe("route curtain", () => {
 
     await expect(page.locator("main#main")).toBeFocused();
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
-    await expect(page.getByRole("status")).not.toBeEmpty();
+    await expect(page.locator("[data-route-announcer]")).not.toBeEmpty();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
     );

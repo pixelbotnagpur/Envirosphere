@@ -57,6 +57,8 @@ export function PageTransition({ label }: { label: string }) {
     const main = document.getElementById("main");
     if (main) main.focus({ preventScroll: true });
     setAnnouncement(document.title);
+    // Next updates document.title just after the route commits; read it again once it has settled.
+    window.setTimeout(() => setAnnouncement(document.title), 200);
   }, []);
 
   const finish = useCallback(() => {
@@ -142,7 +144,7 @@ export function PageTransition({ label }: { label: string }) {
 
   return (
     <>
-      <div role="status" aria-live="polite" className="sr-only">
+      <div data-route-announcer aria-live="polite" className="sr-only">
         {announcement}
       </div>
       {phase === "idle" ? null : (

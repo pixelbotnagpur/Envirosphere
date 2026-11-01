@@ -58,7 +58,7 @@ describe("PageTransition", () => {
   it("renders no panel initially and exposes an empty polite live region", () => {
     setup();
     expect(panel()).toBeNull();
-    const region = screen.getByRole("status");
+    const region = document.querySelector("[data-route-announcer]") as HTMLElement;
     expect(region).toHaveAttribute("aria-live", "polite");
     expect(region).toHaveTextContent("");
   });
@@ -107,7 +107,7 @@ describe("PageTransition", () => {
 
     await waitFor(() => expect(panel()).toBeNull());
     expect(document.getElementById("main")).toHaveFocus();
-    expect(screen.getByRole("status")).toHaveTextContent("Services page");
+    expect(document.querySelector("[data-route-announcer]") as HTMLElement).toHaveTextContent("Services page");
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
   });
 
