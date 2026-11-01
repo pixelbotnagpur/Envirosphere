@@ -21,3 +21,9 @@ openings:
   generalApplyLabel: Send a general application
   generalRoleLabel: General application
   emailLabel: Or email us
+  # Shown on each opening listed in content/jobs.yaml:
+  requirementsLabel: "Key Requirements:"
+  applyWithCvLabel: Apply with CV
+  applyByEmailLabel: Apply via Email
+  # Subject of the "Apply via Email" link; {title} becomes the job title.
+  emailSubject: "Application for {title} - [Your Name]"

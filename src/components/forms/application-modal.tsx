@@ -17,40 +17,51 @@ import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { cn } from "@/lib/utils";
 import { validateCvFile } from "@/lib/forms/cv";
 import { collectFieldErrors, firstInvalidField } from "@/lib/forms/errors";
-import { submitForm } from "@/lib/forms/submit";
+import { submitForm, submitMessage } from "@/lib/forms/submit";
+import { fillText } from "@/lib/forms/text";
 import {
-  applicationSchema,
+  createApplicationSchema,
   isBotSubmission,
   type ApplicationInput,
   type CvFileInput,
 } from "@/lib/validators/forms";
+import type { FormsContent } from "@/lib/validators/forms-content";
 
 export interface ApplicationModalProps {
+  /** Every label, hint and message of the window (content/forms.yaml). */
+  copy: FormsContent;
   role: string;
   isOpen: boolean;
   onClose: () => void;
+  /** Where to send a CV when the form fails (site.yaml contact). Omitted: no email is suggested. */
   emailFallback?: string;
   /** Called while focus is being returned after close; call preventDefault() to move it elsewhere. */
   onCloseAutoFocus?: (event: Event) => void;
 }
 
-/** On-screen order of the fields, with the control id and visible name used by the error summary. */
+/** On-screen order of the fields and the id of each control (used by the error summary). */
 const fields = [
-  { key: "name", id: "app-name", label: "Full Name" },
-  { key: "email", id: "app-email", label: "Email Address" },
-  { key: "phone", id: "app-phone", label: "Phone Number" },
-  { key: "coverLetter", id: "app-cover", label: "Brief Introduction" },
-  { key: "cvFile", id: "app-cv", label: "Curriculum Vitae" },
+  { key: "name", id: "app-name", copyKey: "name" },
+  { key: "email", id: "app-email", copyKey: "email" },
+  { key: "phone", id: "app-phone", copyKey: "phone" },
+  { key: "coverLetter", id: "app-cover", copyKey: "coverLetter" },
+  { key: "cvFile", id: "app-cv", copyKey: "cv" },
 ] as const;
 const fieldKeys = fields.map((f) => f.key);
 
 export function ApplicationModal({
+  copy,
   role,
   isOpen,
   onClose,
   emailFallback,
   onCloseAutoFocus,
 }: ApplicationModalProps) {
+  const { common, application } = copy;
+  const applicationSchema = React.useMemo(
+    () => createApplicationSchema(application.errors),
+    [application.errors],
+  );
   const nameRef = React.useRef<HTMLInputElement>(null);
   // Radix only restores focus to a <Dialog.Trigger>; this dialog is opened from the outside, so
   // remember the element that had focus when it opened and return to it on close.
@@ -105,10 +116,17 @@ export function ApplicationModal({
     if (status === "success") statusRef.current?.focus();
   }, [status]);
 
+  const emailSubject = fillText(application.failure.emailSubject, { role });
   const cvError = fileError ?? fieldErrors.cvFile ?? null;
   const summaryFields: SummaryField[] = Object.entries(fieldErrors).map(([key, message]) => {
     const field = fields.find((f) => f.key === key);
-    return { key, label: field?.label ?? "Form", controlId: field?.id, message };
+    const text = field ? application.fields[field.copyKey] : undefined;
+    return {
+      key,
+      label: text ? (text.summaryLabel ?? text.label) : common.formLabel,
+      controlId: field?.id,
+      message,
+    };
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -136,7 +154,7 @@ export function ApplicationModal({
     // empty or odd type for ordinary documents.
     const check = validateCvFile(file);
     if (!check.ok) {
-      setFileError(check.error);
+      setFileError(application.errors[check.reason]);
       return;
     }
 
@@ -147,7 +165,7 @@ export function ApplicationModal({
       setCvFile({ name: file.name, type: check.mimeType, size: file.size, data: base64Data });
     };
     reader.onerror = () => {
-      setFileError("Could not read file. Please try another document.");
+      setFileError(application.errors.cvUnreadable);
     };
     reader.readAsDataURL(file);
   };
@@ -193,7 +211,7 @@ export function ApplicationModal({
     const issues = parsed.success ? [] : parsed.error.issues;
     const { errors } = collectFieldErrors(issues);
     if (!cvFile) {
-      errors.cvFile = "Please upload your CV document (PDF or DOCX).";
+      errors.cvFile = application.errors.cvRequired;
     }
     if (Object.keys(errors).length > 0) {
       const first = firstInvalidField(fieldKeys, errors);
@@ -205,20 +223,20 @@ export function ApplicationModal({
       // Every other field passed, so only the hidden trap field failed (a bot, or a password manager that filled it): never
       // leave a person stuck on an error they cannot see. Silent fake success.
       setStatus("success");
-      setStatusMessage("Thank you. Your application has been logged.");
+      setStatusMessage(application.success.logged);
       return;
     }
 
     if (isBotSubmission({ website: formData.website, fillMs })) {
       setStatus("success");
-      setStatusMessage("Thank you. Your application has been logged.");
+      setStatusMessage(application.success.logged);
       return;
     }
 
     setFieldErrors({});
     if (isTurnstileEnabled() && !turnstileToken) {
       setStatus("error");
-      setStatusMessage("Please complete the verification check, then submit again.");
+      setStatusMessage(common.verificationRequired);
       return;
     }
 
@@ -230,18 +248,9 @@ export function ApplicationModal({
     });
     setTurnstileReset((n) => n + 1);
 
-    if (result.success) {
-      setStatus("success");
-      setStatusMessage(
-        result.message || "Thank you. Your job application and CV have been safely received.",
-      );
-    } else {
-      setStatus("error");
-      setStatusMessage(
-        result.message ||
-          "Could not transmit application automatically. Please email your CV directly.",
-      );
-    }
+    setStatus(result.success ? "success" : "error");
+    // The server's own text when it gives one; otherwise the text for what happened.
+    setStatusMessage(submitMessage(result, common.submit));
   };
 
   return (
@@ -274,7 +283,7 @@ export function ApplicationModal({
             <Dialog.Close asChild>
               <button
                 type="button"
-                aria-label="Close modal"
+                aria-label={application.closeLabel}
                 className="absolute right-4 top-4 p-2 text-muted-foreground hover:text-foreground transition-colors rounded-pill"
               >
                 <X className="size-5" aria-hidden="true" />
@@ -287,37 +296,36 @@ export function ApplicationModal({
                   <CheckCircle2 className="size-8" aria-hidden="true" />
                 </div>
                 <Dialog.Title className="mt-6 font-heading text-h3 text-foreground">
-                  Application Submitted
+                  {application.success.heading}
                 </Dialog.Title>
                 <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
                 <Dialog.Description className="mt-2 text-sm text-muted-foreground">
-                  We have received your application.
+                  {application.success.note}
                 </Dialog.Description>
                 <div className="mt-8 flex justify-center gap-4">
                   <Dialog.Close asChild>
-                    <Button variant="outline">Close</Button>
+                    <Button variant="outline">{application.success.close}</Button>
                   </Dialog.Close>
                 </div>
               </div>
             ) : (
               <div>
                 <Dialog.Title className="font-heading text-h3 text-foreground">
-                  Apply for {role}
+                  {fillText(application.title, { role })}
                 </Dialog.Title>
                 <Dialog.Description className="mt-1 text-sm text-muted-foreground">
-                  Submit your curriculum vitae and contact details directly to our technical
-                  recruitment panel.
+                  {application.description}
                 </Dialog.Description>
 
                 <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
                   <ErrorSummary
-                    heading="Please check these fields before sending:"
+                    heading={common.errorSummaryHeading}
                     fields={summaryFields}
                   />
 
                   {/* Honeypot */}
                   <div aria-hidden="true" className="sr-only">
-                    <label htmlFor="app-website">Website</label>
+                    <label htmlFor="app-website">{common.honeypotLabel}</label>
                     <input
                       id="app-website"
                       type="text"
@@ -331,7 +339,7 @@ export function ApplicationModal({
 
                   <div>
                     <label htmlFor="app-name" className="block text-sm text-foreground/90">
-                      Full Name <span className="text-destructive">*</span>
+                      {application.fields.name.label} <span className="text-destructive">*</span>
                     </label>
                     <Input
                       id="app-name"
@@ -339,7 +347,7 @@ export function ApplicationModal({
                       name="name"
                       type="text"
                       required
-                      placeholder="e.g. Pooja Deshmukh"
+                      placeholder={application.fields.name.placeholder}
                       value={formData.name}
                       onChange={handleChange}
                       hasError={Boolean(fieldErrors.name)}
@@ -353,14 +361,14 @@ export function ApplicationModal({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="app-email" className="block text-sm text-foreground/90">
-                        Email Address <span className="text-destructive">*</span>
+                        {application.fields.email.label} <span className="text-destructive">*</span>
                       </label>
                       <Input
                         id="app-email"
                         name="email"
                         type="email"
                         required
-                        placeholder="pooja@domain.com"
+                        placeholder={application.fields.email.placeholder}
                         value={formData.email}
                         onChange={handleChange}
                         hasError={Boolean(fieldErrors.email)}
@@ -377,14 +385,14 @@ export function ApplicationModal({
 
                     <div>
                       <label htmlFor="app-phone" className="block text-sm text-foreground/90">
-                        Phone Number <span className="text-destructive">*</span>
+                        {application.fields.phone.label} <span className="text-destructive">*</span>
                       </label>
                       <Input
                         id="app-phone"
                         name="phone"
                         type="tel"
                         required
-                        placeholder="+91 98602 20550"
+                        placeholder={application.fields.phone.placeholder}
                         value={formData.phone}
                         onChange={handleChange}
                         hasError={Boolean(fieldErrors.phone)}
@@ -402,13 +410,13 @@ export function ApplicationModal({
 
                   <div>
                     <label htmlFor="app-cover" className="block text-sm text-foreground/90">
-                      Brief Introduction & Key Clearances Handled
+                      {application.fields.coverLetter.label}
                     </label>
                     <Textarea
                       id="app-cover"
                       name="coverLetter"
                       rows={3}
-                      placeholder="Highlight key sectors (EIA, SPCB, auditing) or technical qualifications..."
+                      placeholder={application.fields.coverLetter.placeholder}
                       value={formData.coverLetter || ""}
                       onChange={handleChange}
                       className="mt-1.5"
@@ -417,7 +425,7 @@ export function ApplicationModal({
 
                   <div>
                     <span id="app-cv-label" className="block text-sm text-foreground/90">
-                      Curriculum Vitae (PDF or DOCX, max 5 MB){" "}
+                      {application.fields.cv.label}{" "}
                       <span className="text-destructive">*</span>
                     </span>
 
@@ -429,7 +437,7 @@ export function ApplicationModal({
                             {cvFile.name}
                           </span>
                           <span className="text-sm text-muted-foreground shrink-0">
-                            ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
+                            ({fillText(application.fields.cv.sizeLabel, { size: (cvFile.size / 1024 / 1024).toFixed(2) })})
                           </span>
                         </div>
                         <button
@@ -437,7 +445,7 @@ export function ApplicationModal({
                           type="button"
                           onClick={handleRemoveFile}
                           className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
-                          aria-label="Remove selected CV"
+                          aria-label={application.fields.cv.removeLabel}
                         >
                           <X className="size-4" aria-hidden="true" />
                         </button>
@@ -458,10 +466,10 @@ export function ApplicationModal({
                       >
                         <UploadCloud className="size-8 text-muted-foreground" aria-hidden="true" />
                         <span className="mt-2 text-sm text-foreground font-normal">
-                          Click to choose or drag CV file
+                          {application.fields.cv.dropTitle}
                         </span>
                         <span className="mt-1 text-sm text-muted-foreground">
-                          PDF or DOCX (up to 5 MB)
+                          {application.fields.cv.dropHint}
                         </span>
                         <input
                           id="app-cv"
@@ -495,11 +503,10 @@ export function ApplicationModal({
                           {emailFallback ? (
                             <>
                               <p className="mt-1 text-sm text-muted-foreground">
-                                Please email your CV directly with subject &quot;Application: {role}
-                                &quot;:
+                                {fillText(application.failure.emailIntro, { subject: emailSubject })}
                               </p>
                               <a
-                                href={`mailto:${emailFallback}?subject=${encodeURIComponent(`Application: ${role}`)}`}
+                                href={`mailto:${emailFallback}?subject=${encodeURIComponent(emailSubject)}`}
                                 className="mt-2 inline-block text-sm text-primary font-normal hover:underline"
                               >
                                 {emailFallback}
@@ -514,11 +521,11 @@ export function ApplicationModal({
                   <div className="mt-6 flex items-center justify-end gap-3 pt-2">
                     <Dialog.Close asChild>
                       <Button type="button" variant="outline">
-                        Cancel
+                        {application.cancelLabel}
                       </Button>
                     </Dialog.Close>
                     <Button type="submit" variant="accent" disabled={status === "submitting"}>
-                      {status === "submitting" ? "Transmitting..." : "Submit Application"}
+                      {status === "submitting" ? common.submitting : application.submitLabel}
                     </Button>
                   </div>
                 </form>

@@ -1,0 +1,121 @@
+# Every word shown by the two forms: the enquiry form on the Contact page and the job application
+# window on the Careers page. Phone numbers and email addresses are NOT written here: the
+# "reach us directly" links use the ones in content/site.yaml.
+# Texts with {something} in them keep that word in braces; it is replaced when the form is shown.
+# TODO(content): owner to review the wording.
+
+common:
+  errorSummaryHeading: "Please check these fields before sending:"
+  # Name used in the list above for a problem that belongs to no field.
+  formLabel: Form
+  verificationRequired: Please complete the verification check, then submit again.
+  submitting: Transmitting...
+  # Label of the hidden spam-trap field. Visitors never see it.
+  honeypotLabel: Website
+  # Shown after sending when the server did not send a text of its own.
+  submit:
+    sent: Thank you. Your inquiry has been successfully submitted.
+    demo: Thank you. Your message has been received (demo mode).
+    unavailable: The submission service is temporarily unavailable. Please contact us directly via phone or email.
+    httpError: Submission failed with status {status}. Please try again or reach out directly.
+    rejected: Could not process submission. Please verify your details or contact us directly.
+    networkError: Network error ({error}). Please check your connection or contact our office.
+
+# The enquiry form on the Contact page.
+inquiry:
+  fields:
+    name:
+      label: Full Name
+      placeholder: e.g. Dr. Rajesh Sharma
+    organization:
+      label: Company / Organization
+      placeholder: e.g. Bharat Chemical Works
+    email:
+      label: Official Email Address
+      placeholder: rajesh@company.com
+    phone:
+      label: Contact Number
+      placeholder: +91 98602 20550
+    service:
+      label: Service of Interest / Required Scope
+      # Name used in the error list (when different from the label above).
+      summaryLabel: Service of Interest
+      placeholder: Select a service...
+      # First choice after the placeholder, before the list of services.
+      generalOption: General Environmental Advisory
+    message:
+      label: Project Brief & Site Location
+      placeholder: Please describe your project...
+  errors:
+    nameMin: Name must be at least 2 characters
+    nameMax: Name cannot exceed 100 characters
+    organizationMax: Organization name cannot exceed 100 characters
+    emailInvalid: Please enter a valid email address
+    emailMax: Email cannot exceed 120 characters
+    phoneInvalid: Please enter a valid phone number (e.g. +91 98602 20550)
+    serviceRequired: Please select a service or general inquiry
+    messageMin: Message must be at least 10 characters
+    messageMax: Message cannot exceed 2000 characters
+  submitLabel: Submit Inquiry
+  success:
+    heading: Inquiry Received
+    # Shown when the form was filled in by a robot (never reaches a person).
+    received: Thank you. Your enquiry has been received.
+    another: Send Another Inquiry
+  # Shown with the reason when sending fails (the reason itself comes from "common.submit" above).
+  failure:
+    direct: "You can reach us directly:"
+
+# The job application window on the Careers page. {role} is the job being applied for.
+application:
+  title: Apply for {role}
+  description: Submit your curriculum vitae and contact details directly to our technical recruitment panel.
+  closeLabel: Close modal
+  fields:
+    name:
+      label: Full Name
+      placeholder: e.g. Pooja Deshmukh
+    email:
+      label: Email Address
+      placeholder: pooja@domain.com
+    phone:
+      label: Phone Number
+      placeholder: +91 98602 20550
+    coverLetter:
+      label: Brief Introduction & Key Clearances Handled
+      summaryLabel: Brief Introduction
+      placeholder: Highlight key sectors (EIA, SPCB, auditing) or technical qualifications...
+    cv:
+      label: Curriculum Vitae (PDF or DOCX, max 5 MB)
+      summaryLabel: Curriculum Vitae
+      dropTitle: Click to choose or drag CV file
+      dropHint: PDF or DOCX (up to 5 MB)
+      removeLabel: Remove selected CV
+      # Size of the chosen file, shown in brackets next to its name.
+      sizeLabel: "{size} MB"
+  errors:
+    nameMin: Name must be at least 2 characters
+    nameMax: Name cannot exceed 100 characters
+    emailInvalid: Please enter a valid email address
+    emailMax: Email cannot exceed 120 characters
+    phoneInvalid: Please enter a valid phone number
+    roleRequired: Please specify the position applied for
+    coverLetterMax: Cover note cannot exceed 2000 characters
+    cvRequired: Please upload your CV document (PDF or DOCX).
+    cvUnreadable: Could not read file. Please try another document.
+    wrongType: Please choose a PDF or DOCX file (older .doc files are not accepted).
+    tooLarge: This file is larger than 5 MB. Please choose a smaller PDF or DOCX.
+    emptyFile: This file looks empty. Please choose another document.
+  cancelLabel: Cancel
+  submitLabel: Submit Application
+  success:
+    heading: Application Submitted
+    # Shown when the form was filled in by a robot (never reaches a person).
+    logged: Thank you. Your application has been logged.
+    note: We have received your application.
+    close: Close
+  # Shown with the reason when sending fails (the reason itself comes from "common.submit" above).
+  failure:
+    # {subject} is the email subject below.
+    emailIntro: 'Please email your CV directly with subject "{subject}":'
+    emailSubject: "Application: {role}"

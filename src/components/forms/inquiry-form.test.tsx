@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InquiryForm } from "./inquiry-form";
 import * as submitClient from "@/lib/forms/submit";
+import { forms, rx, siteContact } from "@tests/unit/helpers/forms";
 
 describe("InquiryForm", () => {
   beforeEach(() => {
@@ -15,53 +16,54 @@ describe("InquiryForm", () => {
   ];
 
   it("renders all form fields and submit button", () => {
-    render(<InquiryForm services={services} />);
-    expect(screen.getByLabelText(/Full Name/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Company/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Official Email Address/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Contact Number/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Service of Interest/)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Project Brief/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Submit Inquiry" })).toBeInTheDocument();
+    render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.name.label))).toBeInTheDocument();
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.organization.label))).toBeInTheDocument();
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.email.label))).toBeInTheDocument();
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.phone.label))).toBeInTheDocument();
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.service.label))).toBeInTheDocument();
+    expect(screen.getByLabelText(rx(forms.inquiry.fields.message.label))).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: forms.inquiry.submitLabel })).toBeInTheDocument();
   });
 
   it("validates required fields on empty submit without calling submitForm", async () => {
     const submitSpy = vi.spyOn(submitClient, "submitForm");
     const user = userEvent.setup();
 
-    render(<InquiryForm services={services} />);
-    await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+    render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
+    await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
 
-    expect(screen.getByText(/Name must be at least 2 characters/)).toBeInTheDocument();
+    expect(screen.getByText(rx(forms.inquiry.errors.nameMin))).toBeInTheDocument();
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
   it("submits the form successfully and displays confirmation state", async () => {
     vi.spyOn(submitClient, "submitForm").mockResolvedValue({
       success: true,
-      message: "Your inquiry has been registered.",
+      outcome: "sent",
+      serverMessage: "Your inquiry has been registered.",
     });
 
     const user = userEvent.setup();
-    render(<InquiryForm services={services} />);
+    render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
 
-    await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
-    await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
-    await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.name.label)), "Dr. Rajesh Sharma");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.email.label)), "rajesh@bharatchem.in");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.phone.label)), "+91 98602 20550");
     await user.selectOptions(
-      screen.getByLabelText(/Service of Interest/),
+      screen.getByLabelText(rx(forms.inquiry.fields.service.label)),
       "environmental-clearance",
     );
     await user.type(
-      screen.getByLabelText(/Project Brief/),
+      screen.getByLabelText(rx(forms.inquiry.fields.message.label)),
       "We require full EIA scoping and appraisal.",
     );
 
-    await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+    await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
 
     await waitFor(() => {
       expect(screen.getByRole("status")).toBeInTheDocument();
-      expect(screen.getByText("Inquiry Received")).toBeInTheDocument();
+      expect(screen.getByText(forms.inquiry.success.heading)).toBeInTheDocument();
       expect(screen.getByText("Your inquiry has been registered.")).toBeInTheDocument();
     });
   });
@@ -69,38 +71,40 @@ describe("InquiryForm", () => {
   it("shows error banner and fallback direct contact links when submission fails", async () => {
     vi.spyOn(submitClient, "submitForm").mockResolvedValue({
       success: false,
-      message: "Gateway timeout. Please contact support.",
+      outcome: "rejected",
+      serverMessage: "Gateway timeout. Please contact support.",
     });
 
     const user = userEvent.setup();
     render(
       <InquiryForm
+        copy={forms}
         services={services}
-        phoneFallback="+91 98602 20550"
-        emailFallback="info@envirosphere.co.in"
+        phoneFallback={siteContact.phones[0]}
+        emailFallback={siteContact.email}
       />,
     );
 
-    await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
-    await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
-    await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-    await user.selectOptions(screen.getByLabelText(/Service of Interest/), "water-audit");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.name.label)), "Dr. Rajesh Sharma");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.email.label)), "rajesh@bharatchem.in");
+    await user.type(screen.getByLabelText(rx(forms.inquiry.fields.phone.label)), "+91 98602 20550");
+    await user.selectOptions(screen.getByLabelText(rx(forms.inquiry.fields.service.label)), "water-audit");
     await user.type(
-      screen.getByLabelText(/Project Brief/),
+      screen.getByLabelText(rx(forms.inquiry.fields.message.label)),
       "Comprehensive water balance and audit required.",
     );
 
-    await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+    await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
 
     await waitFor(() => {
       expect(screen.getByText("Gateway timeout. Please contact support.")).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "+91 98602 20550" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: siteContact.phones[0] })).toHaveAttribute(
         "href",
-        "tel:+919860220550",
+        `tel:${siteContact.phones[0].replace(/\s/g, "")}`,
       );
-      expect(screen.getByRole("link", { name: "info@envirosphere.co.in" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: siteContact.email })).toHaveAttribute(
         "href",
-        "mailto:info@envirosphere.co.in",
+        `mailto:${siteContact.email}`,
       );
     });
   });
@@ -128,12 +132,12 @@ describe("InquiryForm", () => {
     });
 
     const fill = async (user: ReturnType<typeof userEvent.setup>) => {
-      await user.type(screen.getByLabelText(/Full Name/), "Dr. Rajesh Sharma");
-      await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@bharatchem.in");
-      await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-      await user.selectOptions(screen.getByLabelText(/Service of Interest/), "water-audit");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.name.label)), "Dr. Rajesh Sharma");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.email.label)), "rajesh@bharatchem.in");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.phone.label)), "+91 98602 20550");
+      await user.selectOptions(screen.getByLabelText(rx(forms.inquiry.fields.service.label)), "water-audit");
       await user.type(
-        screen.getByLabelText(/Project Brief/),
+        screen.getByLabelText(rx(forms.inquiry.fields.message.label)),
         "Comprehensive water balance and audit required.",
       );
     };
@@ -141,9 +145,9 @@ describe("InquiryForm", () => {
     it("blocks submission until the challenge is solved", async () => {
       const submitSpy = vi.spyOn(submitClient, "submitForm");
       const user = userEvent.setup();
-      render(<InquiryForm services={services} />);
+      render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
       await fill(user);
-      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+      await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
       expect(screen.getByText(/complete the verification check/)).toBeInTheDocument();
       expect(submitSpy).not.toHaveBeenCalled();
     });
@@ -151,13 +155,13 @@ describe("InquiryForm", () => {
     it("sends the turnstileToken in the payload", async () => {
       const submitSpy = vi
         .spyOn(submitClient, "submitForm")
-        .mockResolvedValue({ success: true, message: "ok" });
+        .mockResolvedValue({ success: true, outcome: "sent", serverMessage: "ok" });
       const user = userEvent.setup();
-      render(<InquiryForm services={services} />);
+      render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
       await fill(user);
       await waitFor(() => expect(widget).toBeDefined());
       act(() => widget?.callback("tok-abc"));
-      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+      await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
       await waitFor(() => expect(submitSpy).toHaveBeenCalled());
       expect(submitSpy.mock.calls[0]![0]).toMatchObject({
         turnstileToken: "tok-abc",
@@ -168,12 +172,12 @@ describe("InquiryForm", () => {
 
   describe("honeypot", () => {
     async function fillValid(user: ReturnType<typeof userEvent.setup>) {
-      await user.type(screen.getByLabelText(/Full Name/), "Rajesh Sharma");
-      await user.type(screen.getByLabelText(/Official Email Address/), "rajesh@company.com");
-      await user.type(screen.getByLabelText(/Contact Number/), "+91 98602 20550");
-      await user.selectOptions(screen.getByLabelText(/Service of Interest/), "general");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.name.label)), "Rajesh Sharma");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.email.label)), "rajesh@company.com");
+      await user.type(screen.getByLabelText(rx(forms.inquiry.fields.phone.label)), "+91 98602 20550");
+      await user.selectOptions(screen.getByLabelText(rx(forms.inquiry.fields.service.label)), "general");
       await user.type(
-        screen.getByLabelText(/Project Brief/),
+        screen.getByLabelText(rx(forms.inquiry.fields.message.label)),
         "We need an environmental clearance.",
       );
     }
@@ -185,20 +189,20 @@ describe("InquiryForm", () => {
     it("fakes success without sending when only the honeypot is filled", async () => {
       const submitSpy = vi.spyOn(submitClient, "submitForm");
       const user = userEvent.setup();
-      render(<InquiryForm services={services} />);
+      render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
       await fillValid(user);
       fill();
-      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
+      await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
       expect(await screen.findByRole("status")).toBeInTheDocument();
       expect(submitSpy).not.toHaveBeenCalled();
     });
 
     it("still shows real errors, never the honeypot error, when a field is invalid", async () => {
       const user = userEvent.setup();
-      render(<InquiryForm services={services} />);
+      render(<InquiryForm copy={forms} phoneFallback={siteContact.phones[0]} emailFallback={siteContact.email} services={services} />);
       fill();
-      await user.click(screen.getByRole("button", { name: "Submit Inquiry" }));
-      expect(await screen.findByText(/Name must be at least 2 characters/)).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: forms.inquiry.submitLabel }));
+      expect(await screen.findByText(rx(forms.inquiry.errors.nameMin))).toBeInTheDocument();
       expect(screen.queryByText(/Bot detected/)).toBeNull();
     });
   });

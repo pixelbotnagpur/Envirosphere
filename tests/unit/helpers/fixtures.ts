@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 export const LOGO_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20"/></svg>';
 
@@ -179,7 +181,14 @@ openings:
   generalApplyLabel: Send a general application
   generalRoleLabel: General application
   emailLabel: Or email us
+  requirementsLabel: "Key Requirements:"
+  applyWithCvLabel: Apply with CV
+  applyByEmailLabel: Apply via Email
+  emailSubject: "Application for {title}"
 `;
+
+/** A complete, valid forms file: the real one, so the fixture can never drift from the schema. */
+export const FORMS_YAML = readFileSync("content/forms.yaml", "utf8");
 
 export const ABOUT_YAML = `
 seo:
@@ -317,6 +326,7 @@ export function validFiles(): Record<string, string> {
     "content/services/environmental-audit.md": SERVICE_MD,
     "content/pages/services.yaml": SERVICES_PAGE_YAML,
     "content/pages/careers.yaml": CAREERS_YAML,
+    "content/forms.yaml": FORMS_YAML,
     "content/pages/about.yaml": ABOUT_YAML,
     "content/pages/why-us.yaml": WHY_US_YAML,
     "content/pages/contact.yaml": CONTACT_YAML,

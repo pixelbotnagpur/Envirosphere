@@ -1,6 +1,35 @@
+import { fillText } from "@/lib/forms/text";
+import type { FormsCommonCopy } from "@/lib/validators/forms-content";
+
+/** What happened to a submission. The visitor-facing text for each is in content/forms.yaml. */
+export type SubmitOutcome = "sent" | "demo" | "unavailable" | "http-error" | "rejected" | "network-error";
+
 export interface FormSubmissionResult {
   success: boolean;
-  message: string;
+  outcome: SubmitOutcome;
+  /** Text sent back by the Apps Script itself (used as is, it is server-side copy). */
+  serverMessage?: string;
+  /** Extra value for the message: the HTTP status or the network error text. */
+  detail?: string;
+}
+
+/** The sentence to show for a result: the server's own text when there is one, else content/forms.yaml. */
+export function submitMessage(result: FormSubmissionResult, copy: FormsCommonCopy["submit"]): string {
+  if (result.serverMessage) return result.serverMessage;
+  switch (result.outcome) {
+    case "sent":
+      return copy.sent;
+    case "demo":
+      return copy.demo;
+    case "unavailable":
+      return copy.unavailable;
+    case "http-error":
+      return fillText(copy.httpError, { status: result.detail ?? "" });
+    case "rejected":
+      return copy.rejected;
+    case "network-error":
+      return fillText(copy.networkError, { error: result.detail ?? "" });
+  }
 }
 
 /**
@@ -12,16 +41,9 @@ export async function submitForm<T extends Record<string, unknown>>(
 ): Promise<FormSubmissionResult> {
   if (!endpoint || endpoint.trim() === "") {
     if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-      return {
-        success: true,
-        message: "Thank you. Your message has been received (demo mode).",
-      };
+      return { success: true, outcome: "demo" };
     }
-    return {
-      success: false,
-      message:
-        "The submission service is temporarily unavailable. Please contact us directly via phone or email.",
-    };
+    return { success: false, outcome: "unavailable" };
   }
 
   try {
@@ -34,33 +56,21 @@ export async function submitForm<T extends Record<string, unknown>>(
     });
 
     if (!response.ok) {
-      return {
-        success: false,
-        message: `Submission failed with status ${response.status}. Please try again or reach out directly.`,
-      };
+      return { success: false, outcome: "http-error", detail: String(response.status) };
     }
 
     const data = (await response.json()) as { success?: boolean; message?: string; error?: string };
 
     if (data.success) {
-      return {
-        success: true,
-        message: data.message || "Thank you. Your inquiry has been successfully submitted.",
-      };
+      return { success: true, outcome: "sent", serverMessage: data.message || undefined };
     }
 
-    return {
-      success: false,
-      message:
-        data.error ||
-        data.message ||
-        "Could not process submission. Please verify your details or contact us directly.",
-    };
+    return { success: false, outcome: "rejected", serverMessage: data.error || data.message || undefined };
   } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return {
       success: false,
-      message: `Network error (${errorMessage}). Please check your connection or contact our office.`,
+      outcome: "network-error",
+      detail: err instanceof Error ? err.message : "Unknown error",
     };
   }
 }

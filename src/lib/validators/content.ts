@@ -8,6 +8,7 @@ import {
 } from "./shared";
 
 export * from "./pages";
+export * from "./forms-content";
 export { ctaPanelSchema, iconName, pageHeroSchema, pageSeoSchema } from "./shared";
 
 const phone = z
@@ -257,6 +258,14 @@ export const careersSchema = z.object({
     generalApplyLabel: z.string().min(1),
     generalRoleLabel: z.string().min(1),
     emailLabel: z.string().min(1),
+    /** Heading above the list of requirements of an opening. */
+    requirementsLabel: z.string().min(1),
+    applyWithCvLabel: z.string().min(1),
+    applyByEmailLabel: z.string().min(1),
+    /** Subject of the "apply by email" link; {title} becomes the job title. */
+    emailSubject: z
+      .string()
+      .includes("{title}", { error: 'must contain {title}, e.g. "Application for {title} - [Your Name]"' }),
   }),
 });
 

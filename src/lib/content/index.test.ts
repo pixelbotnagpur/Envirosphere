@@ -7,6 +7,7 @@ import {
   loadAll,
   loadContactPage,
   loadDownloadsPage,
+  loadForms,
   loadGalleryPage,
   loadService,
   loadServices,
@@ -61,6 +62,24 @@ describe("loadAll", () => {
     files[key] = files[key].replace(from, to);
     const { content, publicDir } = makeTree(files);
     expect(() => loadAll(content, publicDir)).toThrowError(message);
+  });
+
+  it("loads the forms file and names the file and field when a form text is missing", () => {
+    const { content, publicDir } = makeTree(validFiles());
+    expect(loadAll(content, publicDir).forms.inquiry.submitLabel).toBe("Submit Inquiry");
+    expect(loadForms(content).application.fields.cv.label).toContain("Curriculum Vitae");
+
+    const files = validFiles();
+    files["content/forms.yaml"] = files["content/forms.yaml"].replace(/^ {2}submitLabel: Submit Inquiry\r?\n/m, "");
+    const broken = makeTree(files);
+    expect(() => loadAll(broken.content, broken.publicDir)).toThrowError(/content\/forms\.yaml → inquiry\.submitLabel/);
+  });
+
+  it("fails with a plain message when forms.yaml is missing", () => {
+    const files = validFiles();
+    delete files["content/forms.yaml"];
+    const { content, publicDir } = makeTree(files);
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/forms\.yaml: file is missing/);
   });
 
   it("fails with a plain message when a page file is missing", () => {

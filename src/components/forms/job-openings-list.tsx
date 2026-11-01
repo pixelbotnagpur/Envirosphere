@@ -4,25 +4,36 @@ import { Briefcase, Building2, Check, Clock, FileUp, Mail, MapPin } from "lucide
 import * as React from "react";
 import { ApplicationModal } from "@/components/forms/application-modal";
 import { Button } from "@/components/ui/button";
+import { fillText } from "@/lib/forms/text";
 import { mailtoHref } from "@/lib/links";
 import type { Job } from "@/lib/validators/content";
+import type { FormsContent } from "@/lib/validators/forms-content";
 
-export interface JobOpeningsEmptyState {
+/** The texts of the list (content/pages/careers.yaml, "openings"). */
+export interface JobOpeningsCopy {
   noneHeading: string;
   noneBody: string;
   generalApplyLabel: string;
   generalRoleLabel: string;
   emailLabel: string;
+  requirementsLabel: string;
+  applyWithCvLabel: string;
+  applyByEmailLabel: string;
+  /** {title} becomes the job title. */
+  emailSubject: string;
 }
 
 export interface JobOpeningsListProps {
   jobs: Job[];
+  /** Where applications are emailed (site.yaml: careersEmail when set, else the main email). */
   contactEmail: string;
-  /** Texts for the "no open positions" state, which offers a general application. */
-  emptyState: JobOpeningsEmptyState;
+  /** Texts of the list; the "no open positions" state offers a general application. */
+  copy: JobOpeningsCopy;
+  /** Texts of the application window (content/forms.yaml). */
+  forms: FormsContent;
 }
 
-export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsListProps) {
+export function JobOpeningsList({ jobs, contactEmail, copy, forms }: JobOpeningsListProps) {
   const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
   // Safari and Firefox on macOS do not focus a button on click, so remember it explicitly.
   const triggerRef = React.useRef<HTMLElement | null>(null);
@@ -32,8 +43,8 @@ export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsL
       {jobs.length === 0 ? (
         <div className="mx-auto mt-12 max-w-2xl rounded-card border border-border bg-surface p-12 text-center">
           <Briefcase aria-hidden="true" className="mx-auto size-12 text-muted-foreground" />
-          <h3 className="mt-4 text-h3">{emptyState.noneHeading}</h3>
-          <p className="mt-2 text-sm font-light text-muted-foreground">{emptyState.noneBody}</p>
+          <h3 className="mt-4 text-h3">{copy.noneHeading}</h3>
+          <p className="mt-2 text-sm font-light text-muted-foreground">{copy.noneBody}</p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
               size="lg"
@@ -41,16 +52,16 @@ export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsL
               className="gap-2"
               onClick={(event) => {
                 triggerRef.current = event.currentTarget;
-                setSelectedRole(emptyState.generalRoleLabel);
+                setSelectedRole(copy.generalRoleLabel);
               }}
             >
               <FileUp className="size-4" aria-hidden="true" />
-              {emptyState.generalApplyLabel}
+              {copy.generalApplyLabel}
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2">
-              <a href={mailtoHref(contactEmail, emptyState.generalRoleLabel)}>
+              <a href={mailtoHref(contactEmail, copy.generalRoleLabel)}>
                 <Mail className="size-4" aria-hidden="true" />
-                {emptyState.emailLabel}
+                {copy.emailLabel}
               </a>
             </Button>
           </div>
@@ -89,7 +100,7 @@ export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsL
 
                 <div className="mt-6">
                   <h4 className="text-label uppercase tracking-label text-muted-foreground">
-                    Key Requirements:
+                    {copy.requirementsLabel}
                   </h4>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground font-light">
                     {job.requirements.map((req: string) => (
@@ -113,12 +124,12 @@ export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsL
                   className="w-full gap-2"
                 >
                   <FileUp className="size-4" aria-hidden="true" />
-                  Apply with CV
+                  {copy.applyWithCvLabel}
                 </Button>
                 <Button asChild variant="outline" size="sm" className="w-full gap-2">
-                  <a href={mailtoHref(contactEmail, `Application for ${job.title} - [Your Name]`)}>
+                  <a href={mailtoHref(contactEmail, fillText(copy.emailSubject, { title: job.title }))}>
                     <Mail className="size-3.5" aria-hidden="true" />
-                    Apply via Email
+                    {copy.applyByEmailLabel}
                   </a>
                 </Button>
               </div>
@@ -128,6 +139,7 @@ export function JobOpeningsList({ jobs, contactEmail, emptyState }: JobOpeningsL
       </div>
 
       <ApplicationModal
+        copy={forms}
         key={selectedRole || "none"}
         role={selectedRole || ""}
         isOpen={Boolean(selectedRole)}

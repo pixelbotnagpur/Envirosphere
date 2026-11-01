@@ -15,35 +15,42 @@ import {
 } from "@/components/forms/form-parts";
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { collectFieldErrors, firstInvalidField } from "@/lib/forms/errors";
-import { submitForm } from "@/lib/forms/submit";
-import { inquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
+import { submitForm, submitMessage } from "@/lib/forms/submit";
+import { createInquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
+import type { FormsContent } from "@/lib/validators/forms-content";
 
 export interface InquiryFormProps {
+  /** Every label, hint and message of the form (content/forms.yaml). */
+  copy: FormsContent;
   services?: { slug: string; title: string }[];
   defaultService?: string;
-  phoneFallback?: string;
-  emailFallback?: string;
+  /** Shown when sending fails (site.yaml contact). */
+  phoneFallback: string;
+  emailFallback: string;
   className?: string;
 }
 
-/** On-screen order of the fields, with the control id and visible name used by the error summary. */
+/** On-screen order of the fields and the id of each control (used by the error summary). */
 const fields = [
-  { key: "name", id: "inquiry-name", label: "Full Name" },
-  { key: "organization", id: "inquiry-org", label: "Company / Organization" },
-  { key: "email", id: "inquiry-email", label: "Official Email Address" },
-  { key: "phone", id: "inquiry-phone", label: "Contact Number" },
-  { key: "service", id: "inquiry-service", label: "Service of Interest" },
-  { key: "message", id: "inquiry-message", label: "Project Brief & Site Location" },
+  { key: "name", id: "inquiry-name" },
+  { key: "organization", id: "inquiry-org" },
+  { key: "email", id: "inquiry-email" },
+  { key: "phone", id: "inquiry-phone" },
+  { key: "service", id: "inquiry-service" },
+  { key: "message", id: "inquiry-message" },
 ] as const;
 const fieldKeys = fields.map((f) => f.key);
 
 export function InquiryForm({
+  copy,
   services = [],
   defaultService = "",
-  phoneFallback = "+91 98602 20550",
-  emailFallback = "info@envirosphere.co.in",
+  phoneFallback,
+  emailFallback,
   className,
 }: InquiryFormProps) {
+  const { common, inquiry } = copy;
+  const inquirySchema = React.useMemo(() => createInquirySchema(inquiry.errors), [inquiry.errors]);
   const [formData, setFormData] = React.useState<InquiryInput>({
     type: "inquiry",
     name: "",
@@ -84,7 +91,13 @@ export function InquiryForm({
 
   const summaryFields: SummaryField[] = Object.entries(fieldErrors).map(([key, message]) => {
     const field = fields.find((f) => f.key === key);
-    return { key, label: field?.label ?? "Form", controlId: field?.id, message };
+    const text = field ? inquiry.fields[field.key] : undefined;
+    return {
+      key,
+      label: text ? (text.summaryLabel ?? text.label) : common.formLabel,
+      controlId: field?.id,
+      message,
+    };
   });
 
   const handleChange = (
@@ -122,7 +135,7 @@ export function InquiryForm({
       // Only the hidden trap field failed (a bot, or a password manager that filled it): never
       // leave a person stuck on an error they cannot see. Silent fake success.
       setStatus("success");
-      setStatusMessage("Thank you. Your enquiry has been received.");
+      setStatusMessage(inquiry.success.received);
       return;
     }
 
@@ -130,14 +143,14 @@ export function InquiryForm({
     if (isBotSubmission({ website: formData.website, fillMs })) {
       // Fake success for bots to prevent adversarial learning
       setStatus("success");
-      setStatusMessage("Thank you. Your enquiry has been received.");
+      setStatusMessage(inquiry.success.received);
       return;
     }
 
     setFieldErrors({});
     if (isTurnstileEnabled() && !turnstileToken) {
       setStatus("error");
-      setStatusMessage("Please complete the verification check, then submit again.");
+      setStatusMessage(common.verificationRequired);
       return;
     }
 
@@ -152,15 +165,11 @@ export function InquiryForm({
 
     if (result.success) {
       setStatus("success");
-      setStatusMessage(
-        result.message || "Thank you. Your enquiry has been sent.",
-      );
+      setStatusMessage(submitMessage(result, common.submit));
     } else {
       setStatus("error");
-      setStatusMessage(
-        result.message ||
-          "We could not deliver your message automatically. Please connect with our team directly.",
-      );
+      // The server's own explanation when it gives one; otherwise the text for what went wrong.
+      setStatusMessage(submitMessage(result, common.submit));
     }
   };
 
@@ -192,12 +201,12 @@ export function InquiryForm({
         <div className="mx-auto flex size-14 items-center justify-center rounded-pill bg-primary/10 text-primary">
           <CheckCircle2 className="size-8" aria-hidden="true" />
         </div>
-        <h3 className="mt-6 font-heading text-h3 text-foreground">Inquiry Received</h3>
+        <h3 className="mt-6 font-heading text-h3 text-foreground">{inquiry.success.heading}</h3>
         <p className="mt-3 text-lead font-light text-muted-foreground">{statusMessage}</p>
         <div className="mt-8 flex justify-center">
           <Button variant="outline" onClick={handleReset} className="gap-2">
             <RotateCcw className="size-4" aria-hidden="true" />
-            Send Another Inquiry
+            {inquiry.success.another}
           </Button>
         </div>
       </div>
@@ -211,14 +220,14 @@ export function InquiryForm({
       className={className ?? "rounded-card border border-border bg-surface/40 p-6 sm:p-10"}
     >
       <ErrorSummary
-        heading="Please check these fields before sending:"
+        heading={common.errorSummaryHeading}
         fields={summaryFields}
         className="mb-6"
       />
 
       {/* Honeypot field for bot protection */}
       <div aria-hidden="true" className="sr-only">
-        <label htmlFor="inquiry-website">Website</label>
+        <label htmlFor="inquiry-website">{common.honeypotLabel}</label>
         <input
           id="inquiry-website"
           type="text"
@@ -233,7 +242,7 @@ export function InquiryForm({
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <label htmlFor="inquiry-name" className="block text-sm text-foreground/90">
-            Full Name <span className="text-destructive">*</span>
+            {inquiry.fields.name.label} <span className="text-destructive">*</span>
           </label>
           <Input
             id="inquiry-name"
@@ -241,7 +250,7 @@ export function InquiryForm({
             type="text"
             required
             autoComplete="name"
-            placeholder="e.g. Dr. Rajesh Sharma"
+            placeholder={inquiry.fields.name.placeholder}
             value={formData.name}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.name)}
@@ -253,14 +262,14 @@ export function InquiryForm({
 
         <div>
           <label htmlFor="inquiry-org" className="block text-sm text-foreground/90">
-            Company / Organization
+            {inquiry.fields.organization.label}
           </label>
           <Input
             id="inquiry-org"
             name="organization"
             type="text"
             autoComplete="organization"
-            placeholder="e.g. Bharat Chemical Works"
+            placeholder={inquiry.fields.organization.placeholder}
             value={formData.organization || ""}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.organization)}
@@ -276,7 +285,7 @@ export function InquiryForm({
 
         <div>
           <label htmlFor="inquiry-email" className="block text-sm text-foreground/90">
-            Official Email Address <span className="text-destructive">*</span>
+            {inquiry.fields.email.label} <span className="text-destructive">*</span>
           </label>
           <Input
             id="inquiry-email"
@@ -284,7 +293,7 @@ export function InquiryForm({
             type="email"
             required
             autoComplete="email"
-            placeholder="rajesh@company.com"
+            placeholder={inquiry.fields.email.placeholder}
             value={formData.email}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.email)}
@@ -296,7 +305,7 @@ export function InquiryForm({
 
         <div>
           <label htmlFor="inquiry-phone" className="block text-sm text-foreground/90">
-            Contact Number <span className="text-destructive">*</span>
+            {inquiry.fields.phone.label} <span className="text-destructive">*</span>
           </label>
           <Input
             id="inquiry-phone"
@@ -304,7 +313,7 @@ export function InquiryForm({
             type="tel"
             required
             autoComplete="tel"
-            placeholder="+91 98602 20550"
+            placeholder={inquiry.fields.phone.placeholder}
             value={formData.phone}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.phone)}
@@ -317,7 +326,7 @@ export function InquiryForm({
 
       <div className="mt-6">
         <label htmlFor="inquiry-service" className="block text-sm text-foreground/90">
-          Service of Interest / Required Scope <span className="text-destructive">*</span>
+          {inquiry.fields.service.label} <span className="text-destructive">*</span>
         </label>
         <Select
           id="inquiry-service"
@@ -328,8 +337,8 @@ export function InquiryForm({
           aria-describedby={describedBy(fieldErrors.service && errorId("inquiry-service"))}
           className="mt-2"
         >
-          <option value="">Select a service...</option>
-          <option value="general">General Environmental Advisory</option>
+          <option value="">{inquiry.fields.service.placeholder}</option>
+          <option value="general">{inquiry.fields.service.generalOption}</option>
           {services.map((srv) => (
             <option key={srv.slug} value={srv.slug}>
               {srv.title}
@@ -341,14 +350,14 @@ export function InquiryForm({
 
       <div className="mt-6">
         <label htmlFor="inquiry-message" className="block text-sm text-foreground/90">
-          Project Brief & Site Location <span className="text-destructive">*</span>
+          {inquiry.fields.message.label} <span className="text-destructive">*</span>
         </label>
         <Textarea
           id="inquiry-message"
           name="message"
           rows={4}
           required
-          placeholder="Please describe your project..."
+          placeholder={inquiry.fields.message.placeholder}
           value={formData.message}
           onChange={handleChange}
           hasError={Boolean(fieldErrors.message)}
@@ -370,7 +379,7 @@ export function InquiryForm({
             <div className="flex-1">
               <p className="font-normal text-destructive">{statusMessage}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                You can reach us directly:
+                {inquiry.failure.direct}
               </p>
               <div className="mt-3 flex flex-wrap gap-4">
                 <a
@@ -401,7 +410,7 @@ export function InquiryForm({
           disabled={status === "submitting"}
           className="w-full sm:w-auto shrink-0"
         >
-          {status === "submitting" ? "Transmitting..." : "Submit Inquiry"}
+          {status === "submitting" ? common.submitting : inquiry.submitLabel}
         </Button>
       </div>
     </form>

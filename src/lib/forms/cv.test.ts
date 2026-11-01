@@ -23,7 +23,7 @@ describe("validateCvFile", () => {
   it("rejects old .doc and other formats in plain language", () => {
     const doc = validateCvFile(file("cv.doc"));
     expect(doc.ok).toBe(false);
-    if (!doc.ok) expect(doc.error).toMatch(/PDF or DOCX/);
+    if (!doc.ok) expect(doc.reason).toBe("wrongType");
     expect(validateCvFile(file("cv")).ok).toBe(false);
     expect(validateCvFile(file("cv.pdf.exe")).ok).toBe(false);
   });
@@ -31,8 +31,8 @@ describe("validateCvFile", () => {
   it("rejects files over 5 MB and empty files", () => {
     const big = validateCvFile(file("cv.pdf", cvMaxBytes + 1));
     expect(big.ok).toBe(false);
-    if (!big.ok) expect(big.error).toMatch(/5 MB/);
+    if (!big.ok) expect(big.reason).toBe("tooLarge");
     expect(validateCvFile(file("cv.pdf", cvMaxBytes)).ok).toBe(true);
-    expect(validateCvFile(file("cv.pdf", 0)).ok).toBe(false);
+    expect(validateCvFile(file("cv.pdf", 0))).toEqual({ ok: false, reason: "emptyFile" });
   });
 });

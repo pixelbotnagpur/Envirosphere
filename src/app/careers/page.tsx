@@ -3,7 +3,7 @@ import { JobOpeningsList } from "@/components/forms/job-openings-list";
 import { OpeningsHeader } from "@/components/sections/openings-header";
 import { PageHero } from "@/components/sections/page-hero";
 import { Container } from "@/components/ui/container";
-import { loadCareers, loadJobs, loadSite } from "@/lib/content";
+import { loadCareers, loadForms, loadJobs, loadSite } from "@/lib/content";
 import { pageMetadata } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
@@ -13,6 +13,7 @@ export function generateMetadata(): Metadata {
 export default function CareersPage() {
   const site = loadSite();
   const jobs = loadJobs();
+  const forms = loadForms();
   const { hero, openings } = loadCareers();
   const countText = (jobs.length === 1 ? openings.countOne : openings.countMany).replace(
     "{count}",
@@ -32,7 +33,12 @@ export default function CareersPage() {
             note={jobs.length > 0 ? countText : undefined}
           />
 
-          <JobOpeningsList jobs={jobs} contactEmail={site.contact.email} emptyState={openings} />
+          <JobOpeningsList
+            jobs={jobs}
+            contactEmail={site.contact.careersEmail ?? site.contact.email}
+            copy={openings}
+            forms={forms}
+          />
         </Container>
       </section>
     </div>

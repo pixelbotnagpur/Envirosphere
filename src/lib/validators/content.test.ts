@@ -6,6 +6,7 @@ import {
   CAREERS_YAML,
   CONTACT_YAML,
   DOWNLOADS_PAGE_YAML,
+  FORMS_YAML,
   GALLERY_PAGE_YAML,
   HOME_YAML,
   MEDIA_YAML,
@@ -18,6 +19,7 @@ import {
   careersSchema,
   contactPageSchema,
   downloadsPageSchema,
+  formsSchema,
   galleryPageSchema,
   homeSchema,
   mediaSchema,
@@ -125,6 +127,61 @@ describe("content schemas", () => {
   });
 });
 
+describe("site.contact.careersEmail", () => {
+  it("is optional and, when set, must be an email address", () => {
+    const site = parse(SITE_YAML);
+    expect(siteSchema.safeParse(site).success).toBe(true);
+    site.contact.careersEmail = "jobs@example.com";
+    expect(siteSchema.safeParse(site).success).toBe(true);
+    site.contact.careersEmail = "not an email";
+    expect(siteSchema.safeParse(site).success).toBe(false);
+  });
+});
+
+describe("forms schema (content/forms.yaml)", () => {
+  it("accepts the real forms file", () => {
+    expect(formsSchema.safeParse(parse(FORMS_YAML)).success).toBe(true);
+  });
+
+  it("requires every validation message of the enquiry form", () => {
+    for (const key of ["nameMin", "emailInvalid", "phoneInvalid", "serviceRequired", "messageMin"]) {
+      const broken = parse(FORMS_YAML);
+      delete broken.inquiry.errors[key];
+      expect(formsSchema.safeParse(broken).success, key).toBe(false);
+    }
+  });
+
+  it("requires the CV messages and the field labels of the application window", () => {
+    for (const key of ["wrongType", "tooLarge", "emptyFile", "cvRequired", "cvUnreadable"]) {
+      const broken = parse(FORMS_YAML);
+      delete broken.application.errors[key];
+      expect(formsSchema.safeParse(broken).success, key).toBe(false);
+    }
+    const noLabel = parse(FORMS_YAML);
+    delete noLabel.application.fields.cv.label;
+    expect(formsSchema.safeParse(noLabel).success).toBe(false);
+  });
+
+  it.each([
+    ["application", "title", "Apply for a job", "{role}"],
+    ["application", "title", "Apply", "{role}"],
+  ])("keeps the %s %s placeholder %s", (block, key, text, placeholder) => {
+    const broken = parse(FORMS_YAML);
+    broken[block][key] = text;
+    const result = formsSchema.safeParse(broken);
+    expect(result.success).toBe(false);
+    expect(JSON.stringify(result.error?.issues)).toContain(placeholder);
+  });
+
+  it("keeps the {status} and {error} placeholders of the sending messages", () => {
+    for (const key of ["httpError", "networkError"]) {
+      const broken = parse(FORMS_YAML);
+      broken.common.submit[key] = "Something failed";
+      expect(formsSchema.safeParse(broken).success, key).toBe(false);
+    }
+  });
+});
+
 describe("inner page schemas", () => {
   const pages = [
     ["about", aboutPageSchema, ABOUT_YAML],
@@ -185,6 +242,17 @@ describe("inner page schemas", () => {
     const data = parse(CONTACT_YAML);
     data.direct.phoneLabels = [];
     expect(contactPageSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("requires the labels of each opening and {title} in the careers email subject", () => {
+    const data = parse(CAREERS_YAML);
+    data.openings.emailSubject = "Application";
+    expect(careersSchema.safeParse(data).success).toBe(false);
+    for (const key of ["requirementsLabel", "applyWithCvLabel", "applyByEmailLabel"]) {
+      const broken = parse(CAREERS_YAML);
+      delete broken.openings[key];
+      expect(careersSchema.safeParse(broken).success, key).toBe(false);
+    }
   });
 
   it("requires {count} in the careers opening counts", () => {

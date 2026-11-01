@@ -6,6 +6,7 @@ import {
   loadCareers,
   loadContactPage,
   loadDownloadsPage,
+  loadForms,
   loadGalleryPage,
   loadServicesPage,
   loadSite,
@@ -46,6 +47,7 @@ const downloads = loadDownloadsPage();
 const careers = loadCareers();
 const { hub } = loadServicesPage();
 const site = loadSite();
+const forms = loadForms();
 
 const cases: PageCase[] = [
   {
@@ -77,6 +79,9 @@ const cases: PageCase[] = [
     hero: contact.hero,
     expected: [
       contact.enquiry.heading,
+      forms.inquiry.submitLabel,
+      forms.inquiry.fields.name.label,
+      forms.inquiry.fields.service.generalOption,
       contact.direct.heading,
       contact.headOffice.heading,
       site.contact.address,

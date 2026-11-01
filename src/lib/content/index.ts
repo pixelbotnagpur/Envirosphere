@@ -6,6 +6,7 @@ import {
   contactPageSchema,
   downloadsPageSchema,
   downloadsSchema,
+  formsSchema,
   galleryPageSchema,
   gallerySchema,
   homeSchema,
@@ -20,6 +21,7 @@ import {
   type ContactPageContent,
   type DownloadItem,
   type DownloadsPageContent,
+  type FormsContent,
   type GalleryItem,
   type GalleryPageContent,
   type Home,
@@ -41,6 +43,9 @@ export const loadSite = (root = CONTENT_ROOT): Site => readYamlFile("site.yaml",
 export const loadMedia = (root = CONTENT_ROOT): Media => readYamlFile("media.yaml", mediaSchema, root);
 export const loadHome = (root = CONTENT_ROOT): Home =>
   readYamlFile("pages/home.yaml", homeSchema, root);
+
+export const loadForms = (root = CONTENT_ROOT): FormsContent =>
+  readYamlFile("forms.yaml", formsSchema, root);
 
 export const loadServicesPage = (root = CONTENT_ROOT): ServicesPage =>
   readYamlFile("pages/services.yaml", servicesPageSchema, root);
@@ -165,6 +170,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const services = loadServices(root);
   const servicesPage = loadServicesPage(root);
   const careers = loadCareers(root);
+  const forms = loadForms(root);
   const aboutPage = loadAboutPage(root);
   const whyUsPage = loadWhyUsPage(root);
   const contactPage = loadContactPage(root);
@@ -221,6 +227,7 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
     home,
     servicesPage,
     careers,
+    forms,
     aboutPage,
     whyUsPage,
     contactPage,

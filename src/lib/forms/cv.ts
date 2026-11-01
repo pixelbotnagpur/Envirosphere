@@ -7,7 +7,10 @@ const mimeByExtension: Record<string, CvFileInput["type"]> = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
 
-export type CvCheck = { ok: true; mimeType: CvFileInput["type"] } | { ok: false; error: string };
+/** Why a chosen file was refused; the visitor-facing text for each is in content/forms.yaml. */
+export type CvRejection = "wrongType" | "emptyFile" | "tooLarge";
+
+export type CvCheck = { ok: true; mimeType: CvFileInput["type"] } | { ok: false; reason: CvRejection };
 
 /**
  * Checks a chosen CV once, at selection time. The type comes from the file extension, never from
@@ -17,13 +20,13 @@ export function validateCvFile(file: { name: string; size: number }): CvCheck {
   const extension = /\.([A-Za-z0-9]+)$/.exec(file.name)?.[1]?.toLowerCase() ?? "";
   const mimeType = mimeByExtension[extension];
   if (!mimeType) {
-    return { ok: false, error: "Please choose a PDF or DOCX file (older .doc files are not accepted)." };
+    return { ok: false, reason: "wrongType" };
   }
   if (file.size <= 0) {
-    return { ok: false, error: "This file looks empty. Please choose another document." };
+    return { ok: false, reason: "emptyFile" };
   }
   if (file.size > cvMaxBytes) {
-    return { ok: false, error: "This file is larger than 5 MB. Please choose a smaller PDF or DOCX." };
+    return { ok: false, reason: "tooLarge" };
   }
   return { ok: true, mimeType };
 }

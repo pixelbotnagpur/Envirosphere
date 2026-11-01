@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest";
+import { forms } from "@tests/unit/helpers/forms";
 import {
-  applicationSchema,
-  cvFileSchema,
-  inquirySchema,
+  createApplicationSchema,
+  createCvFileSchema,
+  createInquirySchema,
   isBotSubmission,
 } from "./forms";
+
+const inquirySchema = createInquirySchema(forms.inquiry.errors);
+const applicationSchema = createApplicationSchema(forms.application.errors);
+const cvFileSchema = createCvFileSchema(forms.application.errors);
+
+/** The message the schema gives for one field of a bad value. */
+const messageFor = (result: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }, field: string) =>
+  result.error?.issues.find((issue) => issue.path[0] === field)?.message;
 
 describe("inquirySchema", () => {
   const validInquiry = {
@@ -31,19 +40,23 @@ describe("inquirySchema", () => {
   it("rejects an empty name or message", () => {
     const emptyName = inquirySchema.safeParse({ ...validInquiry, name: "" });
     expect(emptyName.success).toBe(false);
+    expect(messageFor(emptyName, "name")).toBe(forms.inquiry.errors.nameMin);
 
     const shortMsg = inquirySchema.safeParse({ ...validInquiry, message: "short" });
     expect(shortMsg.success).toBe(false);
+    expect(messageFor(shortMsg, "message")).toBe(forms.inquiry.errors.messageMin);
   });
 
   it("rejects invalid email formats", () => {
     const badEmail = inquirySchema.safeParse({ ...validInquiry, email: "invalid-email" });
     expect(badEmail.success).toBe(false);
+    expect(messageFor(badEmail, "email")).toBe(forms.inquiry.errors.emailInvalid);
   });
 
   it("rejects invalid phone numbers", () => {
     const badPhone = inquirySchema.safeParse({ ...validInquiry, phone: "123" });
     expect(badPhone.success).toBe(false);
+    expect(messageFor(badPhone, "phone")).toBe(forms.inquiry.errors.phoneInvalid);
   });
 
   it("rejects if the honeypot website field is populated", () => {
@@ -88,6 +101,7 @@ describe("applicationSchema", () => {
       },
     });
     expect(oversize.success).toBe(false);
+    expect(oversize.error?.issues[0]?.message).toBe(forms.application.errors.tooLarge);
   });
 
   it("rejects disallowed file extensions or MIME types", () => {
@@ -100,6 +114,7 @@ describe("applicationSchema", () => {
       },
     });
     expect(badExt.success).toBe(false);
+    expect(badExt.error?.issues[0]?.message).toBe(forms.application.errors.wrongType);
   });
 });
 

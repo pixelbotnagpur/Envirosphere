@@ -44,11 +44,22 @@ export interface DownloadsContent extends PageContent {
   downloadLabel: string;
 }
 export interface CareersContent extends PageContent {
-  openings: { heading: string; generalApplyLabel: string };
+  openings: { heading: string; generalApplyLabel: string; applyWithCvLabel: string };
 }
 export interface ServicesContent {
   hub: PageContent;
   serviceDetail: { contact: { primaryCta: Cta }; nextLabel: string };
+}
+export interface FormsContent {
+  inquiry: {
+    submitLabel: string;
+    success: { heading: string };
+    errors: { nameMin: string };
+  };
+  application: {
+    submitLabel: string;
+    success: { heading: string };
+  };
 }
 export interface HomeContent {
   stats: { items: { label: string }[] };

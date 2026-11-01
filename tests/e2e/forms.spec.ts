@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { readContent, type CareersContent } from "./helpers/content";
+import { readContent, type CareersContent, type FormsContent } from "./helpers/content";
 
-const generalApply = readContent<CareersContent>("pages/careers.yaml").openings.generalApplyLabel;
+const { generalApplyLabel: generalApply, applyWithCvLabel } = readContent<CareersContent>("pages/careers.yaml").openings;
+const { inquiry, application } = readContent<FormsContent>("forms.yaml");
 
 /** The server contract: elapsed ms measured by the browser, never an absolute timestamp. */
 function expectFillMsContract(postData: string | null) {
@@ -41,19 +42,19 @@ test.describe("consultation inquiry form", () => {
 
     // The form refuses submissions faster than 3 s, as a real visitor would be
     await page.waitForTimeout(3200);
-    await page.getByRole("button", { name: "Submit Inquiry" }).click();
+    await page.getByRole("button", { name: inquiry.submitLabel }).click();
 
     // Verify confirmation view
     await expect(page.getByRole("status")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Inquiry Received" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: inquiry.success.heading })).toBeVisible();
     expect(requests).toHaveLength(1);
     expectFillMsContract(requests[0]);
   });
 
   test("shows inline error when submitted empty", async ({ page }) => {
     await page.goto("/contact/");
-    await page.getByRole("button", { name: "Submit Inquiry" }).click();
-    await expect(page.getByText("Name must be at least 2 characters")).toBeVisible();
+    await page.getByRole("button", { name: inquiry.submitLabel }).click();
+    await expect(page.getByText(inquiry.errors.nameMin)).toBeVisible();
   });
 });
 
@@ -75,8 +76,8 @@ test.describe("career application modal", () => {
 
     await page.goto("/careers/");
 
-    // content/jobs.yaml is empty, so the page offers a general application; with openings it is "Apply with CV".
-    const applyButton = page.getByRole("button", { name: new RegExp(`${generalApply}|Apply with CV`, "i") }).first();
+    // content/jobs.yaml is empty, so the page offers a general application; with openings it is the apply button.
+    const applyButton = page.getByRole("button", { name: new RegExp(`${generalApply}|${applyWithCvLabel}`, "i") }).first();
     await applyButton.click();
 
     // Verify modal is open
@@ -99,11 +100,11 @@ test.describe("career application modal", () => {
     await expect(dialog.getByText("Sunil_Joshi_Resume.pdf")).toBeVisible();
 
     await page.waitForTimeout(3200);
-    await dialog.getByRole("button", { name: "Submit Application" }).click();
+    await dialog.getByRole("button", { name: application.submitLabel }).click();
 
     // Verify confirmation
     await expect(dialog.getByRole("status")).toBeVisible();
-    await expect(dialog.getByRole("heading", { name: "Application Submitted" })).toBeVisible();
+    await expect(dialog.getByRole("heading", { name: application.success.heading })).toBeVisible();
     expect(requests).toHaveLength(1);
     expectFillMsContract(requests[0]);
   });

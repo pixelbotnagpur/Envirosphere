@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { applicationSchema, inquirySchema } from "@/lib/validators/forms";
+import { forms } from "@tests/unit/helpers/forms";
+import { createApplicationSchema, createInquirySchema } from "@/lib/validators/forms";
 import { collectFieldErrors, firstInvalidField } from "./errors";
+
+const applicationSchema = createApplicationSchema(forms.application.errors);
+const inquirySchema = createInquirySchema(forms.inquiry.errors);
 
 describe("collectFieldErrors", () => {
   it("keeps the first message per field and flattens nested cvFile errors onto cvFile", () => {

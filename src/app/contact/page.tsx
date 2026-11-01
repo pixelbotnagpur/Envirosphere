@@ -4,7 +4,7 @@ import { ContactAside, type ContactLine } from "@/components/sections/contact-as
 import { EnquiryCard } from "@/components/sections/enquiry-card";
 import { PageHero } from "@/components/sections/page-hero";
 import { Container } from "@/components/ui/container";
-import { loadContactPage, loadServices, loadSite } from "@/lib/content";
+import { loadContactPage, loadForms, loadServices, loadSite } from "@/lib/content";
 import { mailtoHref, telHref } from "@/lib/links";
 import { pageMetadata } from "@/lib/page-seo";
 
@@ -39,6 +39,7 @@ export default function ContactPage() {
         <Container className="grid gap-16 lg:grid-cols-12">
           <EnquiryCard {...page.enquiry}>
             <InquiryForm
+              copy={loadForms()}
               services={services}
               phoneFallback={site.contact.phones[0]}
               emailFallback={site.contact.email}
