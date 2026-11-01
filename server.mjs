@@ -6,7 +6,7 @@ import { createReadStream, existsSync, realpathSync, statSync } from "node:fs";
 import { realpath, readFile, stat } from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzip } from "node:zlib";
 
 // ===== SECURITY HEADERS: mirror of public/.htaccess (that file is the single source of truth) =====
@@ -350,7 +350,8 @@ export function createHandler({ root, env = {}, log = () => {} }) {
 }
 
 function main() {
-  const root = path.resolve(process.env.SITE_ROOT || "out");
+  // Default: the "out" folder next to this file, so it works whatever folder the host starts it from.
+  const root = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : fileURLToPath(new URL("./out", import.meta.url));
   if (!existsSync(root) || !statSync(root).isDirectory()) {
     console.error(`\nCannot start: the folder "${root}" does not exist.\nRun "pnpm build" first (it creates the "out" folder), or set SITE_ROOT.\n`);
     process.exit(1);
