@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadService, loadServices, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -25,7 +26,8 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 
   const site = loadSite();
   return {
-    title: `${service.title} | ${site.shortName}`,
+    title: service.title,
+    alternates: canonicalAlternates(site.url, `/services/${slug}/`),
     description: service.summary,
   };
 }

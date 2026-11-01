@@ -5,6 +5,10 @@ logo:
   src: /media/brand/logo.svg
   alt: Envirosphere logo
 
+og-image:
+  src: /media/brand/og-image.jpg
+  alt: Environmental field surveyor recording notes beside a marked quadrat in forest
+
 client-perkins:
   src: /media/clients/perkins.webp
   alt: Perkins logo

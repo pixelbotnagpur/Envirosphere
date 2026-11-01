@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadHome, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Why Us | Proven Track Record & Engineering Precision",
+    alternates: canonicalAlternates(site.url, "/why-us/"),
     description: `Discover why 250+ industrial and infrastructure leaders trust ${site.name} for statutory environmental clearances and compliance.`,
   };
 }

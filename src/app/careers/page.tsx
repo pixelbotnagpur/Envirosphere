@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { loadJobs, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
 import { mailtoHref } from "@/lib/links";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Careers | Join Our Environmental Engineering Team",
+    alternates: canonicalAlternates(site.url, "/careers/"),
     description: `Explore career opportunities in EIA coordination, environmental monitoring, and wastewater engineering at ${site.name}.`,
   };
 }

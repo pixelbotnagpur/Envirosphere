@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImageAsset, loadHome, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "About Us | Accreditations & Nationwide Presence",
+    alternates: canonicalAlternates(site.url, "/about/"),
     description: `Learn about ${site.name}, a QCI NABET Category A accredited environmental consultant with offices in Pune, Mumbai, Tarapur, Nashik, and Nagpur.`,
   };
 }

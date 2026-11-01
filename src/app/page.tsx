@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { About } from "@/components/sections/about";
 import { Clients } from "@/components/sections/clients";
 import { ContactCta } from "@/components/sections/contact-cta";
@@ -9,6 +10,11 @@ import { Stats } from "@/components/sections/stats";
 import { Testimonials } from "@/components/sections/testimonials";
 import { VisualBreak } from "@/components/sections/visual-break";
 import { getImageAsset, loadHome, loadServices, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
+
+export function generateMetadata(): Metadata {
+  return { alternates: canonicalAlternates(loadSite().url, "/") };
+}
 
 export default function HomePage() {
   const site = loadSite();

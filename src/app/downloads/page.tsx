@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { SectionLabel } from "@/components/ui/section-label";
 import { getImage, loadDownloads, loadSite } from "@/lib/content";
+import { canonicalAlternates } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
   return {
     title: "Downloads & Accreditations | Official Documentation",
+    alternates: canonicalAlternates(site.url, "/downloads/"),
     description: `Download official QCI NABET accreditation certificates, corporate profile, and compliance brochures from ${site.name}.`,
   };
 }
