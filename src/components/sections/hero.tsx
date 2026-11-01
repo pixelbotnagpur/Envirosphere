@@ -49,7 +49,9 @@ export function Hero({
             alt={bg.alt}
             fill
             priority
-            className="h-full w-full object-cover object-center scale-105"
+            fetchPriority="high"
+            sizes="100vw"
+            className="h-full w-full object-cover object-center"
           />
           {/* Subtle cinematic overlays for text contrast without drowning out the photograph */}
           <div className="absolute inset-0 bg-primary/35" />
