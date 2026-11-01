@@ -56,18 +56,30 @@ Writing the text (Markdown):
 Labels on every service page (breadcrumb, "Previous service", "Next service") and the closing contact box are in `content/pages/services.yaml` under `serviceDetail`.
 
 ## Home page
-Controls the layout and copy of the home page (`content/pages/home.yaml`):
+Controls the layout and copy of the home page (`content/pages/home.yaml`), top to bottom:
 
-- `hero`: Top banner with accreditation eyebrow, main title, subtitle, CTA links, and scroll indicator.
-- `about`: Firm overview text, paragraphs, and CTA button. Its image comes from the `about-photo` key in `content/media.yaml` (`public/media/images/about.webp`).
-- `services`: Section heading, intro, and CTA button. The 13 services displayed in the list are automatically loaded from `content/services/*.md` ordered by their `order:` field.
+- `seo`: the page title (used exactly as written, no "| Envirosphere" added) and the description shown in search results.
+- `hero`: Top banner with accreditation eyebrow, main title, subtitle, CTA links and scroll label. `image` is the background photo (a key from `content/media.yaml`; leave it out for a plain green band). `highlights` lists the labels of stats from the `stats` block below (for example `[Clients, Ongoing projects]`): their numbers appear as short facts under the buttons, so a number is only ever typed once. `keywords` are the words at the bottom right, shown separated by dots.
+- `about`: Firm overview text, paragraphs, and CTA button. `image` is the photo beside the text (a key from `content/media.yaml`; it is `ecological-survey` today, change the key to change the photo).
+- `visualBreak`: the wide photo after "About us". `image` is a media key; the office cities from `content/site.yaml` show at its bottom right (`showOffices: false` hides them). Optional `tag` (pill at the top left) and `quote` (line at the bottom left).
+- `services`: Section heading, intro, and CTA button; `viewLabel` is the text at the bottom of each featured card. `featured` lists the photo cards: `service` is the file name of a service in `content/services` without `.md` (for example `water-wastewater-treatment`), `tag` is the small label on the photo and `image` its media key. The card's link, title and summary come from that service, so a link can never point at a missing page; add `title:` or `summary:` to a card only to show different words. A wrong `service` name stops the build and lists the valid names. The numbered list of all 13 services below the cards is loaded from `content/services/*.md` ordered by `order:`.
 - `stats`: Key metrics and animated counter items (clients, ongoing projects, certifications).
 - `clients`: Logo marquee rows. Each logo comes from a `client-*` key in `content/media.yaml` (`public/media/clients/*.webp`).
+- `fieldArchive`: the photo grid after the logos: `label`, `heading`, `body`, the two buttons (`topCta`, `bottomCta`) and `items`, each with `image` (media key), `tag` and `caption`.
 - `process`: Four-step scroll-pinned workflow narrative. *Note: this block is a draft to be reviewed by the owner.*
 - `testimonials`: Client quotes, names, and roles.
 - `contact`: Closing call-to-action banner with phone and email contact options (values sourced from `content/site.yaml`).
 
+`pnpm content:check` verifies every image key used on the Home page (hero, about, featured cards, field photos, visual break, client logos) and tells you the file and field of a wrong one.
+
 To add client logos: add the file to `public/media/clients/`, add an entry to `media.yaml`, then add its key to `clients.logos`.
+
+## The two forms (`content/forms.yaml`)
+Every word of the enquiry form (Contact page) and the job application window (Careers page) is in `content/forms.yaml`:
+- `common`: the "please check these fields" heading, the sending/verification texts, and `submit` (what is shown after sending when the server sends no text of its own; `{status}` and `{error}` are replaced when shown).
+- `inquiry` and `application`: each field's `label` and `placeholder` (`summaryLabel` is the shorter name used in the "please check" list), the error messages (`errors`), button texts and the success texts. In the application window `{role}` is replaced by the job title and `{size}` by the file size.
+- The phone number and email shown when sending fails are NOT written here: they are the ones in `content/site.yaml`. For job applications the email is `contact.careersEmail` when you add that line to `site.yaml`; if you leave it out the main `contact.email` is used (no other address is ever invented).
+- The texts of each opening on the Careers page ("Key Requirements:", "Apply with CV", "Apply via Email", the email subject with `{title}`) are in `pages/careers.yaml` under `openings`.
 
 ## The other pages (About, Why Us, Services, Contact, Careers, Gallery, Downloads)
 Every word you see on these pages is in `content/pages/<page>.yaml`. Each file starts with the same two blocks:
@@ -96,13 +108,13 @@ Where a card has an `icon:`, pick one of: `award`, `briefcase`, `building`, `fac
 - `serviceDetail`: labels on every single service page (breadcrumb, previous/next, closing contact box, tab title for an unknown address).
 
 ### `pages/contact.yaml`
-- `enquiry`: label, heading and intro above the enquiry form (the form fields themselves are built in code).
+- `enquiry`: label, heading and intro above the enquiry form (the form fields themselves are in `content/forms.yaml`).
 - `direct`: phone and email card. `phoneLabels` is one label per phone number of `content/site.yaml`, in order; with two labels the first two numbers show, add a third label to show a third number. `emailSubject` is the subject filled in when someone clicks the email address.
 - `headOffice`: `city` must be one of the cities under `offices` in `content/site.yaml` (the address shown is `contact.address` there), plus `label` and `heading` of the card.
 - `branches`: label and heading of the list of the other offices; each entry reads "`<city> <itemSuffix>`".
 
 ### `pages/careers.yaml`, `jobs.yaml`
-- `seo`, `hero`, then `openings`: `label` and `heading` above the list, `countOne` / `countMany` (the "Showing 2 open positions" note; `{count}` is replaced by the number), and the texts shown while there are no openings.
+- `seo`, `hero`, then `openings`: `label` and `heading` above the list, `countOne` / `countMany` (the "Showing 2 open positions" note; `{count}` is replaced by the number), the texts shown while there are no openings, and the labels shown on each opening (`requirementsLabel`, `applyWithCvLabel`, `applyByEmailLabel`, `emailSubject` with `{title}`).
 - `content/jobs.yaml`: open positions. Leave it as `[]` when there are none: the Careers page then says so and offers a general application form.
 
 ### `pages/gallery.yaml`, `gallery.yaml`

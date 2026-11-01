@@ -13,6 +13,8 @@ cta:
 
 contact:
   email: info@envirosphere.co.in
+  # Optional: add a line  careersEmail: <address>  to receive job applications at a different address.
+  # Without it, applications use the email above.
   phones:
     - "+91 9860220550"
     - "+91 9225176005"
