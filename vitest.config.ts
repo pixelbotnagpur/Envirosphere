@@ -10,6 +10,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
+    // Form tests type character by character; the default 5s flakes when the whole suite runs in parallel.
+    testTimeout: 15_000,
     setupFiles: ["./tests/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}", "tests/unit/**/*.test.{ts,tsx}"],
   },

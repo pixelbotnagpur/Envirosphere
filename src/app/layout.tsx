@@ -89,7 +89,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>
+      {/* Browser extensions (e.g. Grammarly) inject attributes into <body> before hydration. */}
+      <body suppressHydrationWarning>
         <LenisProvider>
           <a
             href="#main"
