@@ -14,6 +14,7 @@
     "check:launch": "node scripts/check-launch.mjs",
     "preview": "serve out -l 4173",
     "content:check": "tsx scripts/content-check.ts",
+    "optimize:images": "tsx scripts/optimize-images.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
