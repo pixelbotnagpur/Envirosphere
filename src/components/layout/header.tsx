@@ -1,11 +1,13 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { useScrollHidden } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
 
 export interface NavItem {
@@ -26,6 +28,10 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+
+  const reduced = useReducedMotion();
+  // Never hide while the menu is open or when motion is reduced; focus-within (CSS) also keeps it in view.
+  const hidden = useScrollHidden(!open && !reduced);
 
   const isDarkHero = (transparentAtTop ?? true) && !scrolled && !open;
 
@@ -50,13 +56,21 @@ export function Header({ name, logo, labels, nav, cta, transparentAtTop }: Heade
   }, [open]);
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-(--z-header) w-full transition-colors duration-(--duration-base)">
+    <header
+      data-hidden={hidden}
+      className={cn(
+        "group fixed top-0 right-0 left-0 z-(--z-header) w-full transition-transform duration-(--duration-base) ease-out-expo focus-within:translate-y-0",
+        hidden ? "-translate-y-full" : "translate-y-0",
+      )}
+    >
       {/* Sliding background container that slides down on scroll */}
       <div
         aria-hidden="true"
         className={cn(
           "absolute inset-0 -z-10 border-b border-border bg-background/90 shadow-card backdrop-blur-md transition-all duration-(--duration-base) ease-out-expo",
-          isDarkHero ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
+          isDarkHero || hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
+          // Keep the card shadow from peeking below a hidden header, but show the bar when focus is inside.
+          hidden && "group-focus-within:translate-y-0 group-focus-within:opacity-100",
         )}
       />
 

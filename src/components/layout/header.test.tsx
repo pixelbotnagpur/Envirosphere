@@ -1,7 +1,16 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { motionValue } from "motion/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Header } from "./header";
+
+const scrollY = motionValue(0);
+let reduced = false;
+vi.mock("motion/react", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("motion/react")>()),
+  useScroll: () => ({ scrollY }),
+  useReducedMotion: () => reduced,
+}));
 
 // next/link normalizes hrefs using the build-time trailingSlash flag, which is
 // unset under jsdom and strips the trailing slash the tests assert on.
@@ -73,5 +82,48 @@ describe("Header", () => {
   it("marks the logo image decorative because the brand name is visible text", () => {
     const { container } = render(<Header {...props} />);
     expect(container.querySelector("img")).toHaveAttribute("alt", "");
+  });
+
+  describe("hide on scroll down, show on scroll up", () => {
+    beforeEach(() => {
+      reduced = false;
+      scrollY.set(0);
+    });
+    const header = () => document.querySelector("header") as HTMLElement;
+
+    it("is visible at the top", () => {
+      render(<Header {...props} />);
+      expect(header()).toHaveAttribute("data-hidden", "false");
+      expect(header()).toHaveClass("translate-y-0");
+    });
+
+    it("slides up on scroll down and returns on scroll up", () => {
+      render(<Header {...props} />);
+      act(() => scrollY.set(600));
+      expect(header()).toHaveAttribute("data-hidden", "true");
+      expect(header()).toHaveClass("-translate-y-full");
+      act(() => scrollY.set(400));
+      expect(header()).toHaveAttribute("data-hidden", "false");
+    });
+
+    it("stays visible while the mobile menu is open", async () => {
+      render(<Header {...props} />);
+      act(() => scrollY.set(600));
+      expect(header()).toHaveAttribute("data-hidden", "true");
+      await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(header()).toHaveAttribute("data-hidden", "false");
+    });
+
+    it("keeps itself in view when focus is inside, via focus-within", () => {
+      render(<Header {...props} />);
+      expect(header()).toHaveClass("focus-within:translate-y-0");
+    });
+
+    it("never hides under reduced motion", () => {
+      reduced = true;
+      render(<Header {...props} />);
+      act(() => scrollY.set(600));
+      expect(header()).toHaveAttribute("data-hidden", "false");
+    });
   });
 });
