@@ -25,19 +25,6 @@ import { describe, expect, it } from "vitest";
 /** Files whose text is not site copy. Each entry needs a reason. */
 const ALLOWLIST: Record<string, string> = {};
 
-/**
- * TODO(C2b): package C2b moves the Home page, form copy and shared home sections to content/ and
- * empties this list. These files are the work of that package even where the scan finds nothing yet
- * (services-index.tsx still has "View Specifications"); once C2b is done, delete the list.
- */
-const PENDING_C2B: readonly string[] = [
-  "src/app/page.tsx",
-  "src/components/sections/services-index.tsx",
-  "src/components/sections/hero.tsx",
-  "src/components/sections/visual-break.tsx",
-  "src/components/sections/field-archive.tsx",
-];
-
 const PROSE_PROPS = new Set([
   "title",
   "description",
@@ -165,11 +152,10 @@ describe("no hardcoded copy in pages and sections (rule 33)", () => {
       expect(files, `${file} is allowlisted but not scanned`).toContain(file);
       expect(reason.length, `${file} needs a reason`).toBeGreaterThan(10);
     }
-    for (const file of PENDING_C2B) expect(files, `${file} is listed but does not exist`).toContain(file);
   });
 
   it("holds no prose literals outside the allowlists", () => {
-    const skipped = new Set([...Object.keys(ALLOWLIST), ...PENDING_C2B]);
+    const skipped = new Set(Object.keys(ALLOWLIST));
     const hits = files
       .filter((f) => !skipped.has(f))
       .flatMap((f) => findProse(f, readFileSync(path.join(repo, f), "utf8")));
