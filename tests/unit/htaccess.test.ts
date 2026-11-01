@@ -31,7 +31,9 @@ describe("public/.htaccess security header block", () => {
     ]) {
       expect(connect).toContain(o);
     }
-    expect(directive("form-action")).toContain("https://script.google.com");
+    // Forms submit with fetch(), never a native form POST, so form-action stays on the site only.
+    expect(directive("form-action")).not.toContain("script.google.com");
+    expect(directive("form-action").trim()).toBe("form-action 'self'");
     expect(directive("script-src")).toContain("https://challenges.cloudflare.com");
     expect(directive("frame-src")).toContain("https://challenges.cloudflare.com");
   });
