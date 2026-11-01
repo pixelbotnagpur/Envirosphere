@@ -50,7 +50,7 @@ export default function DownloadsPage() {
                         <span className="rounded-pill border border-border bg-surface px-3 py-1 text-label uppercase tracking-label font-normal text-muted-foreground">
                           {item.category}
                         </span>
-                        <span className="text-sm text-muted-foreground tabular-nums ">
+                        <span className="text-sm text-muted-foreground tabular-nums">
                           {item.format} {item.size ? `• ${item.size}` : ""}
                         </span>
                       </div>
