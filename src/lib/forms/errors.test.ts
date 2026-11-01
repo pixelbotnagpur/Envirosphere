@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applicationSchema, inquirySchema } from "@/lib/validators/forms";
-import { collectFieldErrors } from "./errors";
+import { collectFieldErrors, firstInvalidField } from "./errors";
 
 describe("collectFieldErrors", () => {
   it("keeps the first message per field and flattens nested cvFile errors onto cvFile", () => {
@@ -33,5 +33,25 @@ describe("collectFieldErrors", () => {
     const result = collectFieldErrors(parsed.error.issues);
     expect(result.honeypotOnly).toBe(false);
     expect(result.errors.name).toBeDefined();
+  });
+});
+
+describe("firstInvalidField", () => {
+  it("follows on-screen order, not the order errors were found", () => {
+    expect(firstInvalidField(["name", "email", "phone"], { phone: "x", email: "y" })).toBe("email");
+  });
+
+  it("returns null when nothing in the order has an error", () => {
+    expect(firstInvalidField(["name"], { role: "x" })).toBeNull();
+  });
+});
+
+describe("firstInvalidField", () => {
+  it("follows on-screen order, not the order errors were found", () => {
+    expect(firstInvalidField(["name", "email", "phone"], { phone: "x", email: "y" })).toBe("email");
+  });
+
+  it("returns null when nothing in the order has an error", () => {
+    expect(firstInvalidField(["name"], { role: "x" })).toBeNull();
   });
 });

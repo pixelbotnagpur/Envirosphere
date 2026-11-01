@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ErrorSummary,
+  FieldError,
+  describedBy,
+  errorId,
+  type SummaryField,
+} from "@/components/forms/form-parts";
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
-import { collectFieldErrors } from "@/lib/forms/errors";
+import { collectFieldErrors, firstInvalidField } from "@/lib/forms/errors";
 import { submitForm } from "@/lib/forms/submit";
 import { inquirySchema, isBotSubmission, type InquiryInput } from "@/lib/validators/forms";
 
@@ -18,6 +25,17 @@ export interface InquiryFormProps {
   emailFallback?: string;
   className?: string;
 }
+
+/** On-screen order of the fields, with the control id and visible name used by the error summary. */
+const fields = [
+  { key: "name", id: "inquiry-name", label: "Full Name" },
+  { key: "organization", id: "inquiry-org", label: "Company / Organization" },
+  { key: "email", id: "inquiry-email", label: "Official Email Address" },
+  { key: "phone", id: "inquiry-phone", label: "Contact Number" },
+  { key: "service", id: "inquiry-service", label: "Service of Interest" },
+  { key: "message", id: "inquiry-message", label: "Project Brief & Site Location" },
+] as const;
+const fieldKeys = fields.map((f) => f.key);
 
 export function InquiryForm({
   services = [],
@@ -38,6 +56,8 @@ export function InquiryForm({
   });
 
   const openedAtRef = React.useRef<number>(0);
+  const focusTargetRef = React.useRef<string | null>(null);
+  const statusRef = React.useRef<HTMLDivElement>(null);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
@@ -47,6 +67,25 @@ export function InquiryForm({
   React.useEffect(() => {
     openedAtRef.current = performance.now();
   }, []);
+
+  // After a failed submit, move focus to the first invalid field once its error has rendered.
+  React.useEffect(() => {
+    const id = focusTargetRef.current;
+    if (!id) return;
+    focusTargetRef.current = null;
+    document.getElementById(id)?.focus();
+  }, [fieldErrors]);
+
+  // The success message replaces the form, so move focus to it: it is a live region and the old
+  // focused control no longer exists.
+  React.useEffect(() => {
+    if (status === "success") statusRef.current?.focus();
+  }, [status]);
+
+  const summaryFields: SummaryField[] = Object.entries(fieldErrors).map(([key, message]) => {
+    const field = fields.find((f) => f.key === key);
+    return { key, label: field?.label ?? "Form", controlId: field?.id, message };
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -75,11 +114,16 @@ export function InquiryForm({
     if (!parsed.success) {
       const { errors, honeypotOnly } = collectFieldErrors(parsed.error.issues);
       if (!honeypotOnly) {
+        const first = firstInvalidField(fieldKeys, errors);
+        focusTargetRef.current = fields.find((f) => f.key === first)?.id ?? null;
         setFieldErrors(errors);
         return;
       }
-      // Only the hidden trap field failed (a bot, or a password manager that filled it): fall
-      // through to the silent fake success below instead of leaving the visitor stuck.
+      // Only the hidden trap field failed (a bot, or a password manager that filled it): never
+      // leave a person stuck on an error they cannot see. Silent fake success.
+      setStatus("success");
+      setStatusMessage("Thank you. Your consultation request has been received.");
+      return;
     }
 
     // 2. Anti-abuse check (honeypot or sub-3s submit)
@@ -90,17 +134,16 @@ export function InquiryForm({
       return;
     }
 
+    setFieldErrors({});
     if (isTurnstileEnabled() && !turnstileToken) {
       setStatus("error");
       setStatusMessage("Please complete the verification check, then submit again.");
       return;
     }
 
-    setFieldErrors({});
     setStatus("submitting");
 
     // 3. Submit (a Turnstile token is single-use, so the widget is refreshed afterwards)
-    if (!parsed.success) return;
     const result = await submitForm({
       ...parsed.data,
       turnstileToken: turnstileToken ?? undefined,
@@ -141,7 +184,9 @@ export function InquiryForm({
   if (status === "success") {
     return (
       <div
+        ref={statusRef}
         role="status"
+        tabIndex={-1}
         className="rounded-card border border-border bg-surface/60 p-8 sm:p-12 text-center"
       >
         <div className="mx-auto flex size-14 items-center justify-center rounded-pill bg-primary/10 text-primary">
@@ -169,20 +214,14 @@ export function InquiryForm({
       noValidate
       className={className ?? "rounded-card border border-border bg-surface/40 p-6 sm:p-10"}
     >
+      <ErrorSummary
+        heading="Please check these fields before sending:"
+        fields={summaryFields}
+        className="mb-6"
+      />
+
       {/* Honeypot field for bot protection */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          padding: 0,
-          margin: -1,
-          overflow: "hidden",
-          clip: "rect(0, 0, 0, 0)",
-          border: 0,
-        }}
-      >
+      <div aria-hidden="true" className="sr-only">
         <label htmlFor="inquiry-website">Website</label>
         <input
           id="inquiry-website"
@@ -210,11 +249,10 @@ export function InquiryForm({
             value={formData.name}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.name)}
+            aria-describedby={describedBy(fieldErrors.name && errorId("inquiry-name"))}
             className="mt-2"
           />
-          {fieldErrors.name ? (
-            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.name}</p>
-          ) : null}
+          <FieldError controlId="inquiry-name" message={fieldErrors.name} className="mt-1.5" />
         </div>
 
         <div>
@@ -230,11 +268,14 @@ export function InquiryForm({
             value={formData.organization || ""}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.organization)}
+            aria-describedby={describedBy(fieldErrors.organization && errorId("inquiry-org"))}
             className="mt-2"
           />
-          {fieldErrors.organization ? (
-            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.organization}</p>
-          ) : null}
+          <FieldError
+            controlId="inquiry-org"
+            message={fieldErrors.organization}
+            className="mt-1.5"
+          />
         </div>
 
         <div>
@@ -251,11 +292,10 @@ export function InquiryForm({
             value={formData.email}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.email)}
+            aria-describedby={describedBy(fieldErrors.email && errorId("inquiry-email"))}
             className="mt-2"
           />
-          {fieldErrors.email ? (
-            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.email}</p>
-          ) : null}
+          <FieldError controlId="inquiry-email" message={fieldErrors.email} className="mt-1.5" />
         </div>
 
         <div>
@@ -272,11 +312,10 @@ export function InquiryForm({
             value={formData.phone}
             onChange={handleChange}
             hasError={Boolean(fieldErrors.phone)}
+            aria-describedby={describedBy(fieldErrors.phone && errorId("inquiry-phone"))}
             className="mt-2"
           />
-          {fieldErrors.phone ? (
-            <p className="mt-1.5 text-sm text-destructive">{fieldErrors.phone}</p>
-          ) : null}
+          <FieldError controlId="inquiry-phone" message={fieldErrors.phone} className="mt-1.5" />
         </div>
       </div>
 
@@ -290,6 +329,7 @@ export function InquiryForm({
           value={formData.service}
           onChange={handleChange}
           hasError={Boolean(fieldErrors.service)}
+          aria-describedby={describedBy(fieldErrors.service && errorId("inquiry-service"))}
           className="mt-2"
         >
           <option value="">Select a compliance or engineering service...</option>
@@ -300,9 +340,7 @@ export function InquiryForm({
             </option>
           ))}
         </Select>
-        {fieldErrors.service ? (
-          <p className="mt-1.5 text-sm text-destructive">{fieldErrors.service}</p>
-        ) : null}
+        <FieldError controlId="inquiry-service" message={fieldErrors.service} className="mt-1.5" />
       </div>
 
       <div className="mt-6">
@@ -318,17 +356,19 @@ export function InquiryForm({
           value={formData.message}
           onChange={handleChange}
           hasError={Boolean(fieldErrors.message)}
+          aria-describedby={describedBy(fieldErrors.message && errorId("inquiry-message"))}
           className="mt-2"
         />
-        {fieldErrors.message ? (
-          <p className="mt-1.5 text-sm text-destructive">{fieldErrors.message}</p>
-        ) : null}
+        <FieldError controlId="inquiry-message" message={fieldErrors.message} className="mt-1.5" />
       </div>
 
       <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} className="mt-6" />
 
       {status === "error" ? (
-        <div className="mt-6 rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
+        <div
+          role="alert"
+          className="mt-6 rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground"
+        >
           <div className="flex items-start gap-3">
             <AlertCircle className="size-5 shrink-0 text-destructive mt-0.5" aria-hidden="true" />
             <div className="flex-1">

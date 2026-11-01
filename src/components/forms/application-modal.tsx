@@ -6,10 +6,17 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ErrorSummary,
+  FieldError,
+  describedBy,
+  errorId,
+  type SummaryField,
+} from "@/components/forms/form-parts";
 import { Turnstile, isTurnstileEnabled } from "@/components/forms/turnstile";
 import { cn } from "@/lib/utils";
 import { validateCvFile } from "@/lib/forms/cv";
-import { collectFieldErrors } from "@/lib/forms/errors";
+import { collectFieldErrors, firstInvalidField } from "@/lib/forms/errors";
 import { submitForm } from "@/lib/forms/submit";
 import {
   applicationSchema,
@@ -26,6 +33,16 @@ export interface ApplicationModalProps {
   /** Called while focus is being returned after close; call preventDefault() to move it elsewhere. */
   onCloseAutoFocus?: (event: Event) => void;
 }
+
+/** On-screen order of the fields, with the control id and visible name used by the error summary. */
+const fields = [
+  { key: "name", id: "app-name", label: "Full Name" },
+  { key: "email", id: "app-email", label: "Email Address" },
+  { key: "phone", id: "app-phone", label: "Phone Number" },
+  { key: "coverLetter", id: "app-cover", label: "Brief Introduction" },
+  { key: "cvFile", id: "app-cv", label: "Curriculum Vitae" },
+] as const;
+const fieldKeys = fields.map((f) => f.key);
 
 export function ApplicationModal({
   role,
@@ -52,6 +69,9 @@ export function ApplicationModal({
   const [fileError, setFileError] = React.useState<string | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
   const openedAtRef = React.useRef<number>(0);
+  const focusTargetRef = React.useRef<string | null>(null);
+  const cvFocusRef = React.useRef<"input" | "remove" | null>(null);
+  const statusRef = React.useRef<HTMLDivElement>(null);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = React.useState<string>("");
@@ -61,6 +81,35 @@ export function ApplicationModal({
   React.useEffect(() => {
     if (isOpen) openedAtRef.current = performance.now();
   }, [isOpen]);
+
+  // After a failed submit, move focus to the first invalid field once its error has rendered.
+  React.useEffect(() => {
+    const id = focusTargetRef.current;
+    if (!id) return;
+    focusTargetRef.current = null;
+    document.getElementById(id)?.focus();
+  }, [fieldErrors]);
+
+  // Choosing a file swaps the chooser for the file chip (and removing it swaps back), so the
+  // focused control disappears: hand focus to the control that replaced it.
+  React.useEffect(() => {
+    const target = cvFocusRef.current;
+    if (!target) return;
+    cvFocusRef.current = null;
+    document.getElementById(target === "remove" ? "app-cv-remove" : "app-cv")?.focus();
+  }, [cvFile]);
+
+  // The success message replaces the form, so move focus to it: it is a live region and the old
+  // focused control no longer exists.
+  React.useEffect(() => {
+    if (status === "success") statusRef.current?.focus();
+  }, [status]);
+
+  const cvError = fileError ?? fieldErrors.cvFile ?? null;
+  const summaryFields: SummaryField[] = Object.entries(fieldErrors).map(([key, message]) => {
+    const field = fields.find((f) => f.key === key);
+    return { key, label: field?.label ?? "Form", controlId: field?.id, message };
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -94,6 +143,7 @@ export function ApplicationModal({
     const reader = new FileReader();
     reader.onload = () => {
       const base64Data = (reader.result as string).split(",")[1] || "";
+      cvFocusRef.current = "remove";
       setCvFile({ name: file.name, type: check.mimeType, size: file.size, data: base64Data });
     };
     reader.onerror = () => {
@@ -127,6 +177,7 @@ export function ApplicationModal({
   };
 
   const handleRemoveFile = () => {
+    cvFocusRef.current = "input";
     setCvFile(null);
     setFileError(null);
   };
@@ -134,28 +185,28 @@ export function ApplicationModal({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const fillMs = Math.round(performance.now() - openedAtRef.current);
+    const payload = { ...formData, cvFile: cvFile ?? undefined, fillMs };
+
+    // Validate everything at once so every problem is reported together, CV included.
+    const parsed = applicationSchema.safeParse(payload);
+    const issues = parsed.success ? [] : parsed.error.issues;
+    const { errors } = collectFieldErrors(issues);
     if (!cvFile) {
-      setFileError("Please upload your CV document (PDF or DOCX).");
+      errors.cvFile = "Please upload your CV document (PDF or DOCX).";
+    }
+    if (Object.keys(errors).length > 0) {
+      const first = firstInvalidField(fieldKeys, errors);
+      focusTargetRef.current = fields.find((f) => f.key === first)?.id ?? null;
+      setFieldErrors(errors);
       return;
     }
-
-    const fillMs = Math.round(performance.now() - openedAtRef.current);
-    const payload = {
-      ...formData,
-      cvFile,
-      fillMs,
-    };
-
-    const parsed = applicationSchema.safeParse(payload);
-
     if (!parsed.success) {
-      const { errors, honeypotOnly } = collectFieldErrors(parsed.error.issues);
-      if (!honeypotOnly) {
-        setFieldErrors(errors);
-        return;
-      }
-      // Only the hidden trap field failed (a bot, or a password manager that filled it): never
-      // leave a person stuck on an error they cannot see. Fall through to the silent fake success.
+      // Every other field passed, so only the hidden trap field failed (a bot, or a password manager that filled it): never
+      // leave a person stuck on an error they cannot see. Silent fake success.
+      setStatus("success");
+      setStatusMessage("Thank you. Your application has been logged.");
+      return;
     }
 
     if (isBotSubmission({ website: formData.website, fillMs })) {
@@ -164,13 +215,13 @@ export function ApplicationModal({
       return;
     }
 
+    setFieldErrors({});
     if (isTurnstileEnabled() && !turnstileToken) {
       setStatus("error");
       setStatusMessage("Please complete the verification check, then submit again.");
       return;
     }
 
-    setFieldErrors({});
     setStatus("submitting");
 
     const result = await submitForm({
@@ -231,7 +282,7 @@ export function ApplicationModal({
             </Dialog.Close>
 
             {status === "success" ? (
-              <div role="status" className="py-6 text-center">
+              <div ref={statusRef} role="status" tabIndex={-1} className="py-6 text-center">
                 <div className="mx-auto flex size-14 items-center justify-center rounded-pill bg-primary/10 text-primary">
                   <CheckCircle2 className="size-8" aria-hidden="true" />
                 </div>
@@ -260,20 +311,13 @@ export function ApplicationModal({
                 </Dialog.Description>
 
                 <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+                  <ErrorSummary
+                    heading="Please check these fields before sending:"
+                    fields={summaryFields}
+                  />
+
                   {/* Honeypot */}
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      position: "absolute",
-                      width: 1,
-                      height: 1,
-                      padding: 0,
-                      margin: -1,
-                      overflow: "hidden",
-                      clip: "rect(0, 0, 0, 0)",
-                      border: 0,
-                    }}
-                  >
+                  <div aria-hidden="true" className="sr-only">
                     <label htmlFor="app-website">Website</label>
                     <input
                       id="app-website"
@@ -300,11 +344,11 @@ export function ApplicationModal({
                       value={formData.name}
                       onChange={handleChange}
                       hasError={Boolean(fieldErrors.name)}
+                      aria-describedby={describedBy(fieldErrors.name && errorId("app-name"))}
+                      autoComplete="name"
                       className="mt-1.5"
                     />
-                    {fieldErrors.name ? (
-                      <p className="mt-1 text-sm text-destructive">{fieldErrors.name}</p>
-                    ) : null}
+                    <FieldError controlId="app-name" message={fieldErrors.name} className="mt-1" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -321,11 +365,15 @@ export function ApplicationModal({
                         value={formData.email}
                         onChange={handleChange}
                         hasError={Boolean(fieldErrors.email)}
+                        aria-describedby={describedBy(fieldErrors.email && errorId("app-email"))}
+                        autoComplete="email"
                         className="mt-1.5"
                       />
-                      {fieldErrors.email ? (
-                        <p className="mt-1 text-sm text-destructive">{fieldErrors.email}</p>
-                      ) : null}
+                      <FieldError
+                        controlId="app-email"
+                        message={fieldErrors.email}
+                        className="mt-1"
+                      />
                     </div>
 
                     <div>
@@ -341,11 +389,15 @@ export function ApplicationModal({
                         value={formData.phone}
                         onChange={handleChange}
                         hasError={Boolean(fieldErrors.phone)}
+                        aria-describedby={describedBy(fieldErrors.phone && errorId("app-phone"))}
+                        autoComplete="tel"
                         className="mt-1.5"
                       />
-                      {fieldErrors.phone ? (
-                        <p className="mt-1 text-sm text-destructive">{fieldErrors.phone}</p>
-                      ) : null}
+                      <FieldError
+                        controlId="app-phone"
+                        message={fieldErrors.phone}
+                        className="mt-1"
+                      />
                     </div>
                   </div>
 
@@ -365,10 +417,10 @@ export function ApplicationModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm text-foreground/90">
+                    <span id="app-cv-label" className="block text-sm text-foreground/90">
                       Curriculum Vitae (PDF or DOCX, max 5 MB){" "}
                       <span className="text-destructive">*</span>
-                    </label>
+                    </span>
 
                     {cvFile ? (
                       <div className="mt-2 flex items-center justify-between rounded-control border border-border bg-surface/50 px-4 py-3 text-sm">
@@ -382,6 +434,7 @@ export function ApplicationModal({
                           </span>
                         </div>
                         <button
+                          id="app-cv-remove"
                           type="button"
                           onClick={handleRemoveFile}
                           className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
@@ -412,7 +465,10 @@ export function ApplicationModal({
                           PDF or DOCX (up to 5 MB)
                         </span>
                         <input
+                          id="app-cv"
                           type="file"
+                          aria-invalid={cvError ? "true" : undefined}
+                          aria-describedby={describedBy(cvError && errorId("app-cv"))}
                           accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                           onChange={handleFileChange}
                           className="sr-only"
@@ -420,15 +476,16 @@ export function ApplicationModal({
                       </label>
                     )}
 
-                    {fileError ? (
-                      <p className="mt-1.5 text-sm text-destructive">{fileError}</p>
-                    ) : null}
+                    <FieldError controlId="app-cv" message={cvError} className="mt-1.5" />
                   </div>
 
                   <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
 
                   {status === "error" ? (
-                    <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground">
+                    <div
+                      role="alert"
+                      className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-foreground"
+                    >
                       <div className="flex items-start gap-3">
                         <AlertCircle
                           className="size-5 shrink-0 text-destructive mt-0.5"

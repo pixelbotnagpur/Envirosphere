@@ -23,3 +23,8 @@ export function collectFieldErrors(issues: readonly ZodIssue[]): FieldErrors {
   }
   return { errors, honeypotOnly: sawHoneypot && Object.keys(errors).length === 0 };
 }
+
+/** The first field, in on-screen order, that has an error. Used to move focus after a failed submit. */
+export function firstInvalidField(order: readonly string[], errors: Record<string, string>): string | null {
+  return order.find((key) => Boolean(errors[key])) ?? null;
+}
