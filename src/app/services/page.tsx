@@ -1,129 +1,29 @@
-import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { Reveal } from "@/components/motion/reveal";
-import { staggerDelay } from "@/lib/motion";
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
-import { SectionLabel } from "@/components/ui/section-label";
-import { getImageAsset, loadServices, loadSite } from "@/lib/content";
-import { pageSeo } from "@/lib/page-seo";
+import { CtaBand } from "@/components/sections/cta-band";
+import { PageHero } from "@/components/sections/page-hero";
+import { ServiceCardGrid } from "@/components/sections/service-card-grid";
+import { getImageAsset, loadServices, loadServicesPage } from "@/lib/content";
+import { pageMetadata } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
-  const site = loadSite();
-  return {
-    title: "Environmental Consultancy & Engineering Services",
-    ...pageSeo("/services/"),
-    description: `The thirteen environmental services offered by ${site.name}, from clearances and compliance to treatment plant operation.`,
-  };
+  return pageMetadata("/services/", loadServicesPage().hub.seo);
 }
 
 export default function ServicesPage() {
-  const services = loadServices();
+  const { hub } = loadServicesPage();
+  const items = loadServices().map(({ slug, order, title, summary, image }) => ({
+    slug,
+    order,
+    title,
+    summary,
+    image: image ? getImageAsset(image) : undefined,
+  }));
 
   return (
     <div>
-      {/* Page Hero */}
-      <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
-        <Container>
-          <SectionLabel tone="inverse" index="001">Services</SectionLabel>
-          <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:items-end">
-            <h1 className="text-display max-w-4xl tracking-tight text-primary-foreground lg:col-span-8">
-              Thirteen environmental services.
-            </h1>
-            <p className="text-lead text-primary-foreground/85 font-light lg:col-span-4">
-              From environmental clearances to the operation and maintenance of treatment plants.
-            </p>
-          </div>
-        </Container>
-      </section>
-
-      {/* Services Grid */}
-      <section aria-label="Services List" className="border-t border-border bg-surface py-section">
-        <Container>
-          <ol data-card-grid="" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, idx) => {
-              const imageAsset = service.image ? getImageAsset(service.image) : null;
-              return (
-                <li key={service.slug} data-card="" className="flex">
-                  <Reveal delay={staggerDelay(idx, 0.04)} className="flex w-full">
-                    <Link
-                      href={`/services/${service.slug}/`}
-                      className="group relative flex w-full flex-col justify-between rounded-card border border-border bg-background p-8 transition-colors duration-(--duration-base) ease-out-expo hover:border-primary/40 hover:shadow-card"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-label text-muted-foreground uppercase tracking-label tabular-nums">
-                            {String(service.order).padStart(3, "0")}
-                          </span>
-                          <div className="flex size-9 items-center justify-center rounded-pill border border-border text-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:bg-primary group-hover:text-primary-foreground">
-                            <ArrowUpRight
-                              aria-hidden="true"
-                              className="size-4 transition-transform duration-(--duration-base) ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                            />
-                          </div>
-                        </div>
-
-                        {imageAsset ? (
-                          <div className="mt-5 aspect-[16/10] w-full overflow-hidden rounded-control border border-border bg-surface">
-                            <Image
-                              src={imageAsset.src}
-                              alt={imageAsset.alt}
-                              width={imageAsset.width ?? 600}
-                              height={imageAsset.height ?? 375}
-                              className="h-full w-full object-cover transition-transform duration-(--duration-base) ease-out-expo group-hover:scale-105"
-                            />
-                          </div>
-                        ) : null}
-
-                        <h2 className="mt-5 text-h3 tracking-tight">
-                          {service.title}
-                        </h2>
-                      <p className="mt-4 text-sm text-muted-foreground font-light leading-relaxed">
-                        {service.summary}
-                      </p>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-border flex items-center justify-between text-label uppercase tracking-label text-muted-foreground transition-colors group-hover:text-foreground">
-                      <span>View Specifications</span>
-                      <span aria-hidden="true">&rarr;</span>
-                    </div>
-                  </Link>
-                </Reveal>
-              </li>
-            );
-          })}
-        </ol>
-        </Container>
-      </section>
-
-      {/* Bottom Consultation CTA */}
-      <section className="mt-section">
-        <Container>
-          <div className="rounded-card bg-secondary p-8 sm:p-12 text-secondary-foreground">
-            <div className="max-w-3xl">
-              <SectionLabel className="text-secondary-foreground" index="002">
-                Consultation
-              </SectionLabel>
-              <h2 className="mt-6 text-h2 tracking-tight">
-                Not sure which clearances or studies your project requires?
-              </h2>
-              <p className="mt-4 text-lead font-light">
-                Tell us about your project and we will help you work out which approvals it needs.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Button asChild size="lg">
-                  <Link href="/contact/">Discuss Your Project</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/about/">About us</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
+      <PageHero {...hub.hero} />
+      <ServiceCardGrid items={items} listLabel={hub.listLabel} viewLabel={hub.viewLabel} />
+      <CtaBand tone="secondary" index="002" {...hub.cta} />
     </div>
   );
 }

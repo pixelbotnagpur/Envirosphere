@@ -24,7 +24,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
   const { slug } = await params;
   const service = loadService(slug);
-  if (!service) return { title: "Service Not Found" };
+  if (!service) return { title: loadServicesPage().serviceDetail.notFoundTitle };
 
   return {
     title: service.title,
@@ -51,7 +51,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       <section className="hero-atmosphere relative w-full bg-primary pt-28 pb-16 text-primary-foreground sm:pt-36 sm:pb-20">
         <Container>
           <nav
-            aria-label="Breadcrumbs"
+            aria-label={t.breadcrumbLabel}
             className="mb-8 flex flex-wrap items-center gap-2 text-label text-primary-foreground/70 uppercase tracking-label"
           >
             <Link href="/" className="hover:text-primary-foreground transition-colors">

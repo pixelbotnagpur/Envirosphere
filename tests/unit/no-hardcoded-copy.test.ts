@@ -27,7 +27,8 @@ const ALLOWLIST: Record<string, string> = {};
 
 /**
  * TODO(C2b): package C2b moves the Home page, form copy and shared home sections to content/ and
- * empties this list. Every file here still holds hardcoded copy.
+ * empties this list. These files are the work of that package even where the scan finds nothing yet
+ * (services-index.tsx still has "View Specifications"); once C2b is done, delete the list.
  */
 const PENDING_C2B: readonly string[] = [
   "src/app/page.tsx",
@@ -35,15 +36,6 @@ const PENDING_C2B: readonly string[] = [
   "src/components/sections/hero.tsx",
   "src/components/sections/visual-break.tsx",
   "src/components/sections/field-archive.tsx",
-];
-
-/**
- * TODO(C2a): inner pages still being moved to content/ by package C2a; each page commit removes its
- * entry and the list is deleted with the last one.
- */
-const PENDING_C2A: readonly string[] = [
-  "src/app/services/page.tsx",
-  "src/app/services/[slug]/page.tsx",
 ];
 
 const PROSE_PROPS = new Set([
@@ -173,11 +165,11 @@ describe("no hardcoded copy in pages and sections (rule 33)", () => {
       expect(files, `${file} is allowlisted but not scanned`).toContain(file);
       expect(reason.length, `${file} needs a reason`).toBeGreaterThan(10);
     }
-    for (const file of [...PENDING_C2B, ...PENDING_C2A]) expect(files, `${file} is listed but does not exist`).toContain(file);
+    for (const file of PENDING_C2B) expect(files, `${file} is listed but does not exist`).toContain(file);
   });
 
   it("holds no prose literals outside the allowlists", () => {
-    const skipped = new Set([...Object.keys(ALLOWLIST), ...PENDING_C2B, ...PENDING_C2A]);
+    const skipped = new Set([...Object.keys(ALLOWLIST), ...PENDING_C2B]);
     const hits = files
       .filter((f) => !skipped.has(f))
       .flatMap((f) => findProse(f, readFileSync(path.join(repo, f), "utf8")));
