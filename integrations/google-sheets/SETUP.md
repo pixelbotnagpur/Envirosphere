@@ -52,6 +52,7 @@ The script is made of **two files** that you paste into the Apps Script editor:
    - `NOTIFY_EMAIL`: Your notifications email address (e.g. `info@envirosphere.co.in` or HR email).
    - `DRIVE_FOLDER_ID`: The Folder ID copied from Step 2. **Required.**
    - `TURNSTILE_SECRET`: (Optional, recommended) Your Cloudflare Turnstile **secret** key (see Step 7). **When this is set, every submission must carry a valid Turnstile token; a missing or invalid one is rejected.** When it is not set, the check is skipped.
+   - `TURNSTILE_ALLOWED_HOSTNAMES`: (Optional, recommended) Comma-separated site hostnames, e.g. `envirosphere.co.in,www.envirosphere.co.in`. When set, a Turnstile token is only accepted if Cloudflare reports one of these hostnames for it, so tokens minted on another site are refused.
    - `ALLOWED_ROLES`: (Optional) Job titles separated by `|`, for example `Senior EIA Coordinator|Environmental Engineer`. When set, only these roles are accepted. Keep it equal to the titles in `content/jobs.yaml`.
 4. Click **Save script properties**.
 

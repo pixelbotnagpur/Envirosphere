@@ -51,16 +51,18 @@ describe("Turnstile", () => {
     expect(onToken).toHaveBeenLastCalledWith("tok-1");
   });
 
-  it("clears the token and resets the widget on error and on expiry", async () => {
+  it("clears the token on error without resetting (Turnstile retries itself) and resets on expiry", async () => {
     vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "site-key-123");
     const onToken = vi.fn();
     render(<Turnstile onToken={onToken} />);
     await vi.waitFor(() => expect(api.render).toHaveBeenCalled());
     options?.["error-callback"]();
     expect(onToken).toHaveBeenLastCalledWith(null);
-    expect(api.reset).toHaveBeenCalledWith("w1");
+    expect(api.reset).not.toHaveBeenCalled();
     options?.["expired-callback"]();
-    expect(api.reset).toHaveBeenCalledTimes(2);
+    expect(onToken).toHaveBeenLastCalledWith(null);
+    expect(api.reset).toHaveBeenCalledTimes(1);
+    expect(api.reset).toHaveBeenCalledWith("w1");
   });
 
   it("loads the Cloudflare script only once for several widgets", async () => {

@@ -263,6 +263,24 @@ function turnstileAction(secret, token) {
   return "verify";
 }
 
+/**
+ * Checks the `hostname` Cloudflare reports in the siteverify response against the
+ * TURNSTILE_ALLOWED_HOSTNAMES script property (comma-separated). Not set means no check.
+ */
+function turnstileHostnameOk(result, allowed) {
+  var list = String(allowed || "")
+    .split(",")
+    .map(function (h) {
+      return h.trim().toLowerCase();
+    })
+    .filter(function (h) {
+      return h.length > 0;
+    });
+  if (list.length === 0) return true;
+  if (!result || typeof result.hostname !== "string") return false;
+  return list.indexOf(result.hostname.trim().toLowerCase()) !== -1;
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     SERVICE_SLUGS: SERVICE_SLUGS,
@@ -287,5 +305,6 @@ if (typeof module !== "undefined" && module.exports) {
     safeCvFilename: safeCvFilename,
     isOverLimit: isOverLimit,
     turnstileAction: turnstileAction,
+    turnstileHostnameOk: turnstileHostnameOk,
   };
 }

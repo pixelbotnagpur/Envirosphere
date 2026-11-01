@@ -80,10 +80,8 @@ export function Turnstile({ onToken, resetKey = 0, className }: TurnstileProps) 
         widgetId = api.render(container, {
           sitekey: siteKey,
           callback: (token) => onTokenRef.current(token),
-          "error-callback": () => {
-            onTokenRef.current(null);
-            if (widgetId) api.reset(widgetId);
-          },
+          // Turnstile retries a failed challenge by itself; resetting here would fight it.
+          "error-callback": () => onTokenRef.current(null),
           "expired-callback": () => {
             onTokenRef.current(null);
             if (widgetId) api.reset(widgetId);

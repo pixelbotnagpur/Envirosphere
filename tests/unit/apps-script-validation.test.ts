@@ -26,6 +26,7 @@ interface Validation {
   checkCvBytes(bytes: number[], ext: string): Result;
   safeCvFilename(now: number, name: string, ext: string): string;
   isOverLimit(count: unknown, max: number): boolean;
+  turnstileHostnameOk(result: unknown, allowed: string | null): boolean;
   turnstileAction(secret: string | null, token: unknown): "skip" | "reject" | "verify";
 }
 const mod = { exports: {} as unknown as Validation };
@@ -248,6 +249,22 @@ describe("throttle and Turnstile decisions", () => {
   });
 });
 
+describe("Turnstile hostname check", () => {
+  it("accepts any hostname when TURNSTILE_ALLOWED_HOSTNAMES is not set", () => {
+    expect(v.turnstileHostnameOk({ success: true, hostname: "evil.example" }, "")).toBe(true);
+    expect(v.turnstileHostnameOk({ success: true }, null)).toBe(true);
+  });
+  it("requires the siteverify hostname to be in the comma-separated list when set", () => {
+    const allowed = "envirosphere.co.in, www.envirosphere.co.in";
+    expect(v.turnstileHostnameOk({ hostname: "envirosphere.co.in" }, allowed)).toBe(true);
+    expect(v.turnstileHostnameOk({ hostname: "WWW.Envirosphere.co.in" }, allowed)).toBe(true);
+    expect(v.turnstileHostnameOk({ hostname: "evil.example" }, allowed)).toBe(false);
+    expect(v.turnstileHostnameOk({ hostname: "envirosphere.co.in.evil.example" }, allowed)).toBe(false);
+    expect(v.turnstileHostnameOk({}, allowed)).toBe(false);
+    expect(v.turnstileHostnameOk(null, allowed)).toBe(false);
+  });
+});
+
 describe("Code.gs wiring (source guards; Apps Script cannot run here)", () => {
   it("uses the validation helpers and the TURNSTILE_SECRET property", () => {
     for (const fn of [
@@ -264,6 +281,8 @@ describe("Code.gs wiring (source guards; Apps Script cannot run here)", () => {
       expect(codeSource).toContain(fn + "(");
     }
     expect(codeSource).toContain("TURNSTILE_SECRET");
+    expect(codeSource).toContain("TURNSTILE_ALLOWED_HOSTNAMES");
+    expect(codeSource).toContain("turnstileHostnameOk(");
   });
   it("writes phone numbers to the Sheet through phoneCell on both paths", () => {
     expect(codeSource.match(/phoneCell\(clean\.phone\)/g)).toHaveLength(2);

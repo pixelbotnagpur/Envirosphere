@@ -12,6 +12,8 @@
  *   NOTIFY_EMAIL      where alerts are sent (optional)
  *   DRIVE_FOLDER_ID   REQUIRED for job applications; CVs are refused when this is not set
  *   TURNSTILE_SECRET  optional; when SET, every submission needs a valid Turnstile token
+ *   TURNSTILE_ALLOWED_HOSTNAMES  optional, comma-separated, e.g. envirosphere.co.in,www.envirosphere.co.in;
+ *                     when set, Cloudflare must report one of these hostnames for the token
  *   ALLOWED_ROLES     optional, job titles separated by | ; when set, only these roles
  *                     are accepted
  */
@@ -309,7 +311,9 @@ function verifyTurnstile(token, secret) {
       muteHttpExceptions: true,
     });
     var result = JSON.parse(response.getContentText());
-    return result.success === true;
+    if (result.success !== true) return false;
+    var allowedHosts = PropertiesService.getScriptProperties().getProperty("TURNSTILE_ALLOWED_HOSTNAMES");
+    return turnstileHostnameOk(result, allowedHosts);
   } catch (e) {
     Logger.log("Turnstile validation error: " + (e && e.name ? e.name : "Error"));
     return false;
