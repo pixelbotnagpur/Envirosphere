@@ -91,6 +91,8 @@ describe("motion tokens mirror src/lib/motion.ts", () => {
     expect(tokens.get("--duration-fast")).toBe(`${duration.fast * 1000}ms`);
     expect(tokens.get("--duration-base")).toBe(`${duration.base * 1000}ms`);
     expect(tokens.get("--duration-slow")).toBe(`${duration.slow * 1000}ms`);
+    expect(tokens.get("--duration-transition-cover")).toBe(`${duration.transition.cover * 1000}ms`);
+    expect(tokens.get("--duration-transition-reveal")).toBe(`${duration.transition.reveal * 1000}ms`);
   });
   it("easings", () => {
     expect(tokens.get("--ease-out-expo")).toBe(`cubic-bezier(${ease.outExpo.join(", ")})`);
@@ -125,6 +127,11 @@ describe("motion utilities and layout tokens", () => {
     expect(tokens.get("--text-micro")).toBe("0.6875rem");
     expect(tokens.get("--text-micro--line-height")).toBe("1.4");
     expect(tokens.get("--text-micro")).not.toBe(tokens.get("--text-label"));
+  });
+  it("layers the route transition above the modal", () => {
+    const z = (name: string) => Number(tokens.get(name));
+    expect(z("--z-transition")).toBeGreaterThan(z("--z-modal"));
+    expect(z("--z-modal")).toBeGreaterThan(z("--z-header"));
   });
   it("keeps h1 smaller than display at narrow widths", () => {
     expect(tokens.get("--text-h1")).toBe("clamp(1.85rem, 1.15rem + 2.5vw, 3.25rem)");

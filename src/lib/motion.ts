@@ -1,5 +1,13 @@
 // Mirrors the --duration-* and --ease-* tokens in globals.css (tests/unit/tokens.test.ts enforces this).
-export const duration = { fast: 0.15, base: 0.4, slow: 0.9 } as const;
+export const duration = {
+  fast: 0.15,
+  base: 0.4,
+  slow: 0.9,
+  transition: { cover: 0.45, reveal: 0.5 },
+} as const;
+
+/** Longest the route-transition curtain may stay up if navigation never completes. */
+export const TRANSITION_SAFETY_MS = 2500;
 
 type Bezier = [number, number, number, number];
 export const ease: Record<"outExpo" | "inOutQuart", Bezier> = {
