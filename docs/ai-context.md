@@ -32,9 +32,9 @@ Google Sheet and stores CVs in Drive. No DB or login; no app server logic.
 - Tokens only. Semantic names: primary/secondary/accent/background/surface/foreground.
 - 2 fonts: Syne (headings, Regular 400 only), Manrope (body, ≤ 400 weight). No Sparkles icons.
 - Reduced-motion disables Lenis/parallax/pinning.
-- Route curtain (`page-transition.tsx`): Forest panel wipes up, shows decorative `RouteLeaf` art (hairline
-  S-curve drawn left to right with an Ochre leaf riding it; no text), and stays up at least
-  `duration.travel` so the leaf finishes. Skipped entirely for reduced motion.
+- Route curtain (`page-transition.tsx`): Forest panel wipes up (0.3s), shows the decorative `RouteSprout`
+  (a droplet falls onto a stem that grows two leaves inside a ring, centered on the screen; no text), stays up
+  at least `duration.travel` (0.6s) so it finishes, then wipes away (0.35s). Skipped entirely for reduced motion.
 
 ## Current focus
 Visual-first redesign matching Neiden benchmark complete (cinematic architectural hero split, visual break banner, featured disciplines photo cards, field operations archive). All 229 unit tests and 42 Playwright E2E tests passing green.

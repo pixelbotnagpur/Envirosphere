@@ -90,8 +90,12 @@ describe("PageTransition", () => {
     const art = el.querySelector("[data-transition-art]") as HTMLElement;
     expect(art).toHaveAttribute("aria-hidden", "true");
     expect(art.className).toContain("pointer-events-none");
-    expect(el.querySelector("[data-transition-leaf]")).not.toBeNull();
-    expect(el.querySelector("path[stroke='currentColor']")).not.toBeNull();
+    // The graphic is centered on the screen: a sprout (stem and two leaves) inside a ring.
+    expect(art.className).toContain("grid");
+    expect(art.className).toContain("place-items-center");
+    expect(art.className).toContain("inset-0");
+    expect(el.querySelector("[data-transition-sprout]")).not.toBeNull();
+    expect(el.querySelectorAll("[data-transition-leaf]")).toHaveLength(2);
     expect(el.className).toContain("z-(--z-transition)");
     expect(el.className).toContain("bg-primary");
 
@@ -110,14 +114,14 @@ describe("PageTransition", () => {
       );
     });
 
-    // The curtain holds until the leaf has finished its trip (about 0.85s from the click).
+    // The curtain holds until the sprout has finished drawing (about 0.6s from the click).
     await waitFor(() => expect(panel()).toBeNull(), { timeout: 3000 });
     expect(document.getElementById("main")).toHaveFocus();
     expect(document.querySelector("[data-route-announcer]") as HTMLElement).toHaveTextContent("Services page");
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
   });
 
-  it("keeps the curtain up for the leaf's trip even when the route is ready at once", async () => {
+  it("keeps the curtain up for the sprout's drawing even when the route is ready at once", async () => {
     const view = setup();
     fireEvent.click(screen.getByText("Services"));
     await waitFor(() => expect(push).toHaveBeenCalled());

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { duration, ease, TRANSITION_SAFETY_MS } from "@/lib/motion";
 import { revealWaitMs, shouldIntercept } from "./page-transition-utils";
-import { RouteLeaf } from "./route-leaf";
+import { RouteSprout } from "./route-sprout";
 
 type Phase = "idle" | "cover" | "wait" | "reveal";
 
@@ -131,7 +131,7 @@ export function PageTransition() {
     raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame(() => {
         if (phaseRef.current === "wait") {
-          // Hold the curtain until the leaf has finished its trip (zero when it already has).
+          // Hold the curtain until the sprout has finished drawing (zero when it already has).
           const now = performance.now();
           const wait = revealWaitMs(
             now - startedAtRef.current,
@@ -190,7 +190,7 @@ export function PageTransition() {
             (phase === "reveal" ? "pointer-events-none" : "pointer-events-auto")
           }
         >
-          <RouteLeaf />
+          <RouteSprout />
         </div>
       )}
     </>

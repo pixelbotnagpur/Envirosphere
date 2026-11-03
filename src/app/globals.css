@@ -84,9 +84,9 @@
   --duration-fast: 150ms;
   --duration-base: 400ms;
   --duration-slow: 900ms;
-  --duration-travel: 850ms;
-  --duration-transition-cover: 450ms;
-  --duration-transition-reveal: 500ms;
+  --duration-travel: 600ms;
+  --duration-transition-cover: 300ms;
+  --duration-transition-reveal: 350ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
   --stagger: 120ms;

@@ -32,8 +32,8 @@ test.describe("route curtain", () => {
     await link.click();
 
     await expect(panel(page)).toHaveCount(1);
-    // Decorative leaf only: visible while the curtain covers, and no text of any kind.
-    await expect(page.locator("[data-page-transition] [data-transition-leaf]")).toBeVisible();
+    // Decorative sprout only: visible while the curtain covers, and no text of any kind.
+    await expect(page.locator("[data-page-transition] [data-transition-sprout]")).toBeVisible();
     expect(((await panel(page).textContent()) ?? "").trim()).toBe("");
     await expect(page.locator("[data-page-transition] [data-transition-art]")).toHaveAttribute("aria-hidden", "true");
     await expect(page).toHaveURL(/\/services\/$/);
@@ -47,6 +47,22 @@ test.describe("route curtain", () => {
     );
     expect(overflow).toBe(false);
     expect(errors).toEqual([]);
+  });
+
+  test("the graphic sits in the middle of the screen and the whole transition is quick", async ({ page }) => {
+    await open(page, "/");
+    const link = await internalLink(page, "/services/");
+    const started = Date.now();
+    await link.click();
+    const sprout = page.locator("[data-page-transition] [data-transition-sprout]");
+    await expect(sprout).toBeVisible();
+    const box = (await sprout.boundingBox())!;
+    const viewport = page.viewportSize()!;
+    expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(6);
+    expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThan(6);
+    await expect(panel(page)).toHaveCount(0, { timeout: 5000 });
+    // Cover 0.3s, drawing about 0.6s in all, reveal 0.35s: well under the old 1.4s+.
+    expect(Date.now() - started).toBeLessThan(1700);
   });
 
   test("browser back and forward work without the curtain", async ({ page }) => {
