@@ -99,6 +99,9 @@ fieldArchive:
   bottomCta: { label: Gallery, href: /gallery/ }
   items:
     - { image: about-photo, tag: ONE, caption: First caption. }
+    - { image: about-photo, tag: TWO, caption: Second caption. }
+    - { image: about-photo, tag: THREE, caption: Third caption. }
+    - { image: about-photo, tag: FOUR, caption: Fourth caption. }
 process:
   label: How we work
   heading: Process heading

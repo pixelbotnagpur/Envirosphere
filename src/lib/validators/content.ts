@@ -166,11 +166,12 @@ const homeBaseSchema = z.object({
     body: z.string().min(1),
     /** Outline button at the right of the heading. */
     topCta: navItemSchema,
-    /** Outline button below the photographs. */
+    /** Label and link of the small gallery card that closes the photo grid. */
     bottomCta: navItemSchema,
+    /** The bento is drawn for four photos plus the gallery card. */
     items: z
       .array(z.object({ image: mediaKey, tag: z.string().min(1), caption: z.string().min(1) }))
-      .min(1),
+      .length(4, { message: "Field work shows exactly four photos (the grid is drawn for four plus the gallery card)" }),
   }),
   visualBreak: z.object({
     image: mediaKey,

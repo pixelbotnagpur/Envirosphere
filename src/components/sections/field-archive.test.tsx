@@ -28,28 +28,29 @@ describe("FieldArchive bento grid", () => {
     expect(container.querySelector("[data-card-grid], [data-card]")).toBeNull();
   });
 
-  it("gives the four photos the big, medium and two small shapes whose edges line up", () => {
+  it("places the four photos and the gallery card in one block of four rows, edges lining up", () => {
     const { container } = render(<FieldArchive {...props} />);
-    const [a, b, c, d] = tiles(container);
-    expect(a).toHaveClass("lg:col-span-5", "lg:row-span-4");
-    expect(b).toHaveClass("lg:col-span-4", "lg:row-span-4");
-    // Two small tiles of two rows each stack to the same four rows as the big ones.
-    expect(c).toHaveClass("lg:col-span-3", "lg:row-span-2");
-    expect(d).toHaveClass("lg:col-span-3", "lg:row-span-2");
-    // 5 + 4 + 3 columns fill the 12.
-    expect(5 + 4 + 3).toBe(12);
+    const [a, b, c, d, g] = tiles(container);
+    // A: big, columns 1-5, all four rows.
+    expect(a).toHaveClass("lg:col-start-1", "lg:col-span-5", "lg:row-start-1", "lg:row-span-4");
+    // B and C: columns 6-9, two rows each, one above the other.
+    expect(b).toHaveClass("lg:col-start-6", "lg:col-span-4", "lg:row-start-1", "lg:row-span-2");
+    expect(c).toHaveClass("lg:col-start-6", "lg:col-span-4", "lg:row-start-3", "lg:row-span-2");
+    // D: columns 10-12, rows 1-3; the gallery card takes row 4 under it.
+    expect(d).toHaveClass("lg:col-start-10", "lg:col-span-3", "lg:row-start-1", "lg:row-span-3");
+    expect(g).toHaveClass("lg:col-start-10", "lg:col-span-3", "lg:row-start-4", "lg:row-span-1");
   });
 
-  it("ends the grid with one wide call-to-action tile linking to the gallery, and no button below the grid", () => {
+  it("makes the gallery link a card inside the grid, the last tile, with no extra row and no button below", () => {
     const { container } = render(<FieldArchive {...props} />);
     const all = tiles(container);
     expect(all).toHaveLength(5);
     const cta = all[all.length - 1];
     expect(cta).toHaveAttribute("data-cta-tile");
-    expect(cta).toHaveClass("lg:col-span-12", "md:col-span-2");
+    // Not a full-width strip any more.
+    expect(cta.className).not.toMatch(/col-span-12/);
     expect(cta.querySelector("a")).toHaveAttribute("href", "/gallery/");
     expect(cta).toHaveTextContent("View all gallery");
-    // The old button below the grid is gone: the only links outside the grid are in the heading row.
     const grid = container.querySelector("[data-bento]")!;
     const outside = Array.from(container.querySelectorAll("a")).filter((a) => !grid.contains(a));
     expect(outside).toHaveLength(1);
@@ -64,15 +65,6 @@ describe("FieldArchive bento grid", () => {
     }
     expect(screen.getByText("MARINE")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "marine photo" })).toBeInTheDocument();
-  });
-
-  it("repeats the pattern after four photos", () => {
-    const eight = [...props.items, ...props.items.map((i) => ({ ...i, caption: `${i.caption} again` }))];
-    const { container } = render(<FieldArchive {...props} items={eight} />);
-    const all = tiles(container);
-    expect(all).toHaveLength(9);
-    expect(all[4]).toHaveClass("lg:col-span-5", "lg:row-span-4");
-    expect(all[8]).toHaveAttribute("data-cta-tile");
   });
 
   it("shows the heading and the top button", () => {

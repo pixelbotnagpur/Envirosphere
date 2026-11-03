@@ -361,7 +361,7 @@ test.describe("Field work: bento grid", () => {
   const tiles = (page: Page) => page.locator("[data-bento] [data-tile]");
   const rect = async (el: Locator) => (await el.boundingBox())!;
 
-  test("at desktop width the tiles have different sizes, line up on short rows and fill the grid", async ({ page }) => {
+  test("at desktop width the five tiles fill one block of four rows with every edge lined up", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     const grid = page.locator("[data-bento]");
@@ -372,24 +372,30 @@ test.describe("Field work: bento grid", () => {
     await page.waitForTimeout(300);
     const boxes = [];
     for (let i = 0; i < 5; i += 1) boxes.push(await rect(tiles(page).nth(i)));
-    const [a, b, c, d, cta] = boxes;
-    // Big, medium and two small shapes.
+    const [a, b, c, d, g] = boxes;
+    const gap = 16;
+    const g0 = await rect(grid);
+    // Three columns of tiles: big (A), middle (B over C), right (D over the gallery card).
     expect(a.width).toBeGreaterThan(b.width + 20);
-    expect(b.width).toBeGreaterThan(c.width + 20);
-    expect(a.height).toBeGreaterThan(c.height * 1.8);
-    // Edges line up: the tall tiles are the same height, and the two small ones together make up that height.
-    expect(b.height).toBeCloseTo(a.height, 0);
-    expect(c.height + 16 + d.height).toBeCloseTo(a.height, 0);
-    expect(c.x).toBeCloseTo(d.x, 0);
-    expect(d.y).toBeCloseTo(c.y + c.height + 16, 0);
-    expect(a.y).toBeCloseTo(b.y, 0);
-    expect(a.y).toBeCloseTo(c.y, 0);
-    // The last tile is the wide gallery link under the others, the full width of the grid.
-    const g = await rect(grid);
-    expect(cta.width).toBeCloseTo(g.width, 0);
-    expect(cta.x).toBeCloseTo(g.x, 0);
-    expect(cta.y).toBeCloseTo(a.y + a.height + 16, 0);
-    expect(cta.height).toBeLessThan(a.height / 3);
+    expect(b.width).toBeGreaterThan(d.width + 20);
+    expect(a.x).toBeCloseTo(g0.x, 0);
+    expect(b.x).toBeCloseTo(a.x + a.width + gap, 0);
+    expect(d.x).toBeCloseTo(b.x + b.width + gap, 0);
+    expect(d.x + d.width).toBeCloseTo(g0.x + g0.width, 0);
+    expect(c.x).toBeCloseTo(b.x, 0);
+    expect(g.x).toBeCloseTo(d.x, 0);
+    expect(g.width).toBeCloseTo(d.width, 0);
+    // Every column ends on the same line as the big tile, so there is no extra row below the block.
+    expect(b.y).toBeCloseTo(a.y, 0);
+    expect(d.y).toBeCloseTo(a.y, 0);
+    expect(c.y).toBeCloseTo(b.y + b.height + gap, 0);
+    expect(g.y).toBeCloseTo(d.y + d.height + gap, 0);
+    const bottom = a.y + a.height;
+    expect(c.y + c.height).toBeCloseTo(bottom, 0);
+    expect(g.y + g.height).toBeCloseTo(bottom, 0);
+    expect(g0.y + g0.height).toBeCloseTo(bottom, 0);
+    // The gallery card is small: a single short row under the tall photo.
+    expect(g.height).toBeLessThan(d.height / 2);
     // No overlaps, and together the tiles cover the whole grid except the gaps.
     for (let i = 0; i < boxes.length; i += 1) {
       for (let j = i + 1; j < boxes.length; j += 1) {
@@ -399,7 +405,7 @@ test.describe("Field work: bento grid", () => {
       }
     }
     const covered = boxes.reduce((sum, box) => sum + box.width * box.height, 0);
-    expect(covered / (g.width * g.height)).toBeGreaterThan(0.93);
+    expect(covered / (g0.width * g0.height)).toBeGreaterThan(0.93);
     // Each photo tile shows its photo and caption inside its own box.
     for (let i = 0; i < 4; i += 1) {
       const tile = tiles(page).nth(i);
@@ -409,6 +415,10 @@ test.describe("Field work: bento grid", () => {
       expect(img.x + img.width).toBeLessThanOrEqual(t.x + t.width + 1);
       await expect(tile.locator("p")).toBeVisible();
     }
+    // The gallery label fits inside the small card.
+    const label = await rect(tiles(page).nth(4).locator("span").last());
+    expect(label.x + label.width).toBeLessThanOrEqual(g.x + g.width);
+    expect(label.y + label.height).toBeLessThanOrEqual(g.y + g.height);
   });
 
   test("the gallery tile is a link to the gallery and nothing else sits below the grid", async ({ page }) => {
@@ -423,16 +433,17 @@ test.describe("Field work: bento grid", () => {
     expect(links.filter((l) => !l.insideGrid)).toHaveLength(1);
   });
 
-  test("on a tablet the first tile is tall and the last runs the full width", async ({ page }) => {
+  test("on a tablet the first tile is tall and the last row holds a photo beside the gallery card", async ({ page }) => {
     await page.setViewportSize({ width: 820, height: 1000 });
     await page.goto("/");
     await page.locator("[data-bento]").scrollIntoViewIfNeeded();
     const [a, b, , d] = [await rect(tiles(page).nth(0)), await rect(tiles(page).nth(1)), await rect(tiles(page).nth(2)), await rect(tiles(page).nth(3))];
-    expect(a.height).toBeGreaterThan(b.height * 1.8);
-    expect(d.width).toBeGreaterThan(a.width * 1.9);
     const cta = await rect(tiles(page).nth(4));
-    expect(cta.width).toBeCloseTo(d.width, 0);
-    expect(cta.y).toBeGreaterThan(d.y + d.height - 1);
+    expect(a.height).toBeGreaterThan(b.height * 1.8);
+    // The last row: the fourth photo beside the gallery card, the same size, no extra strip below.
+    expect(cta.y).toBeCloseTo(d.y, 0);
+    expect(cta.height).toBeCloseTo(d.height, 0);
+    expect(cta.x).toBeGreaterThan(d.x + d.width - 1);
   });
 
   test("on a phone the tiles stack in one column", async ({ page }) => {

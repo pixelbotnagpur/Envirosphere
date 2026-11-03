@@ -245,6 +245,13 @@ describe("Home field archive, visual break and images", () => {
     expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/home\.yaml → testimonials\.controls\.next/);
   });
 
+  it("fails with a plain message unless Field work has exactly four photos", () => {
+    const { content, publicDir } = edit("    - { image: about-photo, tag: FOUR, caption: Fourth caption. }\n", "");
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/home\.yaml → fieldArchive\.items: Field work shows exactly four photos/,
+    );
+  });
+
   it("fails when a hero fact is not one of the stats", () => {
     const { content } = edit("highlights: [Clients]", "highlights: [Customers]");
     expect(() => loadAll(content)).toThrowError(

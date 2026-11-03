@@ -20,26 +20,30 @@ export interface FieldArchiveProps {
   body: string;
   /** Outline button at the right of the heading. */
   topCta: Cta;
-  /** The last tile of the grid: a wide call-to-action card that links to the full gallery. */
+  /** The last tile of the bento: a small card inside the grid that links to the full gallery. */
   bottomCta: Cta;
+  /** Exactly four photographs: the bento is drawn for four photos and the gallery card. */
   items: FieldItem[];
 }
 
 /**
- * Bento layout on a grid of short unit rows, repeated for every four photographs and closed by one wide
- * call-to-action tile.
+ * Bento layout for four photographs and the gallery card, with no extra row: every tile sits inside the
+ * same block, and every edge lines up.
  *
- * Large screens (12 columns, rows 10rem): a big tile (5 cols) and a medium tile (4 cols), both 4 rows
- * tall, then two small tiles (3 cols, 2 rows each) stacked beside them, so every edge lines up.
- * Tablets (2 columns, rows 9rem): a tall tile beside two half-height ones, then a full-width tile.
+ * Large screens (12 columns, four rows of 10rem):
+ *   A  columns 1-5,  rows 1-4   big photo
+ *   B  columns 6-9,  rows 1-2   photo        C  columns 6-9,  rows 3-4   photo
+ *   D  columns 10-12, rows 1-3  tall photo   G  columns 10-12, row 4     gallery card
+ * Tablets (2 columns, rows of 9rem): a tall photo beside two photos, then a photo beside the gallery card.
  * Phones: one column. The photographs are portrait, so the tiles favour tall shapes.
  */
-const TILE_SPANS = [
-  "md:row-span-4 lg:col-span-5 lg:row-span-4",
-  "md:row-span-2 lg:col-span-4 lg:row-span-4",
-  "md:row-span-2 lg:col-span-3 lg:row-span-2",
-  "md:col-span-2 md:row-span-2 lg:col-span-3 lg:row-span-2",
+const TILE_PLACEMENT = [
+  "md:row-span-4 lg:col-span-5 lg:col-start-1 lg:row-span-4 lg:row-start-1",
+  "md:row-span-2 lg:col-span-4 lg:col-start-6 lg:row-span-2 lg:row-start-1",
+  "md:row-span-2 lg:col-span-4 lg:col-start-6 lg:row-span-2 lg:row-start-3",
+  "md:row-span-2 lg:col-span-3 lg:col-start-10 lg:row-span-3 lg:row-start-1",
 ] as const;
+const CTA_PLACEMENT = "md:row-span-2 lg:col-span-3 lg:col-start-10 lg:row-span-1 lg:row-start-4";
 
 export function FieldArchive({ index, label, heading, body, topCta, bottomCta, items }: FieldArchiveProps) {
   return (
@@ -63,11 +67,11 @@ export function FieldArchive({ index, label, heading, body, topCta, bottomCta, i
           data-bento=""
           className="mt-14 grid grid-cols-1 gap-4 md:auto-rows-[9rem] md:grid-cols-2 lg:auto-rows-[10rem] lg:grid-cols-12"
         >
-          {items.map((item, position) => (
+          {items.slice(0, TILE_PLACEMENT.length).map((item, position) => (
             <Reveal
               key={item.caption}
               data-tile=""
-              className={`group relative isolate aspect-[4/5] overflow-hidden rounded-card bg-background md:aspect-auto ${TILE_SPANS[position % TILE_SPANS.length]}`}
+              className={`group relative isolate aspect-[4/5] overflow-hidden rounded-card bg-background md:aspect-auto ${TILE_PLACEMENT[position]}`}
             >
               <Image
                 src={item.image.src}
@@ -86,18 +90,18 @@ export function FieldArchive({ index, label, heading, body, topCta, bottomCta, i
             </Reveal>
           ))}
 
-          <Reveal data-tile="" data-cta-tile="" className="md:col-span-2 lg:col-span-12">
+          <Reveal data-tile="" data-cta-tile="" className={`min-h-36 md:min-h-0 ${CTA_PLACEMENT}`}>
             <Link
               href={bottomCta.href}
-              className="group flex h-full min-h-32 w-full items-center justify-between gap-6 rounded-card bg-primary px-6 py-6 text-primary-foreground transition-colors duration-(--duration-base) ease-out-expo hover:bg-primary/90 sm:px-10"
+              className="group flex h-full w-full flex-col justify-between gap-4 rounded-card bg-primary p-5 text-primary-foreground transition-colors duration-(--duration-base) ease-out-expo hover:bg-primary/90"
             >
-              <span className="font-heading text-h3">{bottomCta.label}</span>
               <span
                 aria-hidden="true"
-                className="grid size-12 shrink-0 place-items-center rounded-pill bg-accent text-accent-foreground transition-transform duration-(--duration-base) ease-out-expo group-hover:rotate-45"
+                className="grid size-10 shrink-0 place-items-center self-end rounded-pill bg-accent text-accent-foreground transition-transform duration-(--duration-base) ease-out-expo group-hover:rotate-45"
               >
                 <ArrowUpRight className="size-5" />
               </span>
+              <span className="font-heading text-h4">{bottomCta.label}</span>
             </Link>
           </Reveal>
         </div>
