@@ -79,9 +79,6 @@ services:
   heading: Services heading
   intro: Services intro
   cta: { label: All services, href: /services/ }
-  viewLabel: View details
-  featured:
-    - { service: environmental-audit, tag: "[ AUDITS ]", image: about-photo }
 stats:
   label: In numbers
   items:
@@ -111,6 +108,10 @@ process:
 testimonials:
   label: Testimonials
   heading: Testimonials heading
+  controls:
+    previous: Previous testimonial
+    next: Next testimonial
+    position: Testimonial {current} of {total}
   items:
     - { quote: Great work., name: A Person, role: Manager }
 contact:

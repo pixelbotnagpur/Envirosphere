@@ -90,19 +90,6 @@ export const siteSchema = z.object({
 
 const sectionLabel = z.string().min(1);
 
-const slug = z
-  .string()
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "use the file name of a service without .md, e.g. crz-clearance");
-
-/** One of the cards under "What we offer". Title and summary come from the service file unless set here. */
-export const featuredServiceSchema = z.object({
-  service: slug,
-  tag: z.string().min(1),
-  image: mediaKey,
-  title: z.string().min(1).optional(),
-  summary: z.string().min(1).optional(),
-});
-
 const homeBaseSchema = z.object({
   seo: pageSeoSchema,
   hero: z.object({
@@ -131,8 +118,6 @@ const homeBaseSchema = z.object({
     heading: z.string().min(1),
     intro: z.string().min(1),
     cta: navItemSchema,
-    viewLabel: z.string().min(1),
-    featured: z.array(featuredServiceSchema).default([]),
   }),
   stats: z.object({
     label: sectionLabel,
@@ -154,7 +139,9 @@ const homeBaseSchema = z.object({
   process: z.object({
     label: sectionLabel,
     heading: z.string().min(1),
-    steps: z.array(z.object({ title: z.string().min(1), body: z.string().min(1) })).min(2),
+    steps: z
+      .array(z.object({ title: z.string().min(1), body: z.string().min(1), image: mediaKey.optional() }))
+      .min(2),
   }),
   testimonials: z.object({
     label: sectionLabel,
@@ -162,6 +149,16 @@ const homeBaseSchema = z.object({
     items: z
       .array(z.object({ quote: z.string().min(1), name: z.string().min(1), role: z.string().optional() }))
       .min(1),
+    /** Words for the slider controls (read by screen readers). */
+    controls: z.object({
+      previous: z.string().min(1),
+      next: z.string().min(1),
+      position: z
+        .string()
+        .refine((value) => value.includes("{current}") && value.includes("{total}"), {
+          message: "must contain {current} and {total}, e.g. Testimonial {current} of {total}",
+        }),
+    }),
   }),
   fieldArchive: z.object({
     label: sectionLabel,

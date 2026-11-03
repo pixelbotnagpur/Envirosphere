@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
  */
 const WIDTHS = [375, 768, 1024, 1440];
 const PAGES: { path: string; minGrids: number }[] = [
-  { path: "/", minGrids: 3 },
+  { path: "/", minGrids: 1 }, // In numbers; Field Work is a bento grid with deliberately unequal tiles
   { path: "/services/", minGrids: 1 },
   { path: "/why-us/", minGrids: 2 },
   { path: "/about/", minGrids: 1 },

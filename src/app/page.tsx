@@ -9,7 +9,7 @@ import { ServicesIndex } from "@/components/sections/services-index";
 import { Stats } from "@/components/sections/stats";
 import { Testimonials } from "@/components/sections/testimonials";
 import { VisualBreak } from "@/components/sections/visual-break";
-import { getImageAsset, loadHome, loadServices, loadSite, resolveFeaturedServices } from "@/lib/content";
+import { getImageAsset, loadHome, loadServices, loadSite } from "@/lib/content";
 import { pageSeo } from "@/lib/page-seo";
 
 export function generateMetadata(): Metadata {
@@ -23,9 +23,6 @@ export default function HomePage() {
   const home = loadHome();
   const services = loadServices();
 
-  const featuredDisciplines = resolveFeaturedServices(home, services).map(
-    ({ title, tag, summary, href, image }) => ({ title, tag, summary, href, image: getImageAsset(image) }),
-  );
   const fieldArchiveItems = home.fieldArchive.items.map((item) => ({
     image: getImageAsset(item.image),
     tag: item.tag,
@@ -66,21 +63,24 @@ export default function HomePage() {
       />
       <VisualBreak
         image={getImageAsset(visualBreak.image)}
+        title={home.services.label}
         tag={visualBreak.tag}
         quote={visualBreak.quote}
         location={visualBreak.showOffices ? cities.join(" • ").toUpperCase() : undefined}
-      />
-      <ServicesIndex
-        index="002"
-        label={home.services.label}
-        heading={home.services.heading}
-        intro={home.services.intro}
-        cta={home.services.cta}
-        viewLabel={home.services.viewLabel}
-        services={services.map(({ slug, title, summary }) => ({ slug, title, summary }))}
-        featured={featuredDisciplines}
-      />
-      <Stats index="003" label={home.stats.label} items={home.stats.items} locale={site.locale} />
+      >
+        <ServicesIndex
+          heading={home.services.heading}
+          intro={home.services.intro}
+          cta={home.services.cta}
+          services={services.map(({ slug, title, summary, image }) => ({
+            slug,
+            title,
+            summary,
+            image: image ? getImageAsset(image) : undefined,
+          }))}
+        />
+      </VisualBreak>
+      <Stats index="003" label={home.stats.label} items={home.stats.items} locale={site.locale} tone="primary" />
       <Clients
         index="004"
         label={home.clients.label}
@@ -100,13 +100,17 @@ export default function HomePage() {
         index="006"
         label={home.process.label}
         heading={home.process.heading}
-        steps={home.process.steps}
+        steps={home.process.steps.map((step) => ({
+          ...step,
+          image: step.image ? getImageAsset(step.image) : undefined,
+        }))}
       />
       <Testimonials
         index="007"
         label={home.testimonials.label}
         heading={home.testimonials.heading}
         items={home.testimonials.items}
+        controls={home.testimonials.controls}
       />
       <ContactCta
         index="008"

@@ -124,6 +124,11 @@ describe("motion utilities and layout tokens", () => {
     expect(tokens.get("--spacing-header")).toBe("4rem");
     expect(tokens.get("--animate-marquee")).toContain("marquee");
   });
+  it("defines the mega text token for the big centered title, larger than display", () => {
+    expect(tokens.get("--text-mega")).toBe("clamp(3rem, 1.25rem + 6.5vw, 8rem)");
+    expect(tokens.get("--text-mega--line-height")).toBe("0.95");
+    expect(tokens.get("--text-mega")).not.toBe(tokens.get("--text-display"));
+  });
   it("defines the micro text token for badges over images", () => {
     expect(tokens.get("--text-micro")).toBe("0.6875rem");
     expect(tokens.get("--text-micro--line-height")).toBe("1.4");

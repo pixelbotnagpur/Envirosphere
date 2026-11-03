@@ -128,40 +128,6 @@ export function loadService(slug: string, root = CONTENT_ROOT): Service | undefi
   return loadServices(root).find((s) => s.slug === slug);
 }
 
-export interface FeaturedService {
-  slug: string;
-  title: string;
-  summary: string;
-  tag: string;
-  image: string;
-  href: string;
-}
-
-/**
- * The Home cards under "What we offer". Each card names a service file; its link is built from that
- * name, so it can never point at a page that does not exist. Title and summary come from the service
- * file unless the card overrides them in home.yaml.
- */
-export function resolveFeaturedServices(home: Home, services: Service[]): FeaturedService[] {
-  return home.services.featured.map((card, index) => {
-    const service = services.find((s) => s.slug === card.service);
-    if (!service) {
-      throw new ContentError(
-        `content/pages/home.yaml → services.featured[${index}].service: "${card.service}" is not a service; ` +
-          `use a file name from content/services without .md (${services.map((s) => s.slug).join(", ")})`,
-      );
-    }
-    return {
-      slug: service.slug,
-      title: card.title ?? service.title,
-      summary: card.summary ?? service.summary,
-      tag: card.tag,
-      image: card.image,
-      href: `/services/${service.slug}/`,
-    };
-  });
-}
-
 /** Loads everything and checks every media reference. Used by `pnpm content:check` and the build. */
 export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const site = loadSite(root);
@@ -181,7 +147,6 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
   const downloads = loadDownloads(root);
 
   verifyAllMedia(media, publicRoot);
-  resolveFeaturedServices(home, services);
   if (!site.offices.some((office) => office.city === contactPage.headOffice.city)) {
     throw new ContentError(
       `content/pages/contact.yaml → headOffice.city: "${contactPage.headOffice.city}" is not one of the offices in content/site.yaml (${site.offices.map((o) => o.city).join(", ")})`,
@@ -192,15 +157,15 @@ export function loadAll(root = CONTENT_ROOT, publicRoot = PUBLIC_ROOT) {
     [site.seo.ogImageKey, "content/site.yaml → seo.ogImageKey"],
     [home.hero.image, "content/pages/home.yaml → hero.image"],
     [home.about.image, "content/pages/home.yaml → about.image"],
-    ...home.services.featured.map((card, index): [string | undefined, string] => [
-      card.image,
-      `content/pages/home.yaml → services.featured[${index}].image`,
-    ]),
     ...home.fieldArchive.items.map((item, index): [string | undefined, string] => [
       item.image,
       `content/pages/home.yaml → fieldArchive.items[${index}].image`,
     ]),
     [home.visualBreak.image, "content/pages/home.yaml → visualBreak.image"],
+    ...home.process.steps.map((step, index): [string | undefined, string] => [
+      step.image,
+      `content/pages/home.yaml → process.steps[${index}].image`,
+    ]),
     ...home.clients.logos.map((key, index): [string | undefined, string] => [
       key,
       `content/pages/home.yaml → clients.logos[${index}]`,

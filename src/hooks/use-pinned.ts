@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
-// 64rem is Tailwind's lg breakpoint.
-const QUERY = "(min-width: 64rem) and (prefers-reduced-motion: no-preference)";
+// 64rem is Tailwind's lg breakpoint; below 44rem tall the pinned layouts would be clipped, so they stack instead.
+const QUERY = "(min-width: 64rem) and (min-height: 44rem) and (prefers-reduced-motion: no-preference)";
 
 function subscribe(onChange: () => void) {
   const media = window.matchMedia(QUERY);

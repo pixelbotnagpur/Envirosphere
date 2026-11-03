@@ -42,6 +42,9 @@
   --text-display: clamp(2.25rem, 1.25rem + 4vw, 4.5rem);
   --text-display--line-height: 1;
   --text-display--letter-spacing: -0.03em;
+  --text-mega: clamp(3rem, 1.25rem + 6.5vw, 8rem);
+  --text-mega--line-height: 0.95;
+  --text-mega--letter-spacing: -0.04em;
   --text-h1: clamp(1.85rem, 1.15rem + 2.5vw, 3.25rem);
   --text-h1--line-height: 1.05;
   --text-h1--letter-spacing: -0.025em;
@@ -185,6 +188,21 @@
 
 @utility rise-3 {
   --rise-delay: calc(var(--stagger) * 3);
+}
+
+/* People who prefer reduced motion get the finished state at once: no mask, no lift, no zoom. */
+@utility static-when-reduced {
+  @media (prefers-reduced-motion: reduce) {
+    clip-path: none !important;
+    transform: none !important;
+  }
+}
+
+/* Touch screens cannot hover, so whatever a hover reveals is simply shown there. */
+@utility show-on-touch {
+  @media (hover: none) {
+    clip-path: inset(0) !important;
+  }
 }
 
 @utility hero-atmosphere {

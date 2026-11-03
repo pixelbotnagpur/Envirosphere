@@ -13,7 +13,6 @@ import {
   loadServices,
   loadServicesPage,
   loadWhyUsPage,
-  resolveFeaturedServices,
   socialLinks,
 } from "./index";
 import { ContentError } from "./read";
@@ -203,7 +202,7 @@ describe("loadAll", () => {
   });
 });
 
-describe("Home featured services, field archive and visual break", () => {
+describe("Home field archive, visual break and images", () => {
   const edit = (from: string, to: string) => {
     const files = validFiles();
     const key = "content/pages/home.yaml";
@@ -212,46 +211,38 @@ describe("Home featured services, field archive and visual break", () => {
     return makeTree(files);
   };
 
-  it("builds each card from its service file, with the link derived from the slug", () => {
-    const { content, publicDir } = makeTree(validFiles());
-    const all = loadAll(content, publicDir);
-    expect(resolveFeaturedServices(all.home, all.services)).toEqual([
-      {
-        slug: "environmental-audit",
-        title: "Environmental audit",
-        summary: "Independent audit of compliance.",
-        tag: "[ AUDITS ]",
-        image: "about-photo",
-        href: "/services/environmental-audit/",
-      },
-    ]);
-  });
-
-  it("lets a card override the title and summary", () => {
-    const { content, publicDir } = edit(
-      "tag: \"[ AUDITS ]\", image: about-photo }",
-      "tag: \"[ AUDITS ]\", image: about-photo, title: Own title, summary: Own summary }",
-    );
-    const all = loadAll(content, publicDir);
-    const [card] = resolveFeaturedServices(all.home, all.services);
-    expect([card.title, card.summary, card.href]).toEqual(["Own title", "Own summary", "/services/environmental-audit/"]);
-  });
-
-  it("fails and names the file and field when a card points at a service that does not exist", () => {
-    const { content, publicDir } = edit("service: environmental-audit", "service: no-such-service");
-    expect(() => loadAll(content, publicDir)).toThrowError(
-      /content\/pages\/home\.yaml → services\.featured\[0\]\.service: "no-such-service" is not a service.*environmental-audit/,
-    );
-  });
-
   it.each([
-    ["tag: \"[ AUDITS ]\", image: about-photo", "tag: \"[ AUDITS ]\", image: nope", /services\.featured\[0\]\.image: "nope" is not listed/],
     ["{ image: about-photo, tag: ONE", "{ image: nope, tag: ONE", /fieldArchive\.items\[0\]\.image: "nope" is not listed/],
     ["visualBreak:\n  image: about-photo", "visualBreak:\n  image: nope", /visualBreak\.image: "nope" is not listed/],
     ["  image: about-photo\n  highlights", "  image: nope\n  highlights", /hero\.image: "nope" is not listed/],
   ])("fails when an image key is unknown (%#)", (from, to, message) => {
     const { content, publicDir } = edit(from, to);
     expect(() => loadAll(content, publicDir)).toThrowError(message);
+  });
+
+  it("fails and names the file and field when a How we work picture is not in media.yaml", () => {
+    const { content, publicDir } = edit("{ title: One, body: First step. }", "{ title: One, body: First step., image: nope }");
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/home\.yaml → process\.steps\[0\]\.image: "nope" is not listed/,
+    );
+  });
+
+  it("accepts a step with a picture and a step without one", () => {
+    const { content, publicDir } = edit("{ title: One, body: First step. }", "{ title: One, body: First step., image: about-photo }");
+    const all = loadAll(content, publicDir);
+    expect(all.home.process.steps.map((step) => step.image)).toEqual(["about-photo", undefined]);
+  });
+
+  it("fails with a plain message when the slider position words lack {current} or {total}", () => {
+    const { content, publicDir } = edit("position: Testimonial {current} of {total}", "position: Testimonial number");
+    expect(() => loadAll(content, publicDir)).toThrowError(
+      /content\/pages\/home\.yaml → testimonials\.controls\.position: must contain \{current\} and \{total\}/,
+    );
+  });
+
+  it("fails when the slider button words are missing", () => {
+    const { content, publicDir } = edit("    next: Next testimonial\n", "");
+    expect(() => loadAll(content, publicDir)).toThrowError(/content\/pages\/home\.yaml → testimonials\.controls\.next/);
   });
 
   it("fails when a hero fact is not one of the stats", () => {

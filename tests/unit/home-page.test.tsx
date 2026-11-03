@@ -31,13 +31,11 @@ describe("Home page renders content/pages/home.yaml", () => {
       home.hero.eyebrow,
       home.hero.title,
       home.hero.primaryCta.label,
-      home.services.viewLabel,
       home.fieldArchive.heading,
       home.fieldArchive.topCta.label,
       home.fieldArchive.bottomCta.label,
       ...home.hero.keywords,
       ...home.fieldArchive.items.flatMap((item) => [item.tag, item.caption]),
-      ...home.services.featured.map((card) => card.tag),
     ];
     for (const value of expected) expect(text, value).toContain(value);
   });
@@ -56,17 +54,15 @@ describe("Home page renders content/pages/home.yaml", () => {
     expect(used(home.visualBreak.image)).toBe(true);
   });
 
-  it("links each featured card to its own service page, with title and summary from the service", async () => {
+  it("lists every service as a numbered row linking to its own page, with no photo cards above", async () => {
     const { default: HomePage } = await import("@/app/page");
     const html = renderToStaticMarkup(HomePage());
     const text = visibleText(html);
-    for (const card of home.services.featured) {
-      const service = services.find((s) => s.slug === card.service);
-      expect(service, card.service).toBeDefined();
-      expect(html).toContain(`href="/services/${card.service}/"`);
-      expect(text).toContain(card.title ?? service?.title ?? "");
-      expect(text).toContain(card.summary ?? service?.summary ?? "");
+    for (const service of services) {
+      expect(html).toContain(`href="/services/${service.slug}/"`);
+      expect(text).toContain(service.title);
     }
+    expect(html).not.toContain("View Specifications");
   });
 
   it("shows the hero facts from the stats and the office cities from site.yaml", async () => {

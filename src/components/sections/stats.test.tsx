@@ -36,6 +36,21 @@ describe("Stats", () => {
     expect(container.querySelector("section")).not.toHaveClass("bg-secondary");
   });
 
+  it("can sit on the dark Forest background, with softly tinted cards and light text", () => {
+    const { container } = render(<Stats {...props} tone="primary" />);
+    const section = container.querySelector("section");
+    expect(section).toHaveClass("bg-primary", "text-primary-foreground");
+    expect(section).not.toHaveClass("bg-surface");
+    const cards = container.querySelectorAll("[data-card] > div > div");
+    expect(cards).toHaveLength(2);
+    for (const card of cards) {
+      expect(card).toHaveClass("bg-primary-foreground/5", "border-primary-foreground/15");
+      expect(card).not.toHaveClass("bg-primary");
+    }
+    // The small label switches to its light tone so it stays readable on the dark section.
+    expect(screen.getByText(/In numbers/)).toHaveClass("text-secondary");
+  });
+
   it("can sit on the Bone background instead", () => {
     const { container } = render(<Stats {...props} tone="background" />);
     expect(container.querySelector("section")).toHaveClass("bg-background");

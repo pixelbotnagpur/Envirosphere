@@ -48,7 +48,7 @@ The text of the service page goes here, below the second --- line.
 - `title`: the page heading and the name in menus and cards.
 - `order`: position in lists and the previous/next links. Each service needs its own number.
 - `summary`: short description (also used by Google).
-- `image`: a key from `content/media.yaml` (see "Replace an image" above). The picture is shown at the top of the page. Optional.
+- `image`: a key from `content/media.yaml` (see "Replace an image" above). The picture is shown at the top of the page, and as the small picture in this service's row in "What we offer" on the Home page. Optional: delete the line and the row shows a plain placeholder box instead.
 - The text below the second `---` line must not be empty; `pnpm content:check` stops with a message if it is.
 - To add a service, copy a file, rename it (lowercase, dashes, `.md`) and edit it. Delete the file to remove it. Only `.md` files belong in this folder.
 
@@ -68,16 +68,16 @@ Controls the layout and copy of the home page (`content/pages/home.yaml`), top t
 - `seo`: the page title (used exactly as written, no "| Envirosphere" added) and the description shown in search results.
 - `hero`: Top banner with accreditation eyebrow, main title, subtitle, CTA links and scroll label. `image` is the background photo (a key from `content/media.yaml`; leave it out for a plain green band). `highlights` lists the labels of stats from the `stats` block below (for example `[Clients, Ongoing projects]`): their numbers appear as short facts under the buttons, so a number is only ever typed once. `keywords` are the words at the bottom right, shown separated by dots.
 - `about`: Firm overview text, paragraphs, and CTA button. `image` is the photo beside the text (a key from `content/media.yaml`; it is `ecological-survey` today, change the key to change the photo).
-- `visualBreak`: the wide photo after "About us". `image` is a media key; the office cities from `content/site.yaml` show at its bottom right (`showOffices: false` hides them). Optional `tag` (pill at the top left) and `quote` (line at the bottom left).
-- `services`: Section heading, intro, and CTA button; `viewLabel` is the text at the bottom of each featured card. `featured` lists the photo cards: `service` is the file name of a service in `content/services` without `.md` (for example `water-wastewater-treatment`), `tag` is the small label on the photo and `image` its media key. The card's link, title and summary come from that service, so a link can never point at a missing page; add `title:` or `summary:` to a card only to show different words. A wrong `service` name stops the build and lists the valid names. The numbered list of all 13 services below the cards is loaded from `content/services/*.md` ordered by `order:`.
-- `stats`: Key metrics and animated counter items (clients, ongoing projects, certifications).
+- `visualBreak`: the full-screen photo before "What we offer". It stays pinned to the top of the screen while you scroll: the big word on it (the `label` of `services` below) is revealed, then the Services section slides up over the photo like a window. `image` is a media key; the office cities from `content/site.yaml` show at its bottom (`showOffices: false` hides them). Optional `tag` (small pill at the top left) and `quote`. People who prefer reduced motion see a plain photo band with the word already shown.
+- `services`: `label` is the big centered word on the photo above (it is not repeated in the section). `heading`, `intro` and `cta` (the "All services" button) are the first lines of the Services section. Below them is one row per service, loaded from `content/services/*.md` ordered by `order:`: number, title, a small picture (the service's `image`, or a placeholder box if it has none), the summary and an arrow. On a mouse screen the row under the pointer fills with green while the others fade; touch screens just show the rows.
+- `stats`: Key metrics and animated counter items (clients, ongoing projects, certifications). Shown on the dark green background.
 - `clients`: Logo marquee rows. Each logo comes from a `client-*` key in `content/media.yaml` (`public/media/clients/*.webp`).
-- `fieldArchive`: the photo grid after the logos: `label`, `heading`, `body`, the two buttons (`topCta`, `bottomCta`) and `items`, each with `image` (media key), `tag` and `caption`.
-- `process`: Four-step scroll-pinned workflow narrative. *Note: this block is a draft to be reviewed by the owner.*
-- `testimonials`: Client quotes, names, and roles.
+- `fieldArchive`: "Field work": `label`, `heading`, `body`, the top button `topCta`, and the photos as a bento grid (tiles of different sizes). Use exactly four `items` for the tidy layout (each: `image`, `tag`, `caption`); after the photos comes one wide tile that links to the full gallery, using the `bottomCta` label and link.
+- `process`: "How we work" (draft wording: please review). Each step has a `title`, a `body` and an optional `image` (a name from `media.yaml`). On a desktop the section stays pinned while you scroll: the picture on the left is revealed through a mask as each step becomes active, and that step's card on the right lights up. Steps without an `image` show a placeholder box. On phones and short screens it is a simple list with each picture revealed as it scrolls into view.
+- `testimonials`: "Client testimonials", shown as a slider with one quote at a time. `items` are the quotes (`quote`, `name`, optional `role`); visitors move with the arrow buttons, the bars, the left and right arrow keys, or by dragging. `controls` are the words screen readers use (`previous`, `next`, and `position`, where `{current}` and `{total}` are replaced by the numbers). Confirm the clients agree to be quoted.
 - `contact`: Closing call-to-action banner with phone and email contact options (values sourced from `content/site.yaml`).
 
-`pnpm content:check` verifies every image key used on the Home page (hero, about, featured cards, field photos, visual break, client logos) and tells you the file and field of a wrong one.
+`pnpm content:check` verifies every image key used on the Home page (hero, about, field photos, visual break, client logos) and each service's `image` (the small picture in its row) and tells you the file and field of a wrong one.
 
 To add client logos: add the file to `public/media/clients/`, add an entry to `media.yaml`, then add its key to `clients.logos`.
 

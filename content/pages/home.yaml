@@ -56,20 +56,6 @@ services:
   heading: Thirteen environmental services.
   intro: From environmental clearances to the operation of treatment plants.
   cta: { label: All services, href: /services/ }
-  # Text at the bottom of each featured card.
-  viewLabel: View Specifications
-  # The three photo cards. `service` is the file name of a service in content/services (without .md);
-  # the link, title and summary come from that service. Add `title:` or `summary:` to override them.
-  featured:
-    - service: environmental-clearance
-      tag: "[ STATUTORY & CONSENTS ]"
-      image: hero-eco-architecture
-    - service: water-wastewater-treatment
-      tag: "[ WATER ]"
-      image: clean-water-facility
-    - service: environmental-audit
-      tag: "[ AUDITS ]"
-      image: sustainable-industrial-park
 
 stats:
   label: In numbers
@@ -141,23 +127,36 @@ fieldArchive:
     - { image: photo-g16, tag: SAMPLING, caption: A bagged and labelled sediment sample. }
     - { image: photo-g21, tag: PUNE OFFICE, caption: An executive cabin at the Pune office. }
 
-# Draft: owner to review. Steps are inferred from the services list, not taken from the old site.
 process:
   label: How we work
   heading: From first study to final consent.
   steps:
+    # Draft: owner to review the wording. Steps are inferred from the services list, not taken from the old site.
+    # `image` is the picture revealed on the left while this step is active (a name from media.yaml).
+    # Leave it out and a placeholder box is shown. These are stand-ins from the photo gallery: swap them for
+    # pictures that really show each step.
     - title: Scoping
       body: We study your project, its location and the rules that apply, and list the approvals you need.
+      image: photo-g08
     - title: Assessment
       body: Our specialists carry out the studies and prepare the assessment and management plans.
+      image: photo-g22
     - title: Submission
       body: We file the applications and follow them up with MoEFCC, the Pollution Control Boards, MIDC and other authorities.
+      image: photo-g07
     - title: Compliance
       body: After approval we handle post-clearance compliance, monitoring and audits.
+      image: photo-g13
 
 testimonials:
   label: Client testimonials
   heading: In our clients' words.
+  # Words for the slider controls (read aloud by screen readers). In `position`, {current} and {total}
+  # are replaced by the numbers.
+  controls:
+    previous: Previous testimonial
+    next: Next testimonial
+    position: Testimonial {current} of {total}
   # TODO(content): confirm the clients agree to be quoted. Quotes are copied as published.
   items:
     - quote: Our company received successful and timely clearance of EC which wouldn't have been possible without the hard work and commitment of ENVIROSPHERE.

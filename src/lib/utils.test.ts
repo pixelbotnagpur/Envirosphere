@@ -10,6 +10,11 @@ describe("cn", () => {
     expect(cn("text-h1", "text-primary")).toBe("text-h1 text-primary");
   });
 
+  it("keeps text-mega and a color token together, and lets it replace a smaller size", () => {
+    expect(cn("text-mega", "text-primary-foreground")).toBe("text-mega text-primary-foreground");
+    expect(cn("text-display", "text-mega")).toBe("text-mega");
+  });
+
   it("keeps text-micro and a color token together", () => {
     expect(cn("text-micro", "text-primary")).toBe("text-micro text-primary");
     expect(cn("text-label", "text-micro")).toBe("text-micro");
