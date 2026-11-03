@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { motionValue } from "motion/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +51,9 @@ describe("Header", () => {
     const mobileNav = document.getElementById("mobile-nav") as HTMLElement;
     await userEvent.click(mobileNav.querySelector("a[href='/services/']") as HTMLElement);
     expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
-    expect(mobileNav).toHaveAttribute("hidden");
+    expect(mobileNav).toHaveAttribute("data-open", "false");
+    // The panel leaves the page once its closing animation has played.
+    await waitFor(() => expect(mobileNav).toHaveAttribute("hidden"), { timeout: 2000 });
   });
 
   it("hides #mobile-nav until the menu is opened", async () => {
@@ -60,6 +62,8 @@ describe("Header", () => {
     expect(mobileNav).toHaveAttribute("hidden");
     await userEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(mobileNav).not.toHaveAttribute("hidden");
+    // The reveal animation starts a moment after the panel appears.
+    await waitFor(() => expect(mobileNav).toHaveAttribute("data-open", "true"));
   });
 
   it("makes the mobile menu scrollable and opts it out of Lenis smooth scroll", () => {
@@ -76,7 +80,8 @@ describe("Header", () => {
     await userEvent.click(toggle);
     await userEvent.keyboard("{Escape}");
     expect(screen.getByRole("button", { name: "Open menu" })).toHaveFocus();
-    expect(document.getElementById("mobile-nav")).toHaveAttribute("hidden");
+    expect(document.getElementById("mobile-nav")).toHaveAttribute("data-open", "false");
+    await waitFor(() => expect(document.getElementById("mobile-nav")).toHaveAttribute("hidden"), { timeout: 2000 });
   });
 
   it("marks the logo image decorative because the brand name is visible text", () => {

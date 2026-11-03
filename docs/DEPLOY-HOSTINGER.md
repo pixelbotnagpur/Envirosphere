@@ -43,6 +43,20 @@ The `.htaccess` file is not used on the Node.js plan, so there is nothing to upl
 For a practice run only (never to upload), `pnpm package:hostinger --allow-missing-forms` skips the
 form checks and prints a loud warning. It still refuses test values.
 
+### Client preview (before the forms and Turnstile are ready)
+
+To show the site to the client on a temporary address, build it as a preview. The preview tells
+search engines not to list it (`robots.txt` blocks everything and every page says `noindex`), and
+the contact and job forms will not send anything yet:
+
+```
+NEXT_PUBLIC_NOINDEX=1 pnpm build
+node scripts/package-hostinger.mjs --allow-missing-forms
+```
+
+Upload `hostinger-dist` as in section 3. For the real launch, build again **without**
+`NEXT_PUBLIC_NOINDEX` and with the form settings above, otherwise Google will never list the site.
+
 ## 3. First-time setup in Hostinger
 
 1. hPanel > **Websites** > **Add website** > **Node.js Apps** (or Websites > your site > Node.js).

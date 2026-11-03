@@ -198,6 +198,37 @@
   }
 }
 
+/* Mobile menu: a Forest panel opens as a circle growing from the menu button; links rise in one by one. */
+@utility menu-panel {
+  clip-path: circle(0 at calc(100% - 2.25rem) calc(var(--spacing-header) / 2));
+  transition: clip-path var(--duration-slow) var(--ease-in-out-quart);
+  &[data-open="true"] {
+    clip-path: circle(150vmax at calc(100% - 2.25rem) calc(var(--spacing-header) / 2));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    clip-path: none;
+  }
+}
+
+@utility menu-item {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition:
+    opacity var(--duration-base) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+  [data-open="true"] & {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--stagger) * 1.5 + var(--stagger) * var(--i, 0) * 0.6);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Touch screens cannot hover, so whatever a hover reveals is simply shown there. */
 @utility show-on-touch {
   @media (hover: none) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValueEvent, type MotionValue } from "motion/react";
+import { cubicBezier, motion, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import { ScrollStory } from "@/components/motion/scroll-story";
@@ -26,11 +26,19 @@ export interface ProcessProps {
 
 const pad = (value: number, size: number) => String(value).padStart(size, "0");
 
-/** Clip-path mask: closed shows nothing, open shows everything. A picture opens upward from its bottom edge. */
-const OPEN = "inset(0% 0% 0% 0%)";
-const CLOSED = "inset(100% 0% 0% 0%)";
+/**
+ * Mask reveal with transforms only (smooth, runs on the graphics card): a box with `overflow: hidden`
+ * slides up from below while the picture inside slides down by the same amount, so the picture stays
+ * still and the window opens upward. Animating `clip-path` instead repaints the big photo on every frame.
+ */
+const mask = cubicBezier(...ease.inOutQuart);
 const reveal = { duration: duration.slow, ease: ease.inOutQuart } as const;
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
+/**
+ * Photos are loaded up front at low priority. Lazy loading never starts for a picture that is still
+ * hidden inside its mask, so it would only begin to load once revealed and flash empty.
+ */
 function StepPicture({ image }: { image?: ImageAsset }) {
   if (!image) return <ImagePlaceholder className="h-full w-full" />;
   return (
@@ -39,6 +47,9 @@ function StepPicture({ image }: { image?: ImageAsset }) {
       alt=""
       width={image.width}
       height={image.height}
+      loading="eager"
+      fetchPriority="low"
+      decoding="async"
       className="h-full w-full object-cover"
     />
   );
@@ -55,6 +66,41 @@ function StepCopy({ position, step }: { position: number; step: ProcessStep }) {
         <p className="mt-2 max-w-md text-sm font-light text-primary-foreground/80">{step.body}</p>
       </div>
     </>
+  );
+}
+
+/** One picture of the pinned stage. Its reveal is tied to the scroll, so it never lags behind or restarts. */
+function PinnedLayer({
+  progress,
+  position,
+  total,
+  open,
+  image,
+}: {
+  progress: MotionValue<number>;
+  position: number;
+  total: number;
+  open: boolean;
+  image?: ImageAsset;
+}) {
+  // The first picture is always there. Each later one starts opening half a step before its card lights up
+  // and is fully open exactly when it does.
+  const revealed = useTransform(progress, (value) =>
+    position === 0 ? 1 : clamp01((value * total - (position - 0.5)) / 0.5),
+  );
+  const boxY = useTransform(revealed, [0, 1], ["100%", "0%"], { ease: mask });
+  const pictureY = useTransform(revealed, [0, 1], ["-100%", "0%"], { ease: mask });
+  return (
+    <motion.div
+      data-process-image=""
+      data-open={open}
+      style={{ y: boxY, zIndex: position }}
+      className="absolute inset-0 overflow-hidden will-change-transform"
+    >
+      <motion.div style={{ y: pictureY }} className="h-full w-full will-change-transform">
+        <StepPicture image={image} />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -79,23 +125,16 @@ function PinnedProcess({ index, label, heading, steps, progress }: PinnedProps) 
             aria-hidden="true"
             className="relative h-[70vh] max-h-[44rem] w-full overflow-hidden rounded-card bg-primary-foreground/10"
           >
-            {steps.map((step, position) => {
-              const open = position <= active;
-              return (
-                <motion.div
-                  key={step.title}
-                  data-process-image=""
-                  data-open={open}
-                  initial={false}
-                  animate={{ clipPath: open ? OPEN : CLOSED }}
-                  transition={reveal}
-                  style={{ zIndex: position }}
-                  className="absolute inset-0"
-                >
-                  <StepPicture image={step.image} />
-                </motion.div>
-              );
-            })}
+            {steps.map((step, position) => (
+              <PinnedLayer
+                key={step.title}
+                progress={progress}
+                position={position}
+                total={steps.length}
+                open={position <= active}
+                image={step.image}
+              />
+            ))}
             <span className="absolute bottom-4 left-4 z-20 rounded-pill border border-primary-foreground/25 bg-primary/80 px-3 py-1 text-micro uppercase tracking-label tabular-nums text-primary-foreground backdrop-blur-xs">
               {pad(active + 1, 2)} / {pad(steps.length, 2)}
             </span>
@@ -139,8 +178,7 @@ function StackedProcess({ index, label, heading, steps }: ProcessProps) {
       <ol className="mt-12 flex flex-col gap-10">
         {steps.map((step, position) => (
           <li key={step.title} className="group">
-            {/* The outer box is what scrolls into view; the inner one is masked, because a fully masked
-                element is never reported as "in view". */}
+            {/* Same transform mask as the pinned stage: the box slides up while the picture slides down. */}
             <motion.div
               aria-hidden="true"
               initial="closed"
@@ -151,10 +189,15 @@ function StackedProcess({ index, label, heading, steps }: ProcessProps) {
             >
               <motion.div
                 data-process-image=""
-                variants={{ closed: { clipPath: CLOSED }, open: { clipPath: OPEN, transition: reveal } }}
-                className="static-when-reduced h-full w-full"
+                variants={{ closed: { y: "100%" }, open: { y: "0%", transition: reveal } }}
+                className="static-when-reduced h-full w-full overflow-hidden will-change-transform"
               >
-                <StepPicture image={step.image} />
+                <motion.div
+                  variants={{ closed: { y: "-100%" }, open: { y: "0%", transition: reveal } }}
+                  className="static-when-reduced h-full w-full will-change-transform"
+                >
+                  <StepPicture image={step.image} />
+                </motion.div>
               </motion.div>
             </motion.div>
             <div className="mt-5 grid grid-cols-[3.5rem_1fr] gap-4 border-t border-primary-foreground/35 pt-5">

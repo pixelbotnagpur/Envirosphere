@@ -39,7 +39,16 @@ describe("Process", () => {
     const first = container.querySelector("[data-process-image]") as HTMLElement;
     expect(first.closest("[aria-hidden='true']")).not.toBeNull();
     expect(first.querySelector("img")).toHaveAttribute("alt", "");
-    expect(first.style.clipPath).toMatch(/inset\(100%/);
+    // Hidden below its box until it scrolls into view (a transform mask, not a clip-path).
+    expect(first.style.transform).toMatch(/translateY\(100%\)/);
+    expect(first.style.clipPath).toBe("");
+  });
+
+  it("loads the pictures up front at low priority, so a hidden picture is never blank when revealed", () => {
+    const { container } = render(<Process index="005" label="How we work" heading="From study to consent." steps={steps} />);
+    const img = container.querySelector("[data-process-image] img");
+    expect(img).toHaveAttribute("loading", "eager");
+    expect(img).toHaveAttribute("fetchpriority", "low");
   });
 
   it("shows the finished picture at once for people who prefer reduced motion", () => {

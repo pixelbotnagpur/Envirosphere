@@ -52,6 +52,9 @@ test.describe("route curtain", () => {
   test("the graphic sits in the middle of the screen and the whole transition is quick", async ({ page }) => {
     await open(page, "/");
     const link = await internalLink(page, "/services/");
+    // On a phone the menu panel is still opening: time the transition from when the link has settled.
+    await expect.poll(() => link.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    await page.waitForTimeout(700);
     const started = Date.now();
     await link.click();
     const sprout = page.locator("[data-page-transition] [data-transition-sprout]");

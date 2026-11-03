@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { loadDownloads, loadServices, loadSite } from "@/lib/content";
@@ -43,6 +43,20 @@ describe("SEO & Production Meta", () => {
     expect(config.rules).toEqual({
       userAgent: "*",
       allow: "/",
+    });
+  });
+
+  describe("client preview build", () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it("blocks every crawler when NEXT_PUBLIC_NOINDEX is 1", () => {
+      vi.stubEnv("NEXT_PUBLIC_NOINDEX", "1");
+      expect(robots()).toEqual({ rules: { userAgent: "*", disallow: "/" } });
+    });
+
+    it("still allows crawling in the real launch build", () => {
+      vi.stubEnv("NEXT_PUBLIC_NOINDEX", "");
+      expect(robots().rules).toMatchObject({ allow: "/" });
     });
   });
 });

@@ -336,11 +336,21 @@ test.describe("pinned photo on a small phone", () => {
 });
 
 const bg = (el: Locator) => el.evaluate((node) => getComputedStyle(node).backgroundColor);
-// Percent hidden from the top of a clip-path mask (100 = closed, 0 = open or no mask).
+// Percent of its own height a picture box still sits below its mask (100 = closed, 0 = open or no transform).
 const maskClosed = (el: Locator) =>
   el.evaluate((node) => {
-    const match = getComputedStyle(node).clipPath.match(/inset\(([\d.]+)%/);
-    return match ? parseFloat(match[1]) : 0;
+    const t = getComputedStyle(node).transform;
+    if (t === "none") return 0;
+    const m = new DOMMatrix(t);
+    return Math.max(0, (m.f / (node as HTMLElement).offsetHeight) * 100);
+  });
+// True when the transform only moves the element up or down (no scale, no turn).
+const onlyMoves = (el: Locator) =>
+  el.evaluate((node) => {
+    const t = getComputedStyle(node).transform;
+    if (t === "none") return true;
+    const m = new DOMMatrix(t);
+    return m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0;
   });
 
 test.describe("In numbers: dark Forest section", () => {
@@ -437,6 +447,9 @@ test.describe("Field work: bento grid", () => {
     await page.setViewportSize({ width: 820, height: 1000 });
     await page.goto("/");
     await page.locator("[data-bento]").scrollIntoViewIfNeeded();
+    // Measure after the tiles have finished sliding in.
+    await expect.poll(async () => tiles(page).evaluateAll((els) => els.every((el) => getComputedStyle(el).opacity === "1"))).toBe(true);
+    await page.waitForTimeout(400);
     const [a, b, , d] = [await rect(tiles(page).nth(0)), await rect(tiles(page).nth(1)), await rect(tiles(page).nth(2)), await rect(tiles(page).nth(3))];
     const cta = await rect(tiles(page).nth(4));
     expect(a.height).toBeGreaterThan(b.height * 1.8);
@@ -503,9 +516,9 @@ test.describe("How we work: picture on the left, highlighted step on the right",
 
     // The pictures are only revealed by their mask: nothing zooms, scales or turns.
     for (let i = 0; i < 4; i += 1) {
-      const frameTransform = await frames.nth(i).evaluate((el) => getComputedStyle(el).transform);
       const imgTransform = await frames.nth(i).locator("img").evaluate((el) => getComputedStyle(el).transform);
-      expect(frameTransform, `frame ${i + 1}`).toBe("none");
+      expect(await onlyMoves(frames.nth(i)), `frame ${i + 1}`).toBe(true);
+      expect(await onlyMoves(frames.nth(i).locator("> div")), `inner ${i + 1}`).toBe(true);
       expect(imgTransform, `picture ${i + 1}`).toBe("none");
     }
 

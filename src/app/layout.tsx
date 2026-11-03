@@ -30,6 +30,8 @@ export function generateMetadata(): Metadata {
     title: { default: site.name, template: site.seo.titleTemplate },
     description: site.seo.description,
     openGraph: baseOpenGraph(),
+    // Client preview builds (NEXT_PUBLIC_NOINDEX=1) stay out of search engines; the real launch build does not set it.
+    ...(process.env.NEXT_PUBLIC_NOINDEX === "1" ? { robots: { index: false, follow: false } } : {}),
   };
 }
 

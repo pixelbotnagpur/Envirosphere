@@ -59,7 +59,7 @@ export function About({ index, label, heading, paragraphs, image, cta, accredita
             </Button>
           </Reveal>
         </div>
-        <div className="lg:col-span-5">
+        <div className="max-lg:order-first lg:col-span-5">
           <div className="relative">
             <Parallax className="aspect-[4/5] overflow-hidden rounded-card border border-border bg-surface shadow-card">
               <Image

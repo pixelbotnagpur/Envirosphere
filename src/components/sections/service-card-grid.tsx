@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
+import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 import { staggerDelay } from "@/lib/motion";
 import type { ImageAsset } from "./types";
 
@@ -22,7 +23,10 @@ export interface ServiceCardGridProps {
   viewLabel: string;
 }
 
-/** Numbered, linked service cards for the Services page. */
+/**
+ * Numbered, linked service cards for the Services page: a big picture with the number and an arrow on it,
+ * and a text block that fills with Forest from the bottom on hover. Every card in a row is the same height.
+ */
 export function ServiceCardGrid({ items, listLabel, viewLabel }: ServiceCardGridProps) {
   return (
     <section aria-label={listLabel} className="border-t border-border bg-surface py-section">
@@ -33,42 +37,48 @@ export function ServiceCardGrid({ items, listLabel, viewLabel }: ServiceCardGrid
               <Reveal delay={staggerDelay(index, 0.04)} className="flex w-full">
                 <Link
                   href={`/services/${service.slug}/`}
-                  className="group relative flex w-full flex-col justify-between rounded-card border border-border bg-background p-8 transition-colors duration-(--duration-base) ease-out-expo hover:border-primary/40 hover:shadow-card"
+                  className="group relative flex w-full flex-col overflow-hidden rounded-card border border-border bg-background transition-[transform,box-shadow] duration-(--duration-base) ease-out-expo hover:-translate-y-1 hover:shadow-card"
                 >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-label text-muted-foreground uppercase tracking-label tabular-nums">
-                        {String(service.order).padStart(3, "0")}
-                      </span>
-                      <div className="flex size-9 items-center justify-center rounded-pill border border-border text-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:bg-primary group-hover:text-primary-foreground">
-                        <ArrowUpRight
-                          aria-hidden="true"
-                          className="size-4 transition-transform duration-(--duration-base) ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </div>
-                    </div>
-
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary">
                     {service.image ? (
-                      <div className="mt-5 aspect-[16/10] w-full overflow-hidden rounded-control border border-border bg-surface">
-                        <Image
-                          src={service.image.src}
-                          alt={service.image.alt}
-                          width={service.image.width}
-                          height={service.image.height}
-                          className="h-full w-full object-cover transition-transform duration-(--duration-base) ease-out-expo group-hover:scale-105"
-                        />
-                      </div>
-                    ) : null}
-
-                    <h2 className="mt-5 text-h3 tracking-tight">{service.title}</h2>
-                    <p className="mt-4 text-sm text-muted-foreground font-light leading-relaxed">
-                      {service.summary}
-                    </p>
+                      <Image
+                        src={service.image.src}
+                        alt={service.image.alt}
+                        fill
+                        sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 100vw"
+                        className="object-cover transition-transform duration-(--duration-slow) ease-out-expo group-hover:scale-105"
+                      />
+                    ) : (
+                      <ImagePlaceholder className="h-full w-full" />
+                    )}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
+                    <span className="absolute top-4 left-4 rounded-pill border border-primary-foreground/25 bg-primary/75 px-3 py-1 text-micro uppercase tracking-label text-primary-foreground tabular-nums backdrop-blur-xs">
+                      {String(service.order).padStart(3, "0")}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-4 right-4 grid size-10 place-items-center rounded-pill bg-accent text-accent-foreground transition-transform duration-(--duration-base) ease-out-expo group-hover:rotate-45"
+                    >
+                      <ArrowUpRight className="size-5" />
+                    </span>
                   </div>
 
-                  <div className="mt-8 pt-4 border-t border-border flex items-center justify-between text-label uppercase tracking-label text-muted-foreground transition-colors group-hover:text-foreground">
-                    <span>{viewLabel}</span>
-                    <span aria-hidden="true">&rarr;</span>
+                  <div className="relative isolate flex flex-1 flex-col p-6 text-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:text-primary-foreground">
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 -z-10 origin-bottom scale-y-0 bg-primary transition-transform duration-(--duration-slow) ease-out-expo group-hover:scale-y-100"
+                    />
+                    <h2 className="text-h3 tracking-tight">{service.title}</h2>
+                    <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground transition-colors duration-(--duration-base) ease-out-expo group-hover:text-primary-foreground/80">
+                      {service.summary}
+                    </p>
+                    <span className="mt-auto flex items-center gap-3 pt-6 text-label uppercase tracking-label">
+                      {viewLabel}
+                      <span
+                        aria-hidden="true"
+                        className="h-px w-8 bg-current transition-transform duration-(--duration-base) ease-out-expo origin-left group-hover:scale-x-150"
+                      />
+                    </span>
                   </div>
                 </Link>
               </Reveal>

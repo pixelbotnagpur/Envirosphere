@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { motionValue } from "motion/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Process } from "./process";
@@ -56,12 +56,40 @@ describe("Process, pinned layout", () => {
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(4);
   });
 
-  it("starts with the first step lit and only its picture open", () => {
+  it("starts with the first step lit, its picture in place and the others waiting below their masks", () => {
     const { container } = renderPinned();
     expect(active(container)).toEqual(["true", "false", "false", "false"]);
     expect(frames(container).map((frame) => frame.dataset.open)).toEqual(["true", "false", "false", "false"]);
-    expect(frames(container)[0].style.clipPath).toMatch(/inset\(0%/);
-    expect(frames(container)[1].style.clipPath).toMatch(/inset\(100%/);
+    expect(frames(container)[0].style.transform).not.toMatch(/translateY\(100%\)/);
+    for (const frame of frames(container).slice(1)) expect(frame.style.transform).toMatch(/translateY\(100%\)/);
+  });
+
+  it("reveals with transforms only: no clip-path, and the picture inside moves against its mask", () => {
+    const { container } = renderPinned();
+    for (const frame of frames(container)) {
+      expect(frame.style.clipPath).toBe("");
+      expect(frame).toHaveClass("overflow-hidden");
+    }
+    const inner = frames(container)[1].firstElementChild as HTMLElement;
+    expect(inner.style.transform).toMatch(/translateY\(-100%\)/);
+  });
+
+  it("opens each later picture as the scroll approaches its step, finishing as the card lights", async () => {
+    const { container } = renderPinned();
+    // Halfway through step 1 (progress 0.125 of 4 steps) the second picture has not started.
+    act(() => progress.set(0.125));
+    await waitFor(() => expect(frames(container)[1].style.transform).toMatch(/translateY\(100%\)/));
+    // Just before the boundary it is partly open.
+    act(() => progress.set(0.2));
+    await waitFor(() => {
+      const t = frames(container)[1].style.transform;
+      expect(t).toMatch(/translateY/);
+      expect(t).not.toMatch(/translateY\(100%\)/);
+      expect(t).not.toBe("none");
+    });
+    // At the boundary it is fully open.
+    act(() => progress.set(0.25));
+    await waitFor(() => expect(frames(container)[1].style.transform).toBe("none"));
   });
 
   it("lights the card and reveals the picture of whichever step the scroll has reached", () => {
