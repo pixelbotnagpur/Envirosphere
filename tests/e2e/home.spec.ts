@@ -367,6 +367,9 @@ test.describe("Field work: bento grid", () => {
     const grid = page.locator("[data-bento]");
     await grid.scrollIntoViewIfNeeded();
     await expect(tiles(page)).toHaveCount(5);
+    // Measure after every tile has finished its entrance animation (it slides up while it fades in).
+    for (let i = 0; i < 5; i += 1) await expect(tiles(page).nth(i)).toHaveCSS("opacity", /^(?:0\.99\d*|1)$/);
+    await page.waitForTimeout(300);
     const boxes = [];
     for (let i = 0; i < 5; i += 1) boxes.push(await rect(tiles(page).nth(i)));
     const [a, b, c, d, cta] = boxes;

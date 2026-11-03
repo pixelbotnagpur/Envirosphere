@@ -33,10 +33,13 @@ const initials = (name: string) =>
 
 // Slides wait on the left or right of the active one (the nearest way round the loop), so moving on
 // always slides the old quote out one side while the new one arrives from the other.
+// The old quote leaves quickly, then the new one arrives, so the two are never both readable.
+const leave = { duration: duration.base, ease: ease.outExpo } as const;
+const arrive = { duration: duration.slow, delay: 0.15, ease: ease.outExpo } as const;
 const slideVariants: Variants = {
-  active: { opacity: 1, x: 0, filter: "blur(0px)" },
-  before: { opacity: 0, x: "-4rem", filter: "blur(6px)" },
-  after: { opacity: 0, x: "4rem", filter: "blur(6px)" },
+  active: { opacity: 1, x: 0, filter: "blur(0px)", transition: arrive },
+  before: { opacity: 0, x: "-4rem", filter: "blur(6px)", transition: leave },
+  after: { opacity: 0, x: "4rem", filter: "blur(6px)", transition: leave },
 };
 
 const SWIPE = 60;
@@ -93,7 +96,8 @@ export function Testimonials({ index, label, heading, items, controls }: Testimo
             dragSnapToOrigin
             onDragEnd={onDragEnd}
             aria-live="polite"
-            className="grid cursor-grab touch-pan-y active:cursor-grabbing"
+            // Parked slides wait to the side of the active one; clip them so they never widen the page.
+            className="grid cursor-grab touch-pan-y overflow-x-clip active:cursor-grabbing"
           >
             {items.map((item, position) => {
               const state = stateOf(position);
@@ -110,7 +114,6 @@ export function Testimonials({ index, label, heading, items, controls }: Testimo
                   variants={slideVariants}
                   initial={false}
                   animate={state}
-                  transition={{ duration: duration.slow, ease: ease.outExpo }}
                   className="col-start-1 row-start-1 flex flex-col justify-between gap-12 pt-12 select-none"
                 >
                   <blockquote className="max-w-4xl font-heading text-h2">{item.quote}</blockquote>
